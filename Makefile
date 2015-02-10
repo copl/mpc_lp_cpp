@@ -9,7 +9,18 @@ ifeq ($(UNAME_S),Darwin)
     CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -pedantic
 endif
 
-all: stream_sampler
+all: copl_linalg_test
 
-stream_sampler:
-	$(CPP) $(CFLAGS) $(INCLUDE) ./src/eigen_example.cpp -o ./bin/eigen_example.exe
+copl_linalg.o:	
+	$(CPP) $(CFLAGS) $(INCLUDE) -c ./src/copl_linalg.cpp -o ./bin/copl_linalg.o
+
+eigen_example:
+	$(CPP) $(CFLAGS) $(INCLUDE) ./test/eigen_example.cpp -o ./bin/eigen_example.exe
+
+copl_linalg_test: copl_linalg.o
+	$(CPP) $(CFLAGS) $(INCLUDE) ./test/copl_linalg_test.cpp ./bin/copl_linalg.o -o ./bin/copl_linalg_example.exe
+
+clean:
+	cd ./bin
+	rm *.o
+	rm *.exe
