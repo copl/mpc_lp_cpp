@@ -1,59 +1,62 @@
-#ifndef MATRIX_POINT_DATA_STRUCTURES
-#define MATRIX_DATA_STRUCTURES
+/*
+ * Linear algebra definitions for the copl interior point solver 
+ * Santiago Akle 
+ */
+#ifndef COPL_LINALG_H
+#define COPL_LINALG_H
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
+#include <random>
 
+namespace copl_ip
+{
 typedef Eigen::SparseMatrix<double> EigenSpMat_t;
-typedef Eigen:Eigen::VectorXd EigenVector_t;
+typedef std::vector<double> copl_vector;
+
+//Wrapper for our matrix classes
+class matrix 
+{
+public: 
+	EigenSpMat_t* eigenMat;	
+
+	matrix(int m, int n);
+	//Random sparse matrix with dist p
+	matrix(int m, int n, double p);
+	//Destructor 
+	~matrix();
+
+};
+
+
 //These functions do not belong to either vector or matrices
 
 //y<- alpha Ax + beta y with sparse A
-void sp_dgemv(double alpha, double beta, copl_matrix A, copl_vector x, copl_vector y);
+void sp_dgemv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y);
 
 //Matrix vector multiply and accumulate in y
 //y<- alpha A^Tx + beta y with sparse A (The input matrix is A not A^T)
-void sp_dgemtv(double alpha, double beta, copl_matrix A, copl_vector x, copl_vector y);
+void sp_dgemtv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y);
 
 //Scale the vector
 //x<-alpha *x
-void scal(copl_vector x, double alpha );
+void scal(copl_vector &copl_x, double alpha );
 
 //y<- a*x + y
-void axpy(double alpha, copl_vector x, copl_vector y);
+void axpy(double alpha, copl_vector &copl_x, copl_vector &copl_y);
 
 // x^Ty
-double dot(copl_vector y, copl_vector x);
+double dot(copl_vector &copl_y, copl_vector &copl_x);
 
 //Zero out 
-double zeros(copl_vector y);
+void zeros(copl_vector &y);
 
-//Wrapper for our matrix classes
-class copl_matrix 
-{
-public: 
-	EigenSpMat_t eigenMat;	
+//Two norm 
+double norm2(copl_vector &y);
 
-	//Constructs a matrix from the CSR format vectors
-	copl_matrix(vector<int> &col_counts, vector<int> &row_ix, vector<double> &vals);
+//Infinity norm 	
+double normInf(copl_vector &y);
 
-	//This returns a copl_matrix from 3 vectors or rows columns and values
-	static copl_matrix from_coo_format(vector<int> &row_ix, vector<int> &col_ix, vector<double> &vals);
-};
-
-class copl_vector {
-	EigenVector_t *vec;	
-
-	//Construct from an STL vector	
-	copl_vector(vector<double> vec);
-
-	//Construct form a raw memory vector
-	copl_vector(int n, double*);
-
-	~copl_vector()
-	{
-		delete(vec;)			
-	}
-};
+}
 
 #endif
