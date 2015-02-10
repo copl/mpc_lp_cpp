@@ -1,7 +1,7 @@
 #ifndef INTERIOR_POINT_DATA_STRUCTURES
 #define INTERIOR_POINT_DATA_STRUCTURES
 
-#include "matrix_data_structures.h"
+#include "copl_linalg.h"
 
 
 namespace copl_ip{
