@@ -1,10 +1,11 @@
 #ifndef MATRIX_POINT_DATA_STRUCTURES
 #define MATRIX_DATA_STRUCTURES
 
-class class_matrix {
+namespace copl_ip{
+class matrix {
 };
 
-class class_vector {
+class vector {
 	//	this.zeros() = 0
 	//
 	//	this.multiply(A,x) = Ax
@@ -17,5 +18,5 @@ class class_vector {
 	//
 	//	this.multiply_subtract(A,x) = this - Ax
 };
-
+}
 #endif
