@@ -3,7 +3,7 @@
 
 #include "copl_core.h"
 
-void interior_point_algorithm(class_linear_program_input problem_data, class_settings settings);
+void interior_point_algorithm(copl_ip::lp_input problem_data, copl_ip::settings settings);
 
 
 #endif

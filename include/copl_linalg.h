@@ -20,11 +20,11 @@ class copl_matrix
 public: 
 	EigenSpMat_t* eigenMat;	
 
-	matrix(int m, int n);
+	copl_matrix(int m, int n);
 	//Random sparse matrix with dist p
-	matrix(int m, int n, double p);
+	copl_matrix(int m, int n, double p);
 	//Destructor 
-	~matrix();
+	~copl_matrix();
 
 };
 

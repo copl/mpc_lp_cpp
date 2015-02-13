@@ -6,6 +6,7 @@
  */
 #include <iostream>
 #include "copl_algorithm.h"
+using namespace std;
 
 int main()
 {
@@ -14,6 +15,8 @@ int main()
   const double comp_tol			= 1e-8; //Assuming possible Integer Overflow
   const double bkscale			=0.95;
   
+  cout << "COLP 2015" << endl;
+  cout << "Interior point algorithm coming" << endl;
 }
 
 

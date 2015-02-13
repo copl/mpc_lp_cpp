@@ -5,6 +5,76 @@
 
 
 namespace copl_ip{
+
+// preliminary definitions //
+class direction;
+
+//lp_input
+class lp_input {
+	copl_ip::copl_matrix A;
+	copl_ip::copl_matrix G;
+	
+	copl_ip::copl_vector c;
+	copl_ip::copl_vector h;
+	copl_ip::copl_vector b;
+	
+	int m;
+	int n;
+	int k;
+public:
+	lp_input();
+};
+//--------End lp_input--------
+
+//lp_variables
+class lp_variables {
+	copl_ip::copl_vector x;
+	copl_ip::copl_vector s;
+	copl_ip::copl_vector z;
+	copl_ip::copl_vector y;
+
+	float tau;
+	float kappa;
+public:
+	lp_variables(lp_input problem_data);
+	void take_step(direction dir);
+};
+//--------End lp_variables--------
+
+//k_newton_matrix
+class k_newton_matrix {
+	public:
+		k_newton_matrix();
+		void update(lp_variables variables);
+
+};
+
+//--------End k_newton_matrix--------
+
+//lp_result
+class lp_result {
+
+};
+//--------End lp_result--------
+
+
+
+//algorithm_state
+class algorithm_state {
+
+	float mu;
+	float sigma;
+	float gap;
+
+public:
+	algorithm_state();
+	void update_mu (lp_variables variables, lp_input progblem_data); //TODO
+	void update_gap (lp_variables variables, lp_input problem_data); //TODO
+};
+
+
+//--------End algorithm_state--------
+	
 //settings
 class settings {
 	int max_iter;
@@ -48,23 +118,6 @@ public:
 	void compute_residuals();
 };
 //--------End residuals--------
-
-//lp_input
-class lp_input {
-	copl_ip::matrix A;
-	copl_ip::matrix G;
-	
-	copl_ip::copl_vector c;
-	copl_ip::copl_vector h;
-	copl_ip::copl_vector b;
-	
-	int m;
-	int n;
-	int k;
-public:
-	lp_input();
-};
-//--------End lp_input--------
 
 //linear_system_rhs
 
@@ -137,56 +190,6 @@ public:
 
 };
 //--------End direction--------
-
-//lp_variables
-class lp_variables {
-	copl_ip::copl_vector x;
-	copl_ip::copl_vector s;
-	copl_ip::copl_vector z;
-	copl_ip::copl_vector y;
-
-	float tau;
-	float kappa;
-public:
-	lp_variables(lp_input problem_data);
-	void take_step(direction dir);
-};
-//--------End lp_variables--------
-
-//k_newton_matrix
-class k_newton_matrix {
-	public:
-		k_newton_matrix();
-		void update(lp_variables variables);
-
-};
-
-//--------End k_newton_matrix--------
-
-//lp_result
-class lp_result {
-
-};
-//--------End lp_result--------
-
-
-
-//algorithm_state
-class algorithm_state {
-
-	float mu;
-	float sigma;
-	float gap;
-
-public:
-	algorithm_state();
-	void update_mu (lp_variables variables, lp_input progblem_data); //TODO
-	void update_gap (lp_variables variables, lp_input problem_data); //TODO
-};
-
-
-//--------End algorithm_state--------
-
 
 }
 
