@@ -2,7 +2,7 @@
  * Linear algebra definitions for the copl interior point solver 
  */
 
-#include <copl_linalg.h>
+#include "../include/copl_linalg.h"
 
 namespace copl_ip
 {
