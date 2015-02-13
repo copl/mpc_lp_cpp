@@ -4,16 +4,22 @@ ifeq ($(UNAME_S),Linux)
     CPP = g++
     CFLAGS = -std=c++11 -Wall -Wextra -pedantic
 endif
-#CFLAGS = -std=c++11 -Wall -Wextra -pedantic
+
 ifeq ($(UNAME_S),Darwin)
     CPP = clang++
     CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -pedantic
 endif
 
+# I use cygwin :)
+ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW)
+	CPP = g++
+	CFLAGS = -std=c++11 -Wall -Wextra -pedantic
+endif
+
 all: main
 	
 main:
-	g++ $(INCLUDE) -std=c++11 ./src/main.cpp -o ./bin/main.exe
+	$(CPP) $(CFLAGS) $(INCLUDE) -std=c++11 ./src/main.cpp -o ./bin/main.exe
 	
 
 copl_linalg.o:	
