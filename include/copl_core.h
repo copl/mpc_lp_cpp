@@ -33,10 +33,10 @@ public:
 //residuals
 
 class residuals {
-	copl_ip::vector r1;
-	copl_ip::vector r2;
-	copl_ip::vector r3;
-	copl_ip::vector r4;
+	copl_ip::copl_vector r1;
+	copl_ip::copl_vector r2;
+	copl_ip::copl_vector r3;
+	copl_ip::copl_vector r4;
 
 	float r1_norm;
 	float r2_norm;
@@ -54,9 +54,9 @@ class lp_input {
 	copl_ip::matrix A;
 	copl_ip::matrix G;
 	
-	copl_ip::vector c;
-	copl_ip::vector h;
-	copl_ip::vector b;
+	copl_ip::copl_vector c;
+	copl_ip::copl_vector h;
+	copl_ip::copl_vector b;
 	
 	int m;
 	int n;
@@ -69,19 +69,19 @@ public:
 //linear_system_rhs
 
 class linear_system_rhs {
-	copl_ip::vector q1;
-	copl_ip::vector q2;
-	copl_ip::vector q3;
-	copl_ip::vector q4;
-	copl_ip::vector q5;
-	copl_ip::vector q6;
+	copl_ip::copl_vector q1;
+	copl_ip::copl_vector q2;
+	copl_ip::copl_vector q3;
+	copl_ip::copl_vector q4;
+	copl_ip::copl_vector q5;
+	copl_ip::copl_vector q6;
 	void update_values(
-		copl_ip::vector q1, 
-		copl_ip::vector q2, 
-		copl_ip::vector q3, 
-		copl_ip::vector q4, 
-		copl_ip::vector q5, 
-		copl_ip::vector q6
+		copl_ip::copl_vector q1, 
+		copl_ip::copl_vector q2, 
+		copl_ip::copl_vector q3, 
+		copl_ip::copl_vector q4, 
+		copl_ip::copl_vector q5, 
+		copl_ip::copl_vector q6
 	); //Not called in algorithm
 public:
 	linear_system_rhs(lp_input problem_data);
@@ -95,16 +95,16 @@ public:
 
 //direction
 class direction {
-	copl_ip::vector dx;
-	copl_ip::vector dy;
-	copl_ip::vector dz;
-	copl_ip::vector ds;
+	copl_ip::copl_vector dx;
+	copl_ip::copl_vector dy;
+	copl_ip::copl_vector dz;
+	copl_ip::copl_vector ds;
 	float dtau;
 	float dkappa;
 	float alpha;
 public:
 	direction();
-	void update_values(copl_ip::vector dx, copl_ip::vector dy, copl_ip::vector dz, copl_ip::vector ds, float dtau, float dkappa, float alpha);
+	void update_values(copl_ip::copl_vector dx, copl_ip::copl_vector dy, copl_ip::copl_vector dz, copl_ip::copl_vector ds, float dtau, float dkappa, float alpha);
 	void compute_affine_direction(	
 		linear_system_rhs affine_rhs,
 		lp_input problem_data,
@@ -124,26 +124,26 @@ public:
 		settings lp_settings
 		);
 	void compute_min_ratio_alpha (
-		copl_ip::vector var,
-		copl_ip::vector dvar
+		copl_ip::copl_vector var,
+		copl_ip::copl_vector dvar
 		);
 	float get_alpha();
 	float get_dtau(); 
 	float get_dkappa(); 
-	copl_ip::vector get_dx(); 
-	copl_ip::vector get_dy(); 
-	copl_ip::vector get_dz(); 
-	copl_ip::vector get_ds(); 
+	copl_ip::copl_vector get_dx(); 
+	copl_ip::copl_vector get_dy(); 
+	copl_ip::copl_vector get_dz(); 
+	copl_ip::copl_vector get_ds(); 
 
 };
 //--------End direction--------
 
 //lp_variables
 class lp_variables {
-	copl_ip::vector x;
-	copl_ip::vector s;
-	copl_ip::vector z;
-	copl_ip::vector y;
+	copl_ip::copl_vector x;
+	copl_ip::copl_vector s;
+	copl_ip::copl_vector z;
+	copl_ip::copl_vector y;
 
 	float tau;
 	float kappa;

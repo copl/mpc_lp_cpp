@@ -15,7 +15,7 @@ typedef Eigen::SparseMatrix<double> EigenSpMat_t;
 typedef std::vector<double> copl_vector;
 
 //Wrapper for our matrix classes
-class matrix 
+class copl_matrix 
 {
 public: 
 	EigenSpMat_t* eigenMat;	
@@ -32,11 +32,11 @@ public:
 //These functions do not belong to either vector or matrices
 
 //y<- alpha Ax + beta y with sparse A
-void sp_dgemv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y);
+void sp_dgemv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y);
 
 //Matrix vector multiply and accumulate in y
 //y<- alpha A^Tx + beta y with sparse A (The input matrix is A not A^T)
-void sp_dgemtv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y);
+void sp_dgemtv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y);
 
 //Scale the vector
 //x<-alpha *x

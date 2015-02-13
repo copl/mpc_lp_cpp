@@ -1,4 +1,4 @@
-#include "interor_point_algorithm.h"
-#include "interior_point_data_structures.h"
+#include "copl_algorithm.h"
+#include "copl_core.h"
 
 	

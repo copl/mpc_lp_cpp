@@ -5,7 +5,7 @@
  *      Author: Oliver
  */
 #include <iostream>
-#include "interior_point_algorithm.h"
+#include "copl_algorithm.h"
 
 int main()
 {
