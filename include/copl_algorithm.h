@@ -1,9 +1,13 @@
 #ifndef INTERIOR_POINT_ALGORITHM
 #define INTERIOR_POINT_ALGORITHM
 
-#include "ip_core.h"
+#include "copl_core.h"
+#include "copl_linalg.h"
 
-void interior_point_algorithm(class_linear_program_input problem_data, class_settings settings);
+bool termination_criteria_met(lp_settings settings, algorithm_state state, lp_residuals residuals);
+
+// return type subject to change
+void interior_point_algorithm(lp_input problem_data, lp_settings settings);
 
 
 #endif

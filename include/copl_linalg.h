@@ -9,7 +9,7 @@
 #include <Eigen/Sparse>
 #include <random>
 
-namespace copl_ip
+namespace copl_ip 
 {
 typedef Eigen::SparseMatrix<double> EigenSpMat_t;
 typedef std::vector<double> copl_vector;
