@@ -3,23 +3,26 @@ INCLUDE = -I./include
 ifeq ($(UNAME_S),Linux)
     CPP = g++
     CFLAGS = -std=c++11 -Wall -Wextra -pedantic
+	EXE_NAME = _linux
 endif
 
 ifeq ($(UNAME_S),Darwin)
     CPP = clang++
     CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -pedantic
+	EXE_NAME = _darwin
 endif
 
 # I use cygwin :)
 ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW)
 	CPP = g++
 	CFLAGS = -std=c++11 -Wall -Wextra -pedantic
+	EXE_NAME = _cygwin
 endif
 
 all: main
 	
 main:
-	$(CPP) $(CFLAGS) $(INCLUDE) -std=c++11 ./src/main.cpp -o ./bin/main.exe
+	$(CPP) $(CFLAGS) $(INCLUDE) -std=c++11 ./src/main.cpp -o ./bin/main$(EXE_NAME).exe
 	
 
 copl_linalg.o:	
