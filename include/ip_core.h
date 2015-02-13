@@ -1,11 +1,10 @@
 #ifndef INTERIOR_POINT_DATA_STRUCTURES
 #define INTERIOR_POINT_DATA_STRUCTURES
 
-#include "copl_linalg.h"
+#include "matrix_data_structures.h"
 
 
 namespace copl_ip{
-<<<<<<< HEAD
 
 // preliminary definitions //
 class direction;
@@ -78,10 +77,6 @@ public:
 	
 //settings
 class settings {
-=======
-//lp_settings
-class lp_settings {
->>>>>>> e56f22bdfdbaaba154a7681f7b79d59c7dba3341
 	int max_iter;
 	float linear_feas_tol;	//This is a relative tolerance w.r.t. 
                             //some normalizing norms
@@ -92,20 +87,15 @@ class lp_settings {
     float bkscale;
 	
 	//Configuration for solver
-	//linear_solver_lp_settings 
+	//linear_solver_settings 
 public:
-	lp_settings(
+	settings(
 		int max_iter,
 		float linear_feas_tol,	
 		float comp_tol,	
 		float bkscale
 		);
-	int get_max_iter();
-	float get_linear_feas_tol();
-	float get_comp_tol();
-	float get_bkscale();
 };
-<<<<<<< HEAD
 
 
 //--------End settings--------
@@ -129,56 +119,6 @@ public:
 };
 //--------End residuals--------
 
-=======
-//--------End lp_settings--------
-
-//lp_input
-class lp_input {
-	copl_ip::matrix A;
-	copl_ip::matrix G;
-	
-	copl_ip::vector c;
-	copl_ip::vector h;
-	copl_ip::vector b;
-	
-	int m;
-	int n;
-	int k;
-public:
-	lp_input();
-};
-//--------End lp_input--------
-
-//lp_residuals
-
-class lp_residuals {
-	copl_ip::vector r1;
-	copl_ip::vector r2;
-	copl_ip::vector r3;
-	copl_ip::vector r4;
-
-	float r1_norm;
-	float r2_norm;
-	float r3_norm;
-	float normed_squared;
-public:
-	lp_residuals(lp_input problem_data);
-	void update_values(
-		copl_ip::vector r1,
-		copl_ip::vector r2, 
-		copl_ip::vector r3,
-		copl_ip::vector r4
-		);
-	void compute_residuals(lp_input in_problem_data, lp_variables variables);
-
-	float get_r1_norm();
-	float get_r2_norm();
-	float get_r3_norm();
-};
-//--------End lp_residuals--------
-
-
->>>>>>> e56f22bdfdbaaba154a7681f7b79d59c7dba3341
 //linear_system_rhs
 
 class linear_system_rhs {
@@ -199,47 +139,25 @@ class linear_system_rhs {
 public:
 	linear_system_rhs(lp_input problem_data);
 	
-	void compute_affine_rhs(lp_residuals residuals, lp_variables variables);
-	void compute_corrector_rhs(lp_residuals residuals, lp_variables variables);
+	void compute_affine_rhs(residuals residuals, lp_variables variables);
+	void compute_corrector_rhs(residuals residuals, lp_variables variables);
 
 };
 
 //--------End linear_system_rhs--------
 
-<<<<<<< HEAD
 //direction
 class direction {
 	copl_ip::copl_vector dx;
 	copl_ip::copl_vector dy;
 	copl_ip::copl_vector dz;
 	copl_ip::copl_vector ds;
-=======
-//lp_direction
-class lp_direction {
-	copl_ip::vector dx;
-	copl_ip::vector dy;
-	copl_ip::vector dz;
-	copl_ip::vector ds;
->>>>>>> e56f22bdfdbaaba154a7681f7b79d59c7dba3341
 	float dtau;
 	float dkappa;
 	float alpha;
 public:
-<<<<<<< HEAD
 	direction();
 	void update_values(copl_ip::copl_vector dx, copl_ip::copl_vector dy, copl_ip::copl_vector dz, copl_ip::copl_vector ds, float dtau, float dkappa, float alpha);
-=======
-	lp_direction();
-	void update_values(
-		copl_ip::vector dx,
-		copl_ip::vector dy,
-		copl_ip::vector dz,
-		copl_ip::vector ds, 
-		float dtau,
-		float dkappa,
-		float alpha
-		     );
->>>>>>> e56f22bdfdbaaba154a7681f7b79d59c7dba3341
 	void compute_affine_direction(	
 		linear_system_rhs affine_rhs,
 		lp_input problem_data,
@@ -251,12 +169,12 @@ public:
 		lp_input problem_data,
 		lp_variables variables,
 		algorithm_state state,
-		lp_settings settings,
+		settings lp_settings,
 		k_newton_matrix K_newton_matrix
 		);
 	void compute_alpha(
 		algorithm_state state,
-		lp_settings settings
+		settings lp_settings
 		);
 	void compute_min_ratio_alpha (
 		copl_ip::copl_vector var,
@@ -271,61 +189,8 @@ public:
 	copl_ip::copl_vector get_ds(); 
 
 };
-//--------End lp_direction--------
+//--------End direction--------
 
-<<<<<<< HEAD
-=======
-//lp_variables
-class lp_variables {
-	copl_ip::vector x;
-	copl_ip::vector s;
-	copl_ip::vector z;
-	copl_ip::vector y;
-
-	float tau;
-	float kappa;
-public:
-	lp_variables(lp_input problem_data);
-	void take_step(lp_direction dir);
-};
-//--------End lp_variables--------
-
-//k_newton_matrix
-class k_newton_matrix {
-	public:
-		k_newton_matrix(lp_input input);
-		void update(lp_variables variables);
-
-};
-
-//--------End k_newton_matrix--------
-
-//lp_result
-class lp_result {
-
-};
-//--------End lp_result--------
-
-
-
-//algorithm_state
-class algorithm_state {
-
-	float mu;
-	float sigma;
-	float gap;
-
-public:
-	algorithm_state();
-	void update_mu (lp_variables variables, lp_input problem_data); //TODO
-	void update_gap (lp_variables variables, lp_input problem_data); //TODO
-};
-
-
-//--------End algorithm_state--------
-
-
->>>>>>> e56f22bdfdbaaba154a7681f7b79d59c7dba3341
 }
 
 

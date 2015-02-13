@@ -1,6 +1,11 @@
+<<<<<<< HEAD
+#include "copl_algorithm.h"
+#include "copl_core.h"
+=======
 #include "../include/copl_linalg.h"
 #include "../include/copl_core.h"
 #include "../include/copl_algorithm.h"
+>>>>>>> e56f22bdfdbaaba154a7681f7b79d59c7dba3341
 
 bool termination_criterion_met(lp_settings settings, algorithm_state state, lp_residuals residuals){
 	// TODO
