@@ -2,20 +2,21 @@ UNAME_S := $(shell uname -s)
 INCLUDE = -I./include
 ifeq ($(UNAME_S),Linux)
     CPP = g++
-    CFLAGS = -std=c++11 -Wall -Wextra -pedantic
+    CFLAGS = -std=c++11 -Wall -Wextra 
 	EXE_NAME = _linux
 endif
 
 ifeq ($(UNAME_S),Darwin)
     CPP = clang++
-    CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -pedantic
+    CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra
 	EXE_NAME = _darwin
 endif
 
 # I use cygwin :)
+# removed -pedantic because it is crazy at the moment
 ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW)
 	CPP = g++
-	CFLAGS = -std=c++11 -Wall -Wextra -pedantic
+	CFLAGS = -std=c++11 -Wall -Wextra -w
 	EXE_NAME = _cygwin
 endif
 

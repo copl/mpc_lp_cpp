@@ -1,6 +1,7 @@
 #include "../include/copl_core.h"
 #include "../include/copl_linalg.h"
 
+namespace copl_ip {
 // lp_settings
 copl_ip::lp_settings::lp_settings (int input_max_iter, float input_linear_feas_tol, float input_comp_tol, float input_bkscale) {
 	max_iter 			= input_max_iter;
@@ -16,13 +17,13 @@ float copl_ip::lp_settings::get_bkscale() 			{return bkscale;}
 //--------End lp_settings--------
 
 // lp_residuals
-copl_ip::lp_residuals::lp_residuals(){ }
+copl_ip::lp_residuals::lp_residuals(lp_input problem_data){ }
 
 void copl_ip::lp_residuals::update_values(
-	copl_ip::vector r1,
-	copl_ip::vector r2,
-	copl_ip::vectpr r3,
-	copl_ip::vector r4
+	copl_ip::copl_vector r1,
+	copl_ip::copl_vector r2,
+	copl_ip::copl_vector r3,
+	copl_ip::copl_vector r4
 	){
 	this->r1 = r1;
 	this->r2 = r2;
@@ -47,7 +48,7 @@ float copl_ip::lp_residuals::get_r3_norm(){return r3_norm;}
 
 
 // lp_variables
-void copl_ip::lp_variables::lp_variables(lp_input problem_data){
+copl_ip::lp_variables::lp_variables(lp_input problem_data){
 
 	tau = 1;
 	kappa = 1;
@@ -55,7 +56,7 @@ void copl_ip::lp_variables::lp_variables(lp_input problem_data){
 
 void lp_variables::take_step(lp_direction direction){
 	float alpha = direction.get_alpha();
-	//TODO: Implement copl_ip::vector.multiply and copl_ip::vector.add
+	//TODO: Implement copl_ip::copl_vector.multiply and copl_ip::copl_vector.add
 	// x = x.add(direction.get_dx.multiply(alpha));
 	// s = s.add(direction.get_ds.multiply(alpha));
 	// z = z.add(direction.get_dz.multiply(alpha));
@@ -88,12 +89,12 @@ linear_system_rhs::linear_system_rhs(lp_input problem_data){
 }
 
 void linear_system_rhs::update_values(
-	copl_ip::vector q1, 
-	copl_ip::vector q2, 
-	copl_ip::vector q3, 
-	copl_ip::vector q4, 
-	copl_ip::vector q5, 
-	copl_ip::vector q6
+	copl_ip::copl_vector q1, 
+	copl_ip::copl_vector q2, 
+	copl_ip::copl_vector q3, 
+	copl_ip::copl_vector q4, 
+	copl_ip::copl_vector q5, 
+	copl_ip::copl_vector q6
 	){
 
 }
@@ -105,5 +106,5 @@ void linear_system_rhs::compute_correctpr_rhs(lp_residual residuals, lp_variable
 	// TOOD
 }
 //--------End linear_system_rhs--------
-
+}
 

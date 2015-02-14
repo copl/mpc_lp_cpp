@@ -41,15 +41,15 @@ public:
 };
 //--------End lp_variables--------
 
-//k_newton_matrix
-class k_newton_matrix {
+//k_newton_copl_matrix
+class k_newton_copl_matrix {
 	public:
-		k_newton_matrix();
+		k_newton_copl_matrix();
 		void update(lp_variables variables);
 
 };
 
-//--------End k_newton_matrix--------
+//--------End k_newton_copl_matrix--------
 
 
 
@@ -196,7 +196,7 @@ public:
 		linear_system_rhs affine_rhs,
 		lp_input problem_data,
 		lp_variables variables,
-		k_newton_matrix K_newton_matrix
+		k_newton_copl_matrix K_newton_copl_matrix
 		);
 	void compute_corrector_direction(
 		linear_system_rhs corrector_rhs,
@@ -204,7 +204,7 @@ public:
 		lp_variables variables,
 		algorithm_state state,
 		lp_settings settings,
-		k_newton_matrix K_newton_matrix
+		k_newton_copl_matrix K_newton_copl_matrix
 		);
 	void compute_alpha(
 		algorithm_state state,
