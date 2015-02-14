@@ -45,6 +45,53 @@ float copl_ip::lp_residuals::get_r3_norm(){return r3_norm;}
 
 //--------End lp_residuals--------
 
+// lp direction
+lp_direction::lp_direction(lp_input probelm_data) {
+	
+}
+
+float lp_direction::get_alpha() {
+	
+}
+float lp_direction::get_dtau() {
+	
+}
+float lp_direction::get_dkappa() {
+	
+} 
+copl_ip::copl_vector lp_direction::get_dx() {
+	
+}
+copl_ip::copl_vector lp_direction::get_dy() {
+	
+} 
+copl_ip::copl_vector lp_direction::get_dz() {
+	
+}
+copl_ip::copl_vector lp_direction::get_ds() {
+	
+}
+
+void  lp_direction::compute_affine_direction(linear_system_rhs affine_rhs,
+		lp_input problem_data,
+		lp_variables variables,
+		k_newton_copl_matrix K_newton_copl_matrix) {
+	
+}
+
+void lp_direction::compute_corrector_direction(
+		linear_system_rhs corrector_rhs,
+		lp_input problem_data,
+		lp_variables variables,
+		algorithm_state state,
+		lp_settings settings,
+		k_newton_copl_matrix K_newton_copl_matrix
+		) {
+			
+}
+
+//-----------End lp direction
+
 
 
 // lp_variables
@@ -66,6 +113,16 @@ void lp_variables::take_step(lp_direction direction){
 
 }
 //--------End lp_variables--------
+
+//k_newton_copl_matrix
+k_newton_copl_matrix::k_newton_copl_matrix(lp_input problem_data) {
+	
+}
+void k_newton_copl_matrix::update(lp_variables variables) {
+	
+}
+
+//--------End k_newton_copl_matrix--------
 
 // algorithm_state
 
@@ -102,7 +159,7 @@ void linear_system_rhs::update_values(
 void linear_system_rhs::compute_affine_rhs(lp_residuals residuals, lp_variables variables){
 	// TOOD
 }
-void linear_system_rhs::compute_correctpr_rhs(lp_residual residuals, lp_variables variables){
+void linear_system_rhs::compute_corrector_rhs(lp_residuals residuals, lp_variables variables, algorithm_state state, lp_direction direction, lp_input problem_data){
 	// TOOD
 }
 //--------End linear_system_rhs--------

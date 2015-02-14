@@ -7,7 +7,7 @@
 namespace copl_ip{
 
 // preliminary definitions //
-class direction;
+class lp_direction;
 
 //lp_input
 class lp_input {
@@ -37,14 +37,14 @@ class lp_variables {
 	float kappa;
 public:
 	lp_variables(lp_input problem_data);
-	void take_step(direction dir);
+	void take_step(lp_direction dir);
 };
 //--------End lp_variables--------
 
 //k_newton_copl_matrix
 class k_newton_copl_matrix {
 	public:
-		k_newton_copl_matrix();
+		k_newton_copl_matrix(lp_input problem_data);
 		void update(lp_variables variables);
 
 };
@@ -165,7 +165,7 @@ public:
 	linear_system_rhs(lp_input problem_data);
 	
 	void compute_affine_rhs(lp_residuals residuals, lp_variables variables);
-	void compute_corrector_rhs(lp_residuals residuals, lp_variables variables);
+	void compute_corrector_rhs(lp_residuals residuals, lp_variables variables, algorithm_state state, lp_direction direction, lp_input problem_data);
 
 };
 
@@ -182,7 +182,7 @@ class lp_direction {
 	float dkappa;
 	float alpha;
 public:
-	lp_direction();
+	lp_direction(lp_input problem_data);
 	void update_values(
 		copl_ip::copl_vector dx,
 		copl_ip::copl_vector dy,
