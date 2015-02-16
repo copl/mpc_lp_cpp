@@ -14,7 +14,7 @@ endif
 
 # I use cygwin :)
 # removed -pedantic because it is crazy at the moment
-ifeq ($(UNAME_S),CYGWIN_NT-6.1-WOW)
+ifeq ($(UNAME_S),CYGWIN_NT-6.1)
 	CPP = g++
 	CFLAGS = -std=c++11 -Wall -Wextra -w
 	EXE_NAME = _cygwin
