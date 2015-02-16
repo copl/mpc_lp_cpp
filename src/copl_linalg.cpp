@@ -8,7 +8,7 @@ namespace copl_ip
 {
 
 //y<- alpha Ax + beta y with sparse A
-void sp_dgemv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y)
+void sp_dgemv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y)
 {
 	//Make a map to be able to use y and x in Eigen
 	Eigen::Map<Eigen::VectorXd> x(&copl_x[0],copl_x.size());
@@ -17,9 +17,9 @@ void sp_dgemv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, co
 	y = alpha*(A*x)+beta*y;
 }
 
-//Matrix vector multiply and accumulate in y
-//y<- alpha A^Tx + beta y with sparse A (The input matrix is A not A^T)
-void sp_dgemtv(double alpha, double beta, matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y)
+//copl_matrix vector multiply and accumulate in y
+//y<- alpha A^Tx + beta y with sparse A (The input copl_matrix is A not A^T)
+void sp_dgemtv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y)
 {
 	//Make a map to be able to use y and x in Eigen
 	Eigen::Map<Eigen::VectorXd> x(&copl_x[0],copl_x.size());
@@ -96,7 +96,7 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 	std::default_random_engine generator;
 	std::bernoulli_distribution random(p);
 	std::normal_distribution<double> random_normal(0,1.0);
-	//Sample each entry with highish probability so we get a full rank matrix
+	//Sample each entry with highish probability so we get a full rank copl_matrix
 	double val;
 
 	//Sample all entries and select iid	
@@ -112,15 +112,15 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 	}
 }
 
-//The copl matrix 
+//The copl copl_matrix 
 	
-	matrix::matrix(int m, int n)
+	copl_matrix::copl_matrix(int m, int n)
 	{
 		eigenMat = new EigenSpMat_t(m,n); 
 	}
 
-	//Generate a random matrix selecting the entries iid with prob p
-	matrix::matrix(int m, int n, double p)
+	//Generate a random copl_matrix selecting the entries iid with prob p
+	copl_matrix::copl_matrix(int m, int n, double p)
 	{
 		triplet_vector_t entries;
 		generate_random_A(m,n,entries,p);
@@ -129,7 +129,7 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 	}
 	
 	//Destructor 
-	matrix::~matrix()
+	copl_matrix::~copl_matrix()
 	{
 		delete(eigenMat);
 	}
