@@ -42,7 +42,7 @@ void sp_dgemtv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl
 //x<-alpha *x
 void scal(copl_vector &copl_x, double alpha );
 
-//y<- a*x + y
+//y<- alpha*x + y
 void axpy(double alpha, copl_vector &copl_x, copl_vector &copl_y);
 
 // x^Ty

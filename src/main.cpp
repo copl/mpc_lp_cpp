@@ -12,20 +12,30 @@
 #include "copl_linalg.cpp"
 
 using namespace std;
-
+using namespace copl_ip;
+/*
+lp_input construct_instance1() {
+	return lp_input();
+};
+*/
 int main()
 {
   const int max_iter			= 20;
   const double linear_feas_tol 	= 1e-8; //Assuming possible Integer Overflow
   const double comp_tol			= 1e-8; //Assuming possible Integer Overflow
-  const double bkscale			=0.95;
+  const double bkscale			= 0.95;
   
-  cout << "COLP 2015" << endl;
+  copl_vector test(10,10);
+  
+  cout << "COPL 2015" << endl;
   cout << "Interior point algorithm coming" << endl;
-  /*
-    # Initialize configuration variable
-    settings = class_settings(max_iter,linear_feas_tol,comp_tol,bkscale);
-
+  
+  // Initialize configuration variable
+  lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);
+  
+  // We are creating an instance of LP. In practice, we should read the problem data from input stream.
+  //lp_input problem_data = construct_instance1();
+/*
 	srand(1234)
 	# We are creating an instance of LP. In practice, we should read the problem data from input stream.
 	problem_data = construct_instance1()
@@ -34,6 +44,8 @@ int main()
 	interior_point_algorithm(problem_data,settings)
   */
 }
+
+
 
 
 /*
