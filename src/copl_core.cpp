@@ -1,5 +1,5 @@
-#include "../include/copl_core.h"
-#include "../include/copl_linalg.h"
+#include <copl_core.h>
+#include <copl_linalg.h>
 
 using namespace std;
 

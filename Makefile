@@ -22,14 +22,11 @@ endif
 
 all: main
 	
-main: copl_linalg.o copl_newton.o copl_core.o
-	$(CPP) $(CFLAGS) $(INCLUDE) -std=c++11 ./src/main.cpp copl_linalg.o copl_newton.o copl_core.o -o ./bin/main$(EXE_NAME).exe
+main: copl_linalg.o copl_core.o
+	$(CPP) $(CFLAGS) $(INCLUDE) -std=c++11 ./src/main.cpp copl_linalg.o copl_core.o -o ./bin/main$(EXE_NAME).exe
 	
 copl_linalg.o:	
 	$(CPP) $(CFLAGS) $(INCLUDE) -c ./src/copl_linalg.cpp -o ./bin/copl_linalg.o
-
-copl_newton.o:	
-	$(CPP) $(CFLAGS) $(INCLUDE) -c ./src/copl_newton.cpp -o ./bin/copl_newton.o
 
 copl_core.o:	
 	$(CPP) $(CFLAGS) $(INCLUDE) -c ./src/copl_core.cpp -o ./bin/copl_core.o
