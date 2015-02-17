@@ -11,13 +11,6 @@
 using namespace std;
 using namespace copl_ip;
 
-lp_input construct_instance1() {
-	lp_input problem_data(2,2,2);
-	
-	problem_data.var_dump();
-	
-	return problem_data;
-};
 
 int main()
 {
@@ -26,7 +19,7 @@ int main()
 	const double comp_tol			= 1e-8; //Assuming possible Integer Overflow
 	const double bkscale			= 0.95;
 
-	copl_vector test(10,10);
+	//copl_vector test(10,10);
 
 	cout << "COPL 2015" << endl;
 	cout << "Interior point algorithm coming" << endl;
@@ -35,10 +28,11 @@ int main()
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);
 
 	// We are creating an instance of LP. In practice, we should read the problem data from input stream.
-	lp_input problem_data = construct_instance1();
-
+	lp_input problem_data(2,2,2); //= construct_instance1();
+	problem_data.var_dump();
+		
 	// The main function that run interior point algorithm.
-	copl_ip::interior_point_algorithm(problem_data,settings);
+	interior_point_algorithm(problem_data,settings);
 };
 
 

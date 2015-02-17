@@ -5,7 +5,7 @@ using namespace std;
 
 namespace copl_ip {
 
-void copl_vector_dump(copl_vector vec) {
+void copl_vector_dump(copl_vector &vec) {
 	cout << "{";
 	for(int i = 0; i < vec.size() - 1; i++) {
 		cout << vec[i] << ",";
@@ -13,7 +13,7 @@ void copl_vector_dump(copl_vector vec) {
 	cout << vec[vec.size() - 1];
 	cout << "}";
 	cout << endl;
-}
+};
 
 //lp_input
 lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random this must change!!!
@@ -23,7 +23,13 @@ lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random thi
 	k_var = _k_var;
 };
 
-void lp_input::var_dump() {
+lp_input::~lp_input() {
+	cout << "deleting lp input" << endl;
+	cout << "constructor not complete" << endl;
+};
+
+void lp_input::var_dump()  {
+	
 	cout << "=== BEGIN LP INPUT VAR DUMP ====" << endl;
 	cout << "c = ";
 	copl_vector_dump(c);
@@ -34,7 +40,7 @@ void lp_input::var_dump() {
 	
 	// ********* complete for matricies
 	cout << "=== END VAR DUMP ====" << endl;
-}
+};
 
 //--------End lp_input--------
 
@@ -53,9 +59,9 @@ float lp_settings::get_bkscale() 			{return bkscale;}
 //--------End lp_settings--------
 
 // lp_residuals
-lp_residuals::lp_residuals(lp_input problem_data){ }
+lp_residuals::lp_residuals( lp_input &problem_data){ }
 
-void lp_residuals::compute_residuals(lp_input problem_data, lp_variables variables){
+void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables variables){
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
 	
 	zeros(r1);
@@ -107,14 +113,14 @@ copl_vector lp_direction::get_dz() { return dz; }
 copl_vector lp_direction::get_ds() { return ds; }
 
 void  lp_direction::compute_affine_direction(linear_system_rhs affine_rhs,
-		lp_input problem_data,
+		 lp_input &problem_data,
 		lp_variables variables,
 		k_newton_copl_matrix K_newton_copl_matrix) {
 }
 
 void lp_direction::compute_corrector_direction(
 		linear_system_rhs corrector_rhs,
-		lp_input problem_data,
+		 lp_input &problem_data,
 		lp_variables variables,
 		algorithm_state state,
 		lp_settings settings,
@@ -132,6 +138,11 @@ lp_variables::lp_variables(int n, int m, int k_var) :
 	x(n), s(m), z(m), y(k_var) {
 	tau = 1;
 	kappa = 1;
+}
+
+lp_variables::~lp_variables() {
+	cout << "lp variables being deleted" << endl;
+	cout << "destructor not yet complete" << endl;
 }
 
 void lp_variables::take_step(lp_direction direction){
@@ -153,11 +164,11 @@ algorithm_state::algorithm_state() {
 	sigma = -1;
 	gap = -1;
 }
-void algorithm_state::update_gap(lp_variables variables, lp_input problem_data){
+void algorithm_state::update_gap(lp_variables variables,  lp_input &problem_data){
 
 }
 
-void algorithm_state::update_mu(lp_variables variables, lp_input problem_data){
+void algorithm_state::update_mu(lp_variables variables,  lp_input &problem_data){
 	
 }
 //--------End algorithm_state--------
@@ -165,7 +176,7 @@ void algorithm_state::update_mu(lp_variables variables, lp_input problem_data){
 
 // linear_system_rhs
 
-linear_system_rhs::linear_system_rhs(lp_input problem_data) :
+linear_system_rhs::linear_system_rhs( lp_input &problem_data) :
 	q1(1,0), q2(1,0), q3(1,0), q4(1,0), q5(1,0), q6(1,0)
 {
 	cout << "xx" << endl;
@@ -174,21 +185,20 @@ linear_system_rhs::linear_system_rhs(lp_input problem_data) :
 void linear_system_rhs::compute_affine_rhs(lp_residuals residuals, lp_variables variables){
 	// TOOD
 }
-void linear_system_rhs::compute_corrector_rhs(lp_residuals residuals, lp_variables variables, algorithm_state state, lp_direction direction, lp_input problem_data){
+void linear_system_rhs::compute_corrector_rhs(lp_residuals residuals, lp_variables variables, algorithm_state state, lp_direction direction,  lp_input &problem_data){
 	// TOOD
 }
 //--------End linear_system_rhs--------
 
 
-k_newton_copl_matrix::k_newton_copl_matrix(lp_input problem_data)
+k_newton_copl_matrix::k_newton_copl_matrix( lp_input &problem_data)
 {
 
 }
 void k_newton_copl_matrix::factor(){
 
-		}
-void k_newton_copl_matrix::solve(std::vector<double> &solution, std::vector<double> rhs)
-{
+}
+void k_newton_copl_matrix::solve(std::vector<double> &solution, std::vector<double> rhs) {
 
 }
 

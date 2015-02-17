@@ -19,7 +19,8 @@ public:
 	copl_vector c, h, b;
 
 	lp_input(int m, int n, int k_var);
-	void var_dump();
+	~lp_input();
+	void var_dump()  ;
 };
 //--------End lp_input--------
 
@@ -32,6 +33,7 @@ public:
 	
 	lp_variables(int n, int m, int k_var);
 	void take_step(lp_direction dir);
+	~lp_variables();
 };
 //--------End lp_variables--------
 
@@ -45,8 +47,8 @@ class algorithm_state {
 
 public:
 	algorithm_state();
-	void update_mu (lp_variables variables, lp_input progblem_data); //TODO
-	void update_gap (lp_variables variables, lp_input problem_data); //TODO
+	void update_mu (lp_variables variables, lp_input &problem_data); //TODO
+	void update_gap (lp_variables variables,  lp_input &problem_data); //TODO
 };
 
 
@@ -59,7 +61,7 @@ class lp_settings {
                             //some normalizing norms
 	float comp_tol; // How small must s^Tz must be when we stop
 	
-	//Constant length of the 
+	//ant length of the 
     //maximum combined step to the boundary to use
     float bkscale;
 	
@@ -114,8 +116,8 @@ public:
 	float r3_norm;
 	float normed_squared;
 	
-	lp_residuals(lp_input problem_data);
-	void compute_residuals(lp_input in_problem_data, lp_variables variables);
+	lp_residuals( lp_input &problem_data);
+	void compute_residuals( lp_input &problem_data, lp_variables variables);
 
 	float get_r1_norm();
 	float get_r2_norm();
@@ -133,10 +135,10 @@ class linear_system_rhs {
 	copl_vector q5;
 	copl_vector q6;
 public:
-	linear_system_rhs(lp_input problem_data);
+	linear_system_rhs( lp_input &problem_data);
 	
 	void compute_affine_rhs(lp_residuals residuals, lp_variables variables);
-	void compute_corrector_rhs(lp_residuals residuals, lp_variables variables, algorithm_state state, lp_direction direction, lp_input problem_data);
+	void compute_corrector_rhs(lp_residuals residuals, lp_variables variables, algorithm_state state, lp_direction direction,  lp_input &problem_data);
 
 };
 
@@ -167,14 +169,14 @@ public:
 
 	void compute_affine_direction(	
 		linear_system_rhs affine_rhs,
-		lp_input problem_data,
+		 lp_input &problem_data,
 		lp_variables variables,
 		k_newton_copl_matrix K_newton_copl_matrix
 		);
 
 	void compute_corrector_direction(
 		linear_system_rhs corrector_rhs,
-		lp_input problem_data,
+		 lp_input &problem_data,
 		lp_variables variables,
 		algorithm_state state,
 		lp_settings settings,
@@ -206,14 +208,14 @@ class k_newton_copl_matrix {
 		//Indices in the permuted matrix that correspond
 	    //to the entries of the Hessian as read columnwise
 		std::vector<int> permuted_indices;
-		//Called from the constructor to assemble the first
+		//Called from the ructor to assemble the first
 		//version of the matrix
 		//void assemble(copl_matrix A, copl_matrix G, int m, int n, int p);
 		//Calls the symbolic analysis function
 		//void permute();
 			
 	public:
-		k_newton_copl_matrix(lp_input problem_data);
+		k_newton_copl_matrix( lp_input &problem_data);
 		//~k_newton_copl_matrix();
 		//void update(lp_variables variables);
 		void factor();

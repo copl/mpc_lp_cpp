@@ -1,29 +1,24 @@
 
 #include <copl_algorithm.h>
 
+
+
 using namespace std;
 namespace copl_ip {
-	void interior_point_algorithm(lp_input problem_data, lp_settings settings){
+	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){
+	
+		problem_data.var_dump();
+		
 		// create data structures
 		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	
 		algorithm_state state;
-		
-		cout << "here1" << endl;
-		
 		k_newton_copl_matrix K_matrix(problem_data);
-		cout << "here2" << endl;
 		lp_direction direction(variables);
-		
-		cout << "here3" << endl;
-		
 		linear_system_rhs rhs(problem_data);
-		
-		cout << "here4" << endl;
-		
 		lp_residuals residuals(problem_data);
 		
 		state.update_mu(variables, problem_data);
-
+		
 		cout << "here" << endl;
 
 		// Begin iteration
@@ -68,7 +63,7 @@ namespace copl_ip {
 		}
 	}
 
-	bool termination_criteria_met(lp_settings settings, algorithm_state state, lp_residuals residuals){
+	bool termination_criteria_met(lp_settings &settings, algorithm_state &state, lp_residuals &residuals){
 		/*
 		# TO DO
 		# store a bunch of norms

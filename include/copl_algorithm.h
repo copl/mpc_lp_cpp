@@ -6,10 +6,10 @@
 
 namespace copl_ip{
 
-bool termination_criteria_met(lp_settings settings, algorithm_state state, lp_residuals residuals);
+bool termination_criteria_met(lp_settings &settings, algorithm_state &state, lp_residuals &residuals);
 
 // return type subject to change
-void interior_point_algorithm(lp_input problem_data, lp_settings settings);
+void interior_point_algorithm(lp_input &problem_data, lp_settings &settings);
 
 }
 
