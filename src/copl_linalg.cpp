@@ -127,11 +127,38 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 		eigenMat = new EigenSpMat_t(m,n);
 		eigenMat->setFromTriplets(entries.begin(),entries.end());
 	}
+
+	copl_matrix::insert_at(int m, int n, double val)
+	{
+		eigenMat.insert(m,n,val);
+	}
 	
 	//Destructor 
 	copl_matrix::~copl_matrix()
 	{
 		delete(eigenMat);
 	}
+
+//Constructor from lp_input
+k_newton_copl_matrix::k_newton_copl_matrix(lp_input problem_data)
+{
+	//Compute the number of non zeros in the K matrix 
+	//Two copies of A two copies of G, regularization all the columns and rows
+	int nnzK = problem_data.A.nnz*2+problem_data.G.nnz*2+lp_input.n+lp_input.m+lp_input.p;	
+	//Compute the dimensions 
+	int nK   = lp_input.n+lp_input.m+lp_input.p;
+    EigenSpMat_t* eigenKMat;	
+	
+}
+
+//Destructor to cleanly discard of the eigen K matrix
+k_newton_copl_matrix::~k_newton_copl_matrix()
+{
+    	del(eigenKMat);	
+}
+
+void k_newton_copl_matrix::update(lp_variables variables) {
+	
+}
 
 }
