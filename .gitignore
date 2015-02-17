@@ -1,0 +1,5 @@
+#Any compiled files
+bin/
+
+#This file 
+.gitignore
