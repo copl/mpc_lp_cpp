@@ -1,12 +1,9 @@
-//<<<<<<< HEAD
-#include "copl_algorithm.h"
-#include "copl_core.h"
-//=======
-//#include "../include/copl_linalg.h"
-//#include "../include/copl_core.h"
-//#include "../include/copl_algorithm.h"
+
+#include <copl_algorithm.h>
+#include <copl_core.h>
 
 namespace copl_ip {
+	
 	void interior_point_algorithm(lp_input problem_data, lp_settings settings){
 		// create data structures
 		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	
@@ -18,25 +15,18 @@ namespace copl_ip {
 		cout << "here2" << endl;
 		lp_direction direction(variables);
 		
-		copl_vector vec(100,0);
-		
 		cout << "here3" << endl;
 		
-		
-		
+		linear_system_rhs rhs(problem_data);
 		
 		cout << "here4" << endl;
 		
-		lp_residuals residuals; //(problem_data);
-		
-		cout << "here5" << endl;
+		lp_residuals residuals(problem_data);
 		
 		state.update_mu(variables, problem_data);
 
-		cout << "here6" << endl;
+		cout << "here" << endl;
 
-		linear_system_rhs rhs(problem_data);
-		
 		// Begin iteration
 		
 		int MAX_IT = settings.get_max_iter();

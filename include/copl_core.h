@@ -2,12 +2,12 @@
 #define INTERIOR_POINT_DATA_STRUCTURES
 
 #include <copl_linalg.h>
-
-
+#include <iostream>
 namespace copl_ip{
 
 // preliminary definitions //
 class lp_direction;
+class k_newton_copl_matrix;
 
 //lp_input
 class lp_input {
@@ -114,7 +114,7 @@ public:
 	float r3_norm;
 	float normed_squared;
 	
-	lp_residuals(); // lp_input problem_data
+	lp_residuals(lp_input problem_data);
 	void compute_residuals(lp_input in_problem_data, lp_variables variables);
 
 	float get_r1_norm();
@@ -164,12 +164,14 @@ public:
 		float dkappa,
 		float alpha
 		     );
+
 	void compute_affine_direction(	
 		linear_system_rhs affine_rhs,
 		lp_input problem_data,
 		lp_variables variables,
 		k_newton_copl_matrix K_newton_copl_matrix
 		);
+
 	void compute_corrector_direction(
 		linear_system_rhs corrector_rhs,
 		lp_input problem_data,
@@ -195,6 +197,30 @@ public:
 	copl_vector get_ds(); 
 
 };
+
+//k_newton_copl_matrix
+class k_newton_copl_matrix {
+    private: 
+    	//The assembled eigen matrix 
+    	EigenSpMat_t* eigenKMat;	
+		//Indices in the permuted matrix that correspond
+	    //to the entries of the Hessian as read columnwise
+		std::vector<int> permuted_indices;
+		//Called from the constructor to assemble the first
+		//version of the matrix
+		void assemble(copl_matrix A, copl_matrix G, int m, int n, int p);
+		//Calls the symbolic analysis function
+		void permute();
+			
+	public:
+		k_newton_copl_matrix(lp_input problem_data);
+		~k_newton_copl_matrix();
+		void update(lp_variables variables);
+		void factor();
+	  	void solve(std::vector<double> &solution, std::vector<double> rhs);
+
+};
+
 //--------End lp_direction--------
 
 //lp_result
