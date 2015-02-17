@@ -18,18 +18,25 @@ namespace copl_ip {
 		cout << "here2" << endl;
 		lp_direction direction(variables);
 		
+		copl_vector vec(100,0);
+		
 		cout << "here3" << endl;
 		
-		linear_system_rhs rhs(problem_data);
+		
+		
 		
 		cout << "here4" << endl;
 		
-		lp_residuals residuals(problem_data);
+		lp_residuals residuals; //(problem_data);
+		
+		cout << "here5" << endl;
 		
 		state.update_mu(variables, problem_data);
 
-		cout << "here" << endl;
+		cout << "here6" << endl;
 
+		linear_system_rhs rhs(problem_data);
+		
 		// Begin iteration
 		
 		int MAX_IT = settings.get_max_iter();
