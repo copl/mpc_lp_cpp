@@ -1,15 +1,41 @@
 #include "../include/copl_core.h"
 #include "../include/copl_linalg.h"
 
+using namespace std;
+
 namespace copl_ip {
 
+void copl_vector_dump(copl_vector vec) {
+	cout << "{";
+	for(int i = 0; i < vec.size() - 1; i++) {
+		cout << vec[i] << ",";
+	}
+	cout << vec[vec.size() - 1];
+	cout << "}";
+	cout << endl;
+}
+
 //lp_input
-lp_input::lp_input(int _m, int _n, int _k) 
-	: A(_n,_m), G(_n,_m), c(_n,0.0), h(_n,0.0), b(_n,0.0) { // ************
+lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random this must change!!!
+	: A(_k_var,_n,1.0), G(_m,_n,1.0), c(_n,0.0), h(_m,0.0), b(_k_var,0.0) { // ************
 	m = _m;
 	n = _n;
-	k = _k;
+	k_var = _k_var;
 };
+
+void lp_input::var_dump() {
+	cout << "=== BEGIN LP INPUT VAR DUMP ====" << endl;
+	cout << "c = ";
+	copl_vector_dump(c);
+	cout << "b = ";
+	copl_vector_dump(b);
+	cout << "h = ";
+	copl_vector_dump(h);
+	
+	// ********* complete for matricies
+	cout << "=== END VAR DUMP ====" << endl;
+}
+
 //--------End lp_input--------
 
 // lp_settings
@@ -103,8 +129,8 @@ void lp_direction::compute_corrector_direction(
 
 
 // lp_variables
-lp_variables::lp_variables(lp_input problem_data){
-
+lp_variables::lp_variables(int n, int m, int k_var) :
+	x(n), s(m), z(m), y(k_var) {
 	tau = 1;
 	kappa = 1;
 }
@@ -135,7 +161,9 @@ void k_newton_copl_matrix::update(lp_variables variables) {
 // algorithm_state
 
 algorithm_state::algorithm_state() {
-	
+	mu = -1;
+	sigma = -1;
+	gap = -1;
 }
 void algorithm_state::update_gap(lp_variables variables, lp_input problem_data){
 
@@ -149,19 +177,10 @@ void algorithm_state::update_mu(lp_variables variables, lp_input problem_data){
 
 // linear_system_rhs
 
-linear_system_rhs::linear_system_rhs(lp_input problem_data){
-
-}
-
-void linear_system_rhs::update_values(
-	copl_vector q1, 
-	copl_vector q2, 
-	copl_vector q3, 
-	copl_vector q4, 
-	copl_vector q5, 
-	copl_vector q6
-	){
-
+linear_system_rhs::linear_system_rhs(lp_input problem_data) :
+	q1(1,0), q2(1,0), q3(1,0), q4(1,0), q5(1,0), q6(1,0)
+{
+	cout << "xx" << endl;
 }
 
 void linear_system_rhs::compute_affine_rhs(lp_residuals residuals, lp_variables variables){
