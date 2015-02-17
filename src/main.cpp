@@ -4,7 +4,6 @@
  *  Created on: 28/01/2015
  *      Author: Oliver
  */
-#include <iostream>
 #include "copl_algorithm.h"
 #include "copl_linalg.h"
 
