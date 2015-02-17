@@ -2,7 +2,7 @@
  * Linear algebra definitions for the copl interior point solver 
  */
 
-#include "../include/copl_linalg.h"
+#include <copl_linalg.h>
 
 namespace copl_ip
 {
@@ -130,7 +130,7 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 
 	void copl_matrix::insert_at(int m, int n, double val)
 	{
-		eigenMat.insert(m,n,val);
+		(eigenMat->insert(m,n)) = val;
 	}
 	
 	//Destructor 
@@ -142,5 +142,6 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 	//Return the number of non zeros
 	int copl_matrix::nnz()
 	{
-		eigenMat->nonZeros();	
+		return eigenMat->nonZeros();	
 	}
+}
