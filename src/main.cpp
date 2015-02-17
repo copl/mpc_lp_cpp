@@ -6,6 +6,7 @@
  */
 #include <iostream>
 #include "copl_algorithm.h"
+#include "copl_linalg.h"
 
 #include "copl_core.cpp"
 #include "copl_algorithm.cpp"
