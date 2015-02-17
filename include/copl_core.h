@@ -208,16 +208,17 @@ class k_newton_copl_matrix {
 		std::vector<int> permuted_indices;
 		//Called from the constructor to assemble the first
 		//version of the matrix
-		void assemble(copl_matrix A, copl_matrix G, int m, int n, int p);
+		//void assemble(copl_matrix A, copl_matrix G, int m, int n, int p);
 		//Calls the symbolic analysis function
-		void permute();
+		//void permute();
 			
 	public:
 		k_newton_copl_matrix(lp_input problem_data);
-		~k_newton_copl_matrix();
-		void update(lp_variables variables);
+		//~k_newton_copl_matrix();
+		//void update(lp_variables variables);
 		void factor();
 	  	void solve(std::vector<double> &solution, std::vector<double> rhs);
+	  	void update(lp_variables variables);
 
 };
 
