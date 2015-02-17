@@ -8,7 +8,6 @@
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 #include <random>
-#include <../include/copl_core.h>
 
 namespace copl_ip 
 {
