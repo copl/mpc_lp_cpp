@@ -110,7 +110,6 @@ void  lp_direction::compute_affine_direction(linear_system_rhs affine_rhs,
 		lp_input problem_data,
 		lp_variables variables,
 		k_newton_copl_matrix K_newton_copl_matrix) {
-		K_newton_copl_matrix.solve()	
 }
 
 void lp_direction::compute_corrector_direction(
@@ -179,5 +178,23 @@ void linear_system_rhs::compute_corrector_rhs(lp_residuals residuals, lp_variabl
 	// TOOD
 }
 //--------End linear_system_rhs--------
+
+
+k_newton_copl_matrix::k_newton_copl_matrix(lp_input problem_data)
+{
+
+}
+void k_newton_copl_matrix::factor(){
+
+		}
+void k_newton_copl_matrix::solve(std::vector<double> &solution, std::vector<double> rhs)
+{
+
+}
+
+void k_newton_copl_matrix::update(lp_variables variables)
+{
+	
+}
 }
 

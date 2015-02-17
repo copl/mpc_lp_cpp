@@ -1,9 +1,8 @@
 
 #include <copl_algorithm.h>
-#include <copl_core.h>
 
+using namespace std;
 namespace copl_ip {
-	
 	void interior_point_algorithm(lp_input problem_data, lp_settings settings){
 		// create data structures
 		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	

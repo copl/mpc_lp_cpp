@@ -5,12 +5,8 @@
  *      Author: Oliver
  */
 #include <iostream>
-#include "copl_algorithm.h"
-#include "copl_linalg.h"
-
-#include "copl_core.cpp"
-#include "copl_algorithm.cpp"
-#include "copl_linalg.cpp"
+#include <copl_algorithm.h>
+#include <copl_linalg.h>
 
 using namespace std;
 using namespace copl_ip;
@@ -42,7 +38,7 @@ int main()
 	lp_input problem_data = construct_instance1();
 
 	// The main function that run interior point algorithm.
-	interior_point_algorithm(problem_data,settings);
+	copl_ip::interior_point_algorithm(problem_data,settings);
 };
 
 
