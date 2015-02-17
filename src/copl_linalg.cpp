@@ -127,6 +127,11 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 		eigenMat = new EigenSpMat_t(m,n);
 		eigenMat->setFromTriplets(entries.begin(),entries.end());
 	}
+
+	void copl_matrix::insert_at(int m, int n, double val)
+	{
+		eigenMat.insert(m,n,val);
+	}
 	
 	//Destructor 
 	copl_matrix::~copl_matrix()
@@ -134,4 +139,8 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 		delete(eigenMat);
 	}
 
-}
+	//Return the number of non zeros
+	int copl_matrix::nnz()
+	{
+		eigenMat->nonZeros();	
+	}

@@ -110,7 +110,7 @@ void  lp_direction::compute_affine_direction(linear_system_rhs affine_rhs,
 		lp_input problem_data,
 		lp_variables variables,
 		k_newton_copl_matrix K_newton_copl_matrix) {
-	
+		K_newton_copl_matrix.solve()	
 }
 
 void lp_direction::compute_corrector_direction(
@@ -146,17 +146,6 @@ void lp_variables::take_step(lp_direction direction){
 	kappa = kappa + alpha * direction.get_dkappa();
 
 }
-//--------End lp_variables--------
-
-//k_newton_copl_matrix
-k_newton_copl_matrix::k_newton_copl_matrix(lp_input problem_data) {
-	
-}
-void k_newton_copl_matrix::update(lp_variables variables) {
-	
-}
-
-//--------End k_newton_copl_matrix--------
 
 // algorithm_state
 
