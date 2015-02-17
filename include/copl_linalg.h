@@ -8,6 +8,7 @@
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 #include <random>
+#include <../include/copl_core.h>
 
 namespace copl_ip 
 {
@@ -24,7 +25,9 @@ public:
 	//Random sparse matrix with dist p
 	copl_matrix(int m, int n, double p);
 	//Insert element to sparse matrix, this is slow and we should not use it
-	insert_at(int m, int n, double val)
+	void insert_at(int m, int n, double val);
+	//Return the number of non-zero entires in the matrix	
+	int nnz();
 	//Destructor 
 	~copl_matrix();
 
@@ -66,11 +69,10 @@ class k_newton_copl_matrix {
     	EigenSpMat_t* eigenKMat;	
 		//Indices in the permuted matrix that correspond
 	    //to the entries of the Hessian as read columnwise
-		vector<int> permuted_indices;
+		std::vector<int> permuted_indices;
 		//Called from the constructor to assemble the first
 		//version of the matrix
-		void assemble(lp_input problem_definition);
-
+		void assemble(copl_matrix A, copl_matrix G, int m, int n, int p);
 		//Calls the symbolic analysis function
 		void permute();
 			

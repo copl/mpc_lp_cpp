@@ -1,7 +1,7 @@
 #ifndef INTERIOR_POINT_DATA_STRUCTURES
 #define INTERIOR_POINT_DATA_STRUCTURES
 
-#include "copl_linalg.h"
+#include <copl_linalg.h>
 
 
 namespace copl_ip{
@@ -34,17 +34,6 @@ public:
 	void take_step(lp_direction dir);
 };
 //--------End lp_variables--------
-
-//k_newton_copl_matrix
-class k_newton_copl_matrix {
-	public:
-		k_newton_copl_matrix(lp_input problem_data);
-		void update(lp_variables variables);
-
-};
-
-//--------End k_newton_copl_matrix--------
-
 
 
 //algorithm_state
