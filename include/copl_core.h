@@ -114,7 +114,7 @@ public:
 	float r3_norm;
 	float normed_squared;
 	
-	lp_residuals(lp_input problem_data);
+	lp_residuals(); // lp_input problem_data
 	void compute_residuals(lp_input in_problem_data, lp_variables variables);
 
 	float get_r1_norm();

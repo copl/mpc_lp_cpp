@@ -53,7 +53,11 @@ float lp_settings::get_bkscale() 			{return bkscale;}
 //--------End lp_settings--------
 
 // lp_residuals
-lp_residuals::lp_residuals(lp_input problem_data){ }
+lp_residuals::lp_residuals() : // lp_input problem_data
+	r1(3,0.0), r2(3,0.0), r3(3,0.0)
+{ 
+	cout << "xyz" << endl;
+}
 
 void lp_residuals::compute_residuals(lp_input problem_data, lp_variables variables){
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
@@ -167,7 +171,7 @@ void algorithm_state::update_mu(lp_variables variables, lp_input problem_data){
 // linear_system_rhs
 
 linear_system_rhs::linear_system_rhs(lp_input problem_data) :
-	q1(1,0), q2(1,0), q3(1,0), q4(1,0), q5(1,0), q6(1,0)
+	q1(1,0.0), q2(1,0.0), q3(1,0.0), q4(1,0.0), q5(1,0.0), q6(1,0.0)
 {
 	cout << "xx" << endl;
 }
