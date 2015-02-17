@@ -6,6 +6,7 @@
 
 //k_newton_copl_matrix
 class k_newton_copl_matrix {
+	
     private: 
     	//The assembled eigen matrix 
     	EigenSpMat_t* eigenKMat;	
