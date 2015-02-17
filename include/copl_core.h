@@ -12,28 +12,25 @@ class lp_direction;
 //lp_input
 class lp_input {
 public:
-	int m, n, k;
+	int m, n, k_var;
 	
 	copl_matrix A, G;
 	
 	copl_vector c, h, b;
 
-	lp_input(int m, int n, int k);
+	lp_input(int m, int n, int k_var);
+	void var_dump();
 };
 //--------End lp_input--------
 
 //lp_variables
 class lp_variables {
 public:
-	copl_vector x;
-	copl_vector s;
-	copl_vector z;
-	copl_vector y;
+	copl_vector x, s, z, y;
 
-	float tau;
-	float kappa;
+	float tau, kappa;
 	
-	lp_variables(lp_input problem_data);
+	lp_variables(int n, int m, int k_var);
 	void take_step(lp_direction dir);
 };
 //--------End lp_variables--------
@@ -146,14 +143,6 @@ class linear_system_rhs {
 	copl_vector q4;
 	copl_vector q5;
 	copl_vector q6;
-	void update_values(
-		copl_vector q1, 
-		copl_vector q2, 
-		copl_vector q3, 
-		copl_vector q4, 
-		copl_vector q5, 
-		copl_vector q6
-	); //Not called in algorithm
 public:
 	linear_system_rhs(lp_input problem_data);
 	
