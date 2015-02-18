@@ -68,17 +68,14 @@ lp_residuals::lp_residuals( lp_input &problem_data) : r1(problem_data.k_var,0.0)
 
 }
 
-void lp_residuals::update_norms() {
+/*void lp_residuals::update_norms() {
 	r1_norm = norm2(r1);
 	r2_norm = norm2(r2);
 	r3_norm = norm2(r3);
-}
+}*/
 
 void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &variables){
-	
-	
 	/*
-	zeros(r1);
 	cout << "A " << problem_data.A.num_rows() << "," << problem_data.A.num_cols() << endl;
 	cout << "G " << problem_data.G.num_rows() << "," << problem_data.G.num_cols() << endl;
 	cout << "r1 " << r1.size() << endl;
@@ -89,46 +86,54 @@ void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &vari
 	*/
 	
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
+	zeros(r1);
 	sp_dgemtv(-1.0, 1.0, problem_data.A, variables.y, r1);
 	sp_dgemtv(-1.0, 1.0, problem_data.G, variables.z, r1);
 	axpy(-variables.tau, problem_data.c, r1);
+	
+	cout << "r1:";
+	copl_vector_dump(r1);
 	
 	// r2 = pd.A*variables.x - pd.b*variables.tau;
 	zeros(r2);
 	sp_dgemv(1.0, 1.0, problem_data.A, variables.x, r2);
 	axpy(-variables.tau, problem_data.b, r2);
-		
+	
+	cout << "r2:";
+	copl_vector_dump(r2);
+	
 	// r3 = variables.s + pd.G*variables.x - variables.tau*pd.h;
 	zeros(r3);
 	axpy(1.0, variables.s, r3);
 	sp_dgemv(1.0, 1.0, problem_data.G, variables.x, r3);
 	axpy(-variables.tau, problem_data.h, r3);
-		
+	
+	cout << "r3:";
+	copl_vector_dump(r3);
+	
 	//r4 = variables.kappa + pd.c'*variables.x + pd.b'*variables.y + + pd.h'*variables.z;
 	r4 = variables.kappa;
 	r4 += dot(problem_data.c, variables.x);
 	r4 += dot(problem_data.b, variables.y);
 	r4 += dot(problem_data.h, variables.z);
 	
-	update_norms();
-	//copl_vector_dump(r3);
+	cout << "r4:" << r4 << endl;
 }
 
-double lp_residuals::get_r1_norm(){return r1_norm;}
-double lp_residuals::get_r2_norm(){return r2_norm;}
-double lp_residuals::get_r3_norm(){return r3_norm;}
+double lp_residuals::get_r1_norm(){return norm2(r1);}
+double lp_residuals::get_r2_norm(){return norm2(r2);}
+double lp_residuals::get_r3_norm(){return norm2(r3);}
+double lp_residuals::get_norm_squared() {return -1.0;} // TO DO
 
 
 
 //--------End lp_residuals--------
 
 // lp direction
-lp_direction::lp_direction(lp_variables &variables) {
-	// allocate memory
-	copl_vector dx(variables.x.size(),0);
-	copl_vector dy(variables.y.size(),0);
-	copl_vector dz(variables.z.size(),0);
-	copl_vector ds(variables.s.size(),0);
+lp_direction::lp_direction(lp_variables &variables) 
+	: dx(variables.x.size(),0.0), ds(variables.s.size(),1.0), dz(variables.z.size(),1.0), dy(variables.y.size(),0.0) 
+{
+
 }
 
 double lp_direction::get_alpha() { return alpha; }
@@ -162,7 +167,7 @@ void lp_direction::compute_corrector_direction(
 
 // lp_variables
 lp_variables::lp_variables(int n, int m, int k_var) :
-	x(k_var,0.0), s(m,0.0), z(m,0.0), y(n,0.0) {
+	x(k_var,0.0), s(m,1.0), z(m,1.0), y(n,0.0) {
 	tau = 1;
 	kappa = 1;
 }
@@ -176,9 +181,12 @@ void lp_variables::take_step(lp_direction &direction){
 	double alpha = direction.get_alpha();
 	//TODO: Implement copl_vector.multiply and copl_vector.add
 	// x = x.add(direction.get_dx.multiply(alpha));
-	// s = s.add(direction.get_ds.multiply(alpha));
-	// z = z.add(direction.get_dz.multiply(alpha));
-	// y = y.add(direction.get_dy.multiply(alpha));
+	
+	axpy(alpha,direction.dx,x);
+	axpy(alpha,direction.ds,s);
+	axpy(alpha,direction.dz,z);
+	axpy(alpha,direction.dy,y);
+	
 	tau = tau + alpha * direction.get_dtau();
 	kappa = kappa + alpha * direction.get_dkappa();
 

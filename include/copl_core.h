@@ -82,25 +82,6 @@ public:
 
 //--------End settings--------
 
-//residuals
-
-class residuals {
-public:
-	copl_vector r1;
-	copl_vector r2;
-	copl_vector r3;
-	copl_vector r4;
-
-	double r1_norm;
-	double r2_norm;
-	double r3_norm;
-	double normed_squared;
-	
-	residuals();
-	void update_values();
-	void compute_residuals();
-};
-//--------End residuals--------
 
 //lp_residuals
 
@@ -110,19 +91,14 @@ public:
 	copl_vector r2;
 	copl_vector r3;
 	double r4;
-
-	double r1_norm;
-	double r2_norm;
-	double r3_norm;
-	double normed_squared;
 	
 	lp_residuals( lp_input &problem_data);
-	void update_norms();
 	void compute_residuals( lp_input &problem_data, lp_variables &variables);
 
 	double get_r1_norm();
 	double get_r2_norm();
 	double get_r3_norm();
+	double get_norm_squared();
 };
 //--------End lp_residuals--------
 
@@ -158,15 +134,6 @@ public:
 	double alpha;
 	
 	lp_direction(lp_variables &variables);
-	void update_values(
-		copl_vector dx,
-		copl_vector dy,
-		copl_vector dz,
-		copl_vector ds, 
-		double dtau,
-		double dkappa,
-		double alpha
-		     );
 
 	void compute_affine_direction(	
 		linear_system_rhs &affine_rhs,

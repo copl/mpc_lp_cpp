@@ -30,7 +30,7 @@ namespace copl_ip {
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
 			}
-			// --- broadly working till here --- //
+			// --- BEGIN NOT WORKING --- //
 			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
@@ -50,6 +50,7 @@ namespace copl_ip {
 				K_matrix
 				);
 			
+			// --- END NOT WORKING --- //
 			
 			// take step in the corrector direction
 			variables.take_step(direction);
@@ -73,9 +74,9 @@ namespace copl_ip {
 		#unbounded and infeasible problems.
 		*/
 		
-		if (residuals.r1_norm < settings.get_linear_feas_tol() && 
-			residuals.r2_norm < settings.get_linear_feas_tol() &&
-			residuals.r3_norm < settings.get_linear_feas_tol() && 
+		if (residuals.get_r1_norm() < settings.get_linear_feas_tol() && 
+			residuals.get_r2_norm() < settings.get_linear_feas_tol() &&
+			residuals.get_r3_norm() < settings.get_linear_feas_tol() && 
 			state.mu < settings.get_comp_tol())
 			 return true;
 		else
@@ -85,7 +86,7 @@ namespace copl_ip {
 	}
 	
 	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr) {
-		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.normed_squared << endl;
+		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.get_norm_squared() << endl;
 		//@printf("%3i\t%3.3e\t%3.3e\t%3.3e\t%3.3e\t%3.3e\n", itr, state.gap ,state.mu, direction.alpha, variables.tau, residuals.normed_squared)
 	}
 }
