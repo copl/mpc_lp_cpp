@@ -29,7 +29,7 @@ class lp_variables {
 public:
 	copl_vector x, s, z, y;
 
-	float tau, kappa;
+	double tau, kappa;
 	
 	lp_variables(int n, int m, int k_var);
 	void take_step(lp_direction &direction);
@@ -40,15 +40,15 @@ public:
 
 //algorithm_state
 class algorithm_state {
-
-	float mu;
-	float sigma;
-	float gap;
-
 public:
+	double mu;
+	double sigma;
+	double gap;
+
+
 	algorithm_state();
-	void update_mu (lp_variables &variables, lp_input &problem_data); //TODO
-	void update_gap (lp_variables &variables,  lp_input &problem_data); //TODO
+	void update_mu (lp_variables &variables, lp_input &problem_data);
+	void update_gap (lp_variables &variables,  lp_input &problem_data);
 };
 
 
@@ -57,27 +57,27 @@ public:
 //settings
 class lp_settings {
 	int max_iter;
-	float linear_feas_tol;	//This is a relative tolerance w.r.t. 
+	double linear_feas_tol;	//This is a relative tolerance w.r.t. 
                             //some normalizing norms
-	float comp_tol; // How small must s^Tz must be when we stop
+	double comp_tol; // How small must s^Tz must be when we stop
 	
 	//ant length of the 
     //maximum combined step to the boundary to use
-    float bkscale;
-	
+    double bkscale;
+public:
 	//Configuration for solver
 	//linear_solver_lp_settings 
-public:
+
 	lp_settings(
 		int max_iter,
-		float linear_feas_tol,	
-		float comp_tol,	
-		float bkscale
+		double linear_feas_tol,	
+		double comp_tol,	
+		double bkscale
 		);
 	int get_max_iter();
-	float get_linear_feas_tol();
-	float get_comp_tol();
-	float get_bkscale();
+	double get_linear_feas_tol();
+	double get_comp_tol();
+	double get_bkscale();
 };
 
 //--------End settings--------
@@ -91,10 +91,10 @@ public:
 	copl_vector r3;
 	copl_vector r4;
 
-	float r1_norm;
-	float r2_norm;
-	float r3_norm;
-	float normed_squared;
+	double r1_norm;
+	double r2_norm;
+	double r3_norm;
+	double normed_squared;
 	
 	residuals();
 	void update_values();
@@ -109,19 +109,20 @@ public:
 	copl_vector r1;
 	copl_vector r2;
 	copl_vector r3;
-	float r4;
+	double r4;
 
-	float r1_norm;
-	float r2_norm;
-	float r3_norm;
-	float normed_squared;
+	double r1_norm;
+	double r2_norm;
+	double r3_norm;
+	double normed_squared;
 	
 	lp_residuals( lp_input &problem_data);
+	void update_norms();
 	void compute_residuals( lp_input &problem_data, lp_variables &variables);
 
-	float get_r1_norm();
-	float get_r2_norm();
-	float get_r3_norm();
+	double get_r1_norm();
+	double get_r2_norm();
+	double get_r3_norm();
 };
 //--------End lp_residuals--------
 
@@ -152,9 +153,9 @@ public:
 	copl_vector dy;
 	copl_vector dz;
 	copl_vector ds;
-	float dtau;
-	float dkappa;
-	float alpha;
+	double dtau;
+	double dkappa;
+	double alpha;
 	
 	lp_direction(lp_variables &variables);
 	void update_values(
@@ -162,9 +163,9 @@ public:
 		copl_vector dy,
 		copl_vector dz,
 		copl_vector ds, 
-		float dtau,
-		float dkappa,
-		float alpha
+		double dtau,
+		double dkappa,
+		double alpha
 		     );
 
 	void compute_affine_direction(	
@@ -190,9 +191,9 @@ public:
 		copl_vector var,
 		copl_vector dvar
 		);
-	float get_alpha();
-	float get_dtau(); 
-	float get_dkappa(); 
+	double get_alpha();
+	double get_dtau(); 
+	double get_dkappa(); 
 	copl_vector get_dx(); 
 	copl_vector get_dy(); 
 	copl_vector get_dz(); 

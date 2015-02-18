@@ -19,24 +19,21 @@ namespace copl_ip {
 		
 		state.update_mu(variables, problem_data);
 		
-		cout << "here" << endl;
-
 		// Begin iteration
 		int MAX_IT = settings.get_max_iter();
 		for (int itr = 1; itr <= MAX_IT; itr++){
 			// To be sent to Tiago's Linear Solver
 			K_matrix.update(variables);
-			cout << "here1" << endl;
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
 			
-			cout << "here2" << endl;
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
 			}
+			// --- broadly working till here --- //
+			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
-			cout << "here3" << endl;
 			// compute affine direction using new affine rhs
 			direction.compute_affine_direction(rhs,problem_data,variables,K_matrix); //Incomplete??
 			
@@ -60,6 +57,8 @@ namespace copl_ip {
 			// compute the gap after the step
 			state.update_mu(variables,problem_data);
 			state.update_gap(variables,problem_data);
+			
+			print_status(state, direction, variables, residuals, itr);
 		}
 		cout << "IP algorithm finished" << endl;
 	}
@@ -72,17 +71,21 @@ namespace copl_ip {
 		#Evaluate termination criteria	
 		#TODO: This part will have to be a more sofisticated test to detect 
 		#unbounded and infeasible problems.
-		
-		if (residuals.r1_norm < settings.linear_feas_tol && 
-			residuals.r2_norm < settings.linear_feas_tol &&
-			residuals.r3_norm < settings.linear_feas_tol && 
-			state.mu < settings.comp_tol)
-			 println("Ended");
-			 return true
-		else
-			return false
-		end
 		*/
+		
+		if (residuals.r1_norm < settings.get_linear_feas_tol() && 
+			residuals.r2_norm < settings.get_linear_feas_tol() &&
+			residuals.r3_norm < settings.get_linear_feas_tol() && 
+			state.mu < settings.get_comp_tol())
+			 return true;
+		else
+			return false;
+		
 		return false;
+	}
+	
+	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr) {
+		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.normed_squared << endl;
+		//@printf("%3i\t%3.3e\t%3.3e\t%3.3e\t%3.3e\t%3.3e\n", itr, state.gap ,state.mu, direction.alpha, variables.tau, residuals.normed_squared)
 	}
 }
