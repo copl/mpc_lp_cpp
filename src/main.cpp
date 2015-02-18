@@ -14,7 +14,7 @@ using namespace copl_ip;
 
 int main()
 {
-	const int max_iter			= 20;
+	const int max_iter			= 5;
 	const double linear_feas_tol 	= 1e-8; //Assuming possible Integer Overflow
 	const double comp_tol			= 1e-8; //Assuming possible Integer Overflow
 	const double bkscale			= 0.95;
@@ -23,13 +23,13 @@ int main()
 
 	cout << "COPL 2015" << endl;
 	cout << "Interior point algorithm coming" << endl;
-
+	
 	// Initialize configuration variable
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);
 
 	// We are creating an instance of LP. In practice, we should read the problem data from input stream.
-	lp_input problem_data(2,2,2); //= construct_instance1();
-	problem_data.var_dump();
+	lp_input problem_data(2,3,4); //= construct_instance1();
+	//problem_data.var_dump();
 		
 	// The main function that run interior point algorithm.
 	interior_point_algorithm(problem_data,settings);

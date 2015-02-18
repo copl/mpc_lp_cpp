@@ -8,6 +8,8 @@
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 #include <random>
+#include <iostream>
+using namespace std;
 
 namespace copl_ip 
 {
@@ -25,6 +27,16 @@ public:
 	copl_matrix(int m, int n, double p);
 	//Insert element to sparse matrix, this is slow and we should not use it
 	void insert_at(int m, int n, double val);
+	// number of rows
+	int num_rows();
+	// number of columns
+	int num_cols();
+	// value at
+	/*
+	double value_at(int i, int j);*/
+	// var dump
+	void var_dump();
+	
 	//Return the number of non-zero entires in the matrix	
 	int nnz();
 	//Destructor 

@@ -133,9 +133,31 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 		(eigenMat->insert(m,n)) = val;
 	}
 	
+	int copl_matrix::num_rows()
+	{
+		return eigenMat->rows();
+	}
+	
+	int copl_matrix::num_cols()
+	{
+		return eigenMat->cols();
+	}
+	
+	/*double copl_matrix::value_at(int i, int j)
+	{
+		return eigenMat(i,j);
+	}*/
+
+	void copl_matrix::var_dump()
+	{
+		cout << *eigenMat << endl;
+	}
+	
+	
 	//Destructor 
 	copl_matrix::~copl_matrix()
 	{
+		cout << "deleting eigen matrix" << endl;
 		delete(eigenMat);
 	}
 

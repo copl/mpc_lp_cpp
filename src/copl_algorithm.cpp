@@ -22,21 +22,21 @@ namespace copl_ip {
 		cout << "here" << endl;
 
 		// Begin iteration
-		
 		int MAX_IT = settings.get_max_iter();
 		for (int itr = 1; itr <= MAX_IT; itr++){
 			// To be sent to Tiago's Linear Solver
 			K_matrix.update(variables);
-
+			cout << "here1" << endl;
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
-
+			
+			cout << "here2" << endl;
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
 			}
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
-
+			cout << "here3" << endl;
 			// compute affine direction using new affine rhs
 			direction.compute_affine_direction(rhs,problem_data,variables,K_matrix); //Incomplete??
 			
@@ -61,6 +61,7 @@ namespace copl_ip {
 			state.update_mu(variables,problem_data);
 			state.update_gap(variables,problem_data);
 		}
+		cout << "IP algorithm finished" << endl;
 	}
 
 	bool termination_criteria_met(lp_settings &settings, algorithm_state &state, lp_residuals &residuals){
