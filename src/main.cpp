@@ -29,7 +29,18 @@ int main()
 
 	// We are creating an instance of LP. In practice, we should read the problem data from input stream.
 	lp_input problem_data(2,3,4); //= construct_instance1();
-	//problem_data.var_dump();
+	{
+		problem_data.A.insert_at(0,0,1.0);
+		problem_data.A.insert_at(1,1,1.0);
+		problem_data.A.insert_at(2,2,1.0);
+		problem_data.A.insert_at(2,3,1.0);
+		
+		problem_data.G.insert_at(0,0,1.0);
+		problem_data.G.insert_at(1,1,1.0);
+		problem_data.G.insert_at(0,2,1.0);
+		problem_data.G.insert_at(1,3,1.0);
+	}
+	problem_data.var_dump();
 		
 	// The main function that run interior point algorithm.
 	interior_point_algorithm(problem_data,settings);

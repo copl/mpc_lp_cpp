@@ -17,7 +17,7 @@ void copl_vector_dump(copl_vector &vec) {
 
 //lp_input
 lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random this must change!!!
-	: A(_n,_k_var,1.0), G(_m,_k_var,1.0), c(_k_var,2.0), h(_m,2.0), b(_n,2.0) { // ************
+	: A(_n,_k_var), G(_m,_k_var), c(_k_var,2.0), h(_m,2.0), b(_n,2.0) { // ************
 	m = _m;
 	n = _n;
 	k_var = _k_var;

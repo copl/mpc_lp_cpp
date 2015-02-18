@@ -144,7 +144,7 @@ public:
 
 	void compute_corrector_direction(
 		linear_system_rhs &corrector_rhs,
-		 lp_input &problem_data,
+		lp_input &problem_data,
 		lp_variables &variables,
 		algorithm_state &state,
 		lp_settings &settings,

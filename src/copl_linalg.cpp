@@ -133,6 +133,11 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 		(eigenMat->insert(m,n)) = val;
 	}
 	
+	//void copl_matrix::set_value(int m, int n, double val)
+	//{
+		//eigenMat(m,n) = val;
+	//}
+	
 	int copl_matrix::num_rows()
 	{
 		return eigenMat->rows();
