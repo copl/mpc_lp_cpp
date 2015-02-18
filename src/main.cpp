@@ -39,6 +39,20 @@ int main()
 		problem_data.G.insert_at(1,1,1.0);
 		problem_data.G.insert_at(0,2,1.0);
 		problem_data.G.insert_at(1,3,1.0);
+		
+		problem_data.c[0] = 1;
+		problem_data.c[1] = 2;
+		problem_data.c[2] = 3;
+		problem_data.c[3] = 4;
+		
+		copl_vector temp_x(4,1.0);
+		
+		zeros(problem_data.b);
+		sp_dgemv(1.0, 1.0, problem_data.A, temp_x, problem_data.b);
+		
+		zeros(problem_data.h);
+		sp_dgemv(1.0, 1.0, problem_data.G, temp_x, problem_data.h);
+		
 	}
 	problem_data.var_dump();
 		
