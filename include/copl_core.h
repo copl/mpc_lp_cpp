@@ -198,8 +198,14 @@ class k_newton_copl_matrix {
 class lp_result {
 
 };
+
+
+class copl_utility {
+      // Load problem from "The University of Florida Sparse Matrix Collection"
+      void static loadFromUF(string UF_group, string UF_name, lp_input &problem_data);
+};
+
 //--------End lp_result--------
 }
-
 
 #endif

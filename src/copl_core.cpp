@@ -1,6 +1,7 @@
 #include <copl_core.h>
 #include <copl_linalg.h>
-
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 namespace copl_ip {
@@ -22,6 +23,7 @@ lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random thi
 	n = _n;
 	k_var = _k_var;
 };
+
 
 lp_input::~lp_input() {
 	cout << "deleting lp input" << endl;
@@ -243,5 +245,32 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 {
 	
 }
+
+
+
+void copl_utility::loadFromUF(string UF_group, string UF_name, lp_input &problem_data){
+	// Inserted an script that download file from UF repository
+        ifstream A_File("../example_problems/ex3sta1/ex3sta1.mtx");
+  	if (!A_File) {
+  		cerr << "Error Loading from UF dataset. File not found." << endl;
+    		return ;
+	}
+
+	string line;
+ 	while (getline(A_File, line)) {
+  		if (line.empty()) continue;
+                if (line.at(0) == '%') continue;
+
+		std::istringstream ss(line);
+		std::string token;
+
+		while(std::getline(ss, token, ' ')) {
+			std::cout << token << '\n';
+		}	
+	}
+
+	A_File.close();
 }
 
+
+}

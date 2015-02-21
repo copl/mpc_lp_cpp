@@ -54,6 +54,7 @@ int main()
 		sp_dgemv(1.0, 1.0, problem_data.G, temp_x, problem_data.h);
 		
 	}
+        
 	problem_data.var_dump();
 		
 	// The main function that run interior point algorithm.
