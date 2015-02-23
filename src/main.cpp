@@ -28,7 +28,7 @@ int main()
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);
 
 	// We are creating an instance of LP. In practice, we should read the problem data from input stream.
-	lp_input problem_data(2,3,4); //= construct_instance1();
+	/*lp_input problem_data(2,3,4); //= construct_instance1();
 	{
 		problem_data.A.insert_at(0,0,1.0);
 		problem_data.A.insert_at(1,1,1.0);
@@ -54,13 +54,16 @@ int main()
 		sp_dgemv(1.0, 1.0, problem_data.G, temp_x, problem_data.h);
 		
 	}
-        
+	*/
+	lp_input * p_problem_data;
+	copl_utility::loadFromUF("UF_group", "name", &p_problem_data);
+	lp_input problem_data = *p_problem_data;
+	
 	problem_data.var_dump();
 		
 	// The main function that run interior point algorithm.
 	interior_point_algorithm(problem_data,settings);
 };
-
 
 
 

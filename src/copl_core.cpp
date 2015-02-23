@@ -248,28 +248,107 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 
 
 
-void copl_utility::loadFromUF(string UF_group, string UF_name, lp_input &problem_data){
+void copl_utility::loadFromUF(string UF_group, string UF_name, lp_input ** problem_data){
 	// Inserted an script that download file from UF repository
         ifstream A_File("../example_problems/ex3sta1/ex3sta1.mtx");
   	if (!A_File) {
-  		cerr << "Error Loading from UF dataset. File not found." << endl;
+  		cerr << "Error Loading from UF dataset. File not found (A Matrix)" << endl;
     		return ;
 	}
-
+	
+	int idx = 0;
 	string line;
+        bool first_line = true;
  	while (getline(A_File, line)) {
   		if (line.empty()) continue;
                 if (line.at(0) == '%') continue;
 
 		std::istringstream ss(line);
 		std::string token;
+		string indata[3] = {"", "", ""};
 
+		idx = 0;
 		while(std::getline(ss, token, ' ')) {
-			std::cout << token << '\n';
+			indata[idx++] = token;
 		}	
+		if (first_line){
+                	first_line = false;
+			int m = stoi(indata[0]);
+			int n = m;
+			int k_var = stoi(indata[1]);
+                        *problem_data = new lp_input(m,n,k_var);
+                }else{
+			int row = stoi(indata[0]) - 1;
+			int col = stoi(indata[1]) - 1;
+			double value = stod(indata[2]); 
+			(*problem_data)->A.insert_at(row,col,value);
+		}
+		
 	}
-
 	A_File.close();
+
+
+        ifstream b_File("../example_problems/ex3sta1/ex3sta1_b.mtx");
+        if (!b_File) {
+                cerr << "Error Loading from UF dataset. File not found (b vector)" << endl;
+                return ;
+        }
+
+        first_line = true;
+        int col_idx = 0;
+        while (getline(b_File, line)) {
+                if (line.empty()) continue;
+                if (line.at(0) == '%') continue;
+
+                std::istringstream ss(line);
+                std::string token;
+
+                string indata[1] = {""};
+                idx = 0;
+                while(std::getline(ss, token, ' ')) {
+                        indata[idx++] = token;
+                }
+                if (first_line){
+                        first_line = false;
+                }else{
+                        double value = stod(indata[0]);
+                        (*problem_data)->b[col_idx++] = value;
+                }
+
+        }
+        b_File.close();
+
+
+        ifstream c_File("../example_problems/ex3sta1/ex3sta1_c.mtx");
+        if (!c_File) {
+                cerr << "Error Loading from UF dataset. File not found (c vector)" << endl;
+                return ;
+        }
+
+        first_line = true;
+        col_idx = 0;
+        while (getline(c_File, line)) {
+                if (line.empty()) continue;
+                if (line.at(0) == '%') continue;
+
+                std::istringstream ss(line);
+                std::string token;                
+
+                string indata[1] = {""};
+                idx = 0;
+                while(std::getline(ss, token, ' ')) {
+                        indata[idx++] = token;
+                }
+                if (first_line){
+                        first_line = false;
+                }else{
+                        double value = stod(indata[0]);
+                        (*problem_data)->c[col_idx++] = value;
+                }
+
+        }
+        c_File.close();
+
 }
 
 

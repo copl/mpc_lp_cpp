@@ -201,8 +201,10 @@ class lp_result {
 
 
 class copl_utility {
-      // Load problem from "The University of Florida Sparse Matrix Collection"
-      void static loadFromUF(string UF_group, string UF_name, lp_input &problem_data);
+      public:
+          // Load problem from "The University of Florida Sparse Matrix Collection"
+          // the object would be created and stored in "problem_data"
+          static void loadFromUF(string UF_group, string UF_name, lp_input ** problem_data);
 };
 
 //--------End lp_result--------
