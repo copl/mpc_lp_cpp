@@ -189,7 +189,6 @@ class k_newton_copl_matrix {
 		void factor();
 	  	void solve(copl_vector &solution, copl_vector &rhs);
 	  	void update(lp_variables &variables);
-
 };
 
 //--------End lp_direction--------
@@ -204,7 +203,9 @@ class copl_utility {
       public:
           // Load problem from "The University of Florida Sparse Matrix Collection"
           // the object would be created and stored in "problem_data"
-          static void loadFromUF(string UF_group, string UF_name, lp_input ** problem_data);
+		  static lp_input* Trivial_Test1();
+          static lp_input* loadFromUF(string UF_group, string UF_name);
+		  
 };
 
 //--------End lp_result--------
