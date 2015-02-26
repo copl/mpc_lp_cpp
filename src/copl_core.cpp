@@ -77,51 +77,45 @@ lp_residuals::lp_residuals( lp_input &problem_data) : r1(problem_data.k_var,0.0)
 }*/
 
 void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &variables){
-	/*
-	cout << "A " << problem_data.A.num_rows() << "," << problem_data.A.num_cols() << endl;
-	cout << "G " << problem_data.G.num_rows() << "," << problem_data.G.num_cols() << endl;
-	cout << "r1 " << r1.size() << endl;
-	cout << "y " << variables.y.size() << endl;
-	cout << "z " << variables.z.size() << endl;
-	cout << "x " << variables.x.size() << endl;
-	cout << "c " << problem_data.c.size() << endl;
-	*/
-	
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
 	zeros(r1);
 	sp_dgemtv(-1.0, 1.0, problem_data.A, variables.y, r1);
 	sp_dgemtv(-1.0, 1.0, problem_data.G, variables.z, r1);
 	axpy(-variables.tau, problem_data.c, r1);
 	
-	cout << "r1:";
-	copl_vector_dump(r1);
-	
 	// r2 = pd.A*variables.x - pd.b*variables.tau;
 	zeros(r2);
 	sp_dgemv(1.0, 1.0, problem_data.A, variables.x, r2);
 	axpy(-variables.tau, problem_data.b, r2);
-	
-	cout << "r2:";
-	copl_vector_dump(r2);
+	//copl_vector_dump(r2);
+	//copl_vector_dump(problem_data.b);
 	
 	// r3 = variables.s + pd.G*variables.x - variables.tau*pd.h;
 	zeros(r3);
 	axpy(1.0, variables.s, r3);
 	sp_dgemv(1.0, 1.0, problem_data.G, variables.x, r3);
 	axpy(-variables.tau, problem_data.h, r3);
-	
-	cout << "r3:";
-	copl_vector_dump(r3);
-	
+
 	//r4 = variables.kappa + pd.c'*variables.x + pd.b'*variables.y + + pd.h'*variables.z;
 	r4 = variables.kappa;
 	r4 += dot(problem_data.c, variables.x);
 	r4 += dot(problem_data.b, variables.y);
 	r4 += dot(problem_data.h, variables.z);
+}
+
+void lp_residuals::var_dump() {
+	cout << "DUMP RESIDUALS OBJECT" << endl;
+	cout << "r1:";
+	copl_vector_dump(r1);
+	
+	cout << "r2:";
+	copl_vector_dump(r2);
+	
+	cout << "r3:";
+	copl_vector_dump(r3);
 	
 	cout << "r4:" << r4 << endl;
 }
-
 double lp_residuals::get_r1_norm(){return norm2(r1);}
 double lp_residuals::get_r2_norm(){return norm2(r2);}
 double lp_residuals::get_r3_norm(){return norm2(r3);}
@@ -150,17 +144,129 @@ void  lp_direction::compute_affine_direction(linear_system_rhs &affine_rhs,
 		 lp_input &problem_data,
 		lp_variables &variables,
 		k_newton_copl_matrix &K_matrix) {
+	/*
+	this.compute_affine_direction = function(affine_rhs::class_linear_system_rhs,
+													problem_data::class_linear_program_input,	
+													variables::class_linear_program_variables,	
+													K_newton_matrix::class_K_newton_matrix)
+			
+		dir = solveLinearEquation(problem_data, variables, affine_rhs, K_newton_matrix)
+		
+		m = problem_data.m
+		n = problem_data.n
+		k = problem_data.k
+		
+		x = variables.x
+		z = variables.z
+		s = variables.s
+		y = variables.y
+		tau = variables.tau
+		kappa = variables.kappa
+		
+		dx_a = dir[1:k];
+		dy_a = dir[(k+1):(k+n)];
+		dz_a = dir[(k+n+1):(k+n+m)];
+		dtau_a = dir[(k+n+m+1)];
+		ds_a = ( -z.*s - dz_a.*s)./z;
+		dkappa_a = (-(tau)*(kappa) - dtau_a*(kappa))/(tau)
+
+		# Compute Step size a, and Centering Parameter s
+		this.alpha = 1;
+		this.compute_min_ratio_alpha(variables.s,this.ds)
+		this.compute_min_ratio_alpha(variables.z,this.dz)
+		this.compute_min_ratio_alpha([variables.kappa],[this.dkappa])
+		this.compute_min_ratio_alpha([variables.tau],[this.dtau])
+		
+		this.update_values(dx_a,dy_a,dz_a,dtau_a,ds_a,dkappa_a,alpha)
+	end*/	
+	
+	// figure out alpha (line search value)
+	alpha = 1;
+	compute_min_ratio_alpha(variables.s,variables.s,alpha); // TO DO change to dz
+	compute_min_ratio_alpha(variables.z,variables.z,alpha);
+	compute_min_ratio_alpha(variables.kappa,variables.kappa,alpha);
+	compute_min_ratio_alpha(variables.tau,variables.tau,alpha);
+		
 }
 
 void lp_direction::compute_corrector_direction(
 		linear_system_rhs &corrector_rhs,
-		 lp_input &problem_data,
+		lp_input &problem_data,
 		lp_variables &variables,
 		algorithm_state &state,
 		lp_settings &settings,
 		k_newton_copl_matrix &K_matrix
 		) {
-			
+	// TO DO
+
+	/*
+	this.compute_corrector_direction = function(
+									 corrector_rhs::class_linear_system_rhs,
+									 problem_data::class_linear_program_input,
+                                     variables::class_linear_program_variables,
+									 state::class_algorithm_state,
+                                     settings::class_settings,
+									 K_newton_matrix::class_K_newton_matrix)
+		m = problem_data.m
+		n = problem_data.n
+		k = problem_data.k
+		
+		kappa = variables.kappa
+		tau = variables.tau
+		s = variables.s
+		z = variables.z
+		
+		 # this requires clever manipulation in C to prevent use
+		dx_a = this.dx
+		dy_a = this.dy
+		ds_a = this.ds
+		dz_a = this.dz
+		dtau_a = this.dtau
+		dkappa_a = this.dkappa
+		alpha = this.alpha
+		
+		mu = state.mu
+		sigma = state.sigma
+		
+		dir = solveLinearEquation(problem_data, variables, corrector_rhs, K_newton_matrix);
+		
+		this.dx = dir[1:k];
+		this.dy = dir[(k+1):(k+n)];
+		this.dz = dir[(k+n+1):(k+n+m)];
+		this.dtau = dir[(k+n+m+1)];
+		
+		this.ds = ( -z.*s -ds_a.*dz_a + sigma*mu - (this.dz).*s)./z;
+		this.dkappa = (-tau*kappa-dtau_a*dkappa_a + sigma*mu - (this.dtau)*kappa)/tau
+
+		# Update
+		this.alpha = 1;
+		this.compute_min_ratio_alpha(variables.s,this.ds)
+		this.compute_min_ratio_alpha(variables.z,this.dz)
+		this.compute_min_ratio_alpha([variables.kappa],[this.dkappa])
+		this.compute_min_ratio_alpha([variables.tau],[this.dtau])
+		this.alpha = this.alpha*settings.bkscale
+		#this.update_values(dx,dy,dz,dtau,ds,dkappa,alpha)
+	end
+	*/
+}
+
+void lp_direction::compute_min_ratio_alpha(double var, double dvar, double& alpha_val) {
+	if (dvar != 0) { // GREATER THAN TOL ??????
+		double candidate_alpha = -var/dvar;
+		if (candidate_alpha > 0) {
+			alpha_val = min(alpha_val, candidate_alpha);
+		}
+	}
+}
+
+void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val) {
+	assert(var.size() == dvar.size());
+	
+	for (int i = 0; i < var.size(); i++) {
+		double var_double = var[i];
+		double dvar_double = var[i];
+		compute_min_ratio_alpha(var_double, dvar_double, alpha_val);
+	}
 }
 
 //-----------End lp direction
@@ -216,16 +322,89 @@ void algorithm_state::update_mu(lp_variables &variables,  lp_input &problem_data
 // linear_system_rhs
 
 linear_system_rhs::linear_system_rhs( lp_input &problem_data) :
-	q1(1,0), q2(1,0), q3(1,0), q4(1,0), q5(1,0), q6(1,0)
+	q1(problem_data.k_var,0), q2(problem_data.n,0), q3(problem_data.m,0), q5(problem_data.m,0)
 {
-	cout << "xx" << endl;
+	
+}
+linear_system_rhs::~linear_system_rhs() {
+	cout << "destructor for linear system rhs called" << endl;
 }
 
 void linear_system_rhs::compute_affine_rhs(lp_residuals &residuals, lp_variables &variables){
 	// TOOD
+	
+	// q1 = -r1
+	zeros(q1);
+	axpy(-1.0, residuals.r1, q1);
+	
+	// q2 = -r2
+	zeros(q2);
+	axpy(-1.0, residuals.r2, q2);
+	
+	// q3 = -r3
+	zeros(q3);
+	axpy(-1.0, residuals.r3, q3);
+	
+	// q4 = -r4
+	q4 = -residuals.r4;
+	
+	// q5 = -(variables.z).*(variables.s)
+	zeros(q5);
+	for (int i = 0; i < q5.size(); i++)
+		q5[i] = -variables.z[i]*variables.s[i];
+	
+	// q6 = -(variables.tau)*(variables.kappa)
+	q6 = -variables.tau*variables.kappa;
 }
 void linear_system_rhs::compute_corrector_rhs(lp_residuals &residuals, lp_variables &variables, algorithm_state &state, lp_direction &direction,  lp_input &problem_data){
-	// TOOD
+	// TODO
+	//
+	
+	// mu_a = ((s+alpha*ds_a)'*(z+alpha*dz_a) + (tau + alpha*dtau_a)*((kappa) + alpha*dkappa_a))/(m+1.0);
+	// mu_a = ((s+alpha*ds_a)'*(z+alpha*dz_a) + (tau + alpha*dtau_a)*((kappa) + alpha*dkappa_a))/(m+1.0);
+	
+	
+	/*
+	this.compute_corrector_rhs = function(residuals::class_residuals,variables::class_linear_program_variables,state::class_algorithm_state,affine_direction::class_direction,problem_data::class_linear_program_input)
+		m = problem_data.m
+		
+		z = variables.z
+		s = variables.s
+		tau = variables.tau
+		kappa = variables.kappa
+		
+		dx_a = direction.dx
+		dy_a = direction.dy
+		ds_a = direction.ds
+		dz_a = direction.dz
+		dtau_a = direction.dtau
+		dkappa_a = direction.dkappa
+		alpha = direction.alpha
+		
+		mu = state.mu
+		
+		mu_a = ((s+alpha*ds_a)'*(z+alpha*dz_a) + (tau + alpha*dtau_a)*((kappa) + alpha*dkappa_a))/(m+1.0);
+		sigma = ((mu_a/(mu))^3)[1]
+		
+		state.sigma = sigma
+		
+		this.update_values(-(1-sigma)*residuals.r1, -(1-sigma)*residuals.r2, -(1-sigma)*residuals.r3, -(1-sigma)*residuals.r4, -z.*s -ds_a.*dz_a + sigma*mu,  -tau*kappa-dtau_a*dkappa_a + sigma*mu)
+	end
+	*/
+}
+
+void linear_system_rhs::var_dump() {
+	cout << "DUMP RHS OBJECT" << endl;
+	cout << "q1";
+	copl_vector_dump(q1);
+	cout << "q2";
+	copl_vector_dump(q2);
+	cout << "q3";
+	copl_vector_dump(q3);
+	cout << "q4" << q4 << endl;
+	cout << "q5";
+	copl_vector_dump(q5);
+	cout << "q6" << q6 << endl;
 }
 //--------End linear_system_rhs--------
 
@@ -263,6 +442,16 @@ lp_input* copl_utility::Trivial_Test1() {
 	problem_data->c[1] = 2;
 	problem_data->c[2] = 3;
 	problem_data->c[3] = 4;
+	
+	
+	copl_vector feasible_x(4,1.0);
+	// b = A*x0
+	zeros(problem_data->b);
+	sp_dgemv(1.0, 1.0, problem_data->A, feasible_x, problem_data->b);
+	
+	// h = G*x0
+	zeros(problem_data->h);
+	sp_dgemv(1.0, 1.0, problem_data->G, feasible_x, problem_data->h);
 	
 	return problem_data;
 }

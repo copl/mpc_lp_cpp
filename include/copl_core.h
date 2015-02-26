@@ -99,6 +99,8 @@ public:
 	double get_r2_norm();
 	double get_r3_norm();
 	double get_norm_squared();
+	
+	void var_dump();
 };
 //--------End lp_residuals--------
 
@@ -108,15 +110,17 @@ class linear_system_rhs {
 	copl_vector q1;
 	copl_vector q2;
 	copl_vector q3;
-	copl_vector q4;
+	double q4;
 	copl_vector q5;
-	copl_vector q6;
+	double q6;
 public:
 	linear_system_rhs( lp_input &problem_data);
+	~linear_system_rhs();
 	
 	void compute_affine_rhs(lp_residuals &residuals, lp_variables &variables);
 	void compute_corrector_rhs(lp_residuals &residuals, lp_variables &variables, algorithm_state &state, lp_direction &direction,  lp_input &problem_data);
 
+	void var_dump();
 };
 
 //--------End linear_system_rhs--------
@@ -150,14 +154,10 @@ public:
 		lp_settings &settings,
 		k_newton_copl_matrix &K_matrix
 		);
-	void compute_alpha(
-		algorithm_state &state,
-		lp_settings &settings
-		);
-	void compute_min_ratio_alpha (
-		copl_vector var,
-		copl_vector dvar
-		);
+	
+	void compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val);
+	void compute_min_ratio_alpha(double var, double dvar, double& alpha_val);
+	
 	double get_alpha();
 	double get_dtau(); 
 	double get_dkappa(); 

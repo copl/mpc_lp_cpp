@@ -26,14 +26,17 @@ namespace copl_ip {
 			K_matrix.update(variables);
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
+			residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
 			}
-			// --- BEGIN NOT WORKING --- //
+			
 			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
+			rhs.var_dump();
+			// --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
 			direction.compute_affine_direction(rhs,problem_data,variables,K_matrix); //Incomplete??
 			
