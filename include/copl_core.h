@@ -59,14 +59,15 @@ public:
 	
 //settings
 class lp_settings {
-	int max_iter;
-	double linear_feas_tol;	//This is a relative tolerance w.r.t. 
-                            //some normalizing norms
-	double comp_tol; // How small must s^Tz must be when we stop
-	
-	//ant length of the 
-    //maximum combined step to the boundary to use
-    double bkscale;
+	public:
+		int max_iter;
+		double linear_feas_tol;	//This is a relative tolerance w.r.t. 
+								//some normalizing norms
+		double comp_tol; // How small must s^Tz must be when we stop
+		
+		//ant length of the 
+		//maximum combined step to the boundary to use
+		double bkscale;
 public:
 	//Configuration for solver
 	//linear_solver_lp_settings 
@@ -145,10 +146,12 @@ public:
 	lp_direction(lp_variables &variables);
 	lp_direction(const lp_direction &obj);
 
-	void compute_affine_direction(	
+	void compute_affine_direction(
 		linear_system_rhs &affine_rhs,
-		 lp_input &problem_data,
+		lp_input &problem_data,
 		lp_variables &variables,
+		algorithm_state &state,
+		lp_settings &settings,
 		k_newton_copl_matrix &K_matrix
 		);
 
@@ -160,7 +163,10 @@ public:
 		lp_settings &settings,
 		k_newton_copl_matrix &K_matrix
 		);
+		
+	void solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix);
 	
+	void compute_step_size(lp_variables& variables, lp_settings& settings);
 	void compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val);
 	void compute_min_ratio_alpha(double var, double dvar, double& alpha_val);
 	

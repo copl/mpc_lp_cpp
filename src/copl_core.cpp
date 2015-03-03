@@ -156,10 +156,22 @@ copl_vector lp_direction::get_dy() { return dy; }
 copl_vector lp_direction::get_dz() { return dz; }
 copl_vector lp_direction::get_ds() { return ds; }
 
-void  lp_direction::compute_affine_direction(linear_system_rhs &affine_rhs,
-		 lp_input &problem_data,
+
+void lp_direction::solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix) {
+
+}
+
+void  lp_direction::compute_affine_direction(
+		linear_system_rhs &affine_rhs,
+		lp_input &problem_data,
 		lp_variables &variables,
-		k_newton_copl_matrix &K_matrix) {
+		algorithm_state &state,
+		lp_settings &settings,
+		k_newton_copl_matrix &K_matrix
+		) {
+		
+	this->solve_linear_system_for_new_direction(affine_rhs, K_matrix);
+	this->compute_step_size(variables,settings);
 	/*
 	this.compute_affine_direction = function(affine_rhs::class_linear_system_rhs,
 													problem_data::class_linear_program_input,	
@@ -184,25 +196,13 @@ void  lp_direction::compute_affine_direction(linear_system_rhs &affine_rhs,
 		dz_a = dir[(k+n+1):(k+n+m)];
 		dtau_a = dir[(k+n+m+1)];
 		ds_a = ( -z.*s - dz_a.*s)./z;
-		dkappa_a = (-(tau)*(kappa) - dtau_a*(kappa))/(tau)
-
-		# Compute Step size a, and Centering Parameter s
-		this.alpha = 1;
-		this.compute_min_ratio_alpha(variables.s,this.ds)
-		this.compute_min_ratio_alpha(variables.z,this.dz)
-		this.compute_min_ratio_alpha([variables.kappa],[this.dkappa])
-		this.compute_min_ratio_alpha([variables.tau],[this.dtau])
+		dkappa_a = (-(tau)*(kappa) - dtau_a*(kappa))/(tau)\
 		
 		this.update_values(dx_a,dy_a,dz_a,dtau_a,ds_a,dkappa_a,alpha)
 	end*/	
 	
 	// figure out alpha (line search value)
-	alpha = 1;
-	compute_min_ratio_alpha(variables.s,variables.s,alpha); // TO DO change to dz
-	compute_min_ratio_alpha(variables.z,variables.z,alpha);
-	compute_min_ratio_alpha(variables.kappa,variables.kappa,alpha);
-	compute_min_ratio_alpha(variables.tau,variables.tau,alpha);
-		
+	
 }
 
 void lp_direction::compute_corrector_direction(
@@ -213,8 +213,11 @@ void lp_direction::compute_corrector_direction(
 		lp_settings &settings,
 		k_newton_copl_matrix &K_matrix
 		) {
+	
+	this->solve_linear_system_for_new_direction(corrector_rhs, K_matrix);
+	this->compute_step_size(variables,settings);
+	
 	// TO DO
-
 	/*
 	this.compute_corrector_direction = function(
 									 corrector_rhs::class_linear_system_rhs,
@@ -264,6 +267,15 @@ void lp_direction::compute_corrector_direction(
 		#this.update_values(dx,dy,dz,dtau,ds,dkappa,alpha)
 	end
 	*/
+}
+
+void lp_direction::compute_step_size(lp_variables& variables, lp_settings& settings) {
+	this->alpha = 1;
+	compute_min_ratio_alpha(variables.s,variables.s,this->alpha); // TO DO change to dz
+	compute_min_ratio_alpha(variables.z,variables.z,this->alpha);
+	compute_min_ratio_alpha(variables.kappa,variables.kappa,this->alpha);
+	compute_min_ratio_alpha(variables.tau,variables.tau,this->alpha);
+	this->alpha = this->alpha*settings.bkscale;
 }
 
 void lp_direction::compute_min_ratio_alpha(double var, double dvar, double& alpha_val) {

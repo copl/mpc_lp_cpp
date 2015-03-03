@@ -38,7 +38,14 @@ namespace copl_ip {
 			rhs.var_dump();
 			// --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
-			direction.compute_affine_direction(rhs,problem_data,variables,K_matrix); //Incomplete??
+			direction.compute_affine_direction(
+				rhs,
+				problem_data,
+				variables,
+				state,
+				settings,
+				K_matrix
+				); // are these the same ???
 			
 			// update corrector rhs using new affine direction
 			rhs.compute_corrector_rhs(residuals,variables,state,direction,problem_data);
