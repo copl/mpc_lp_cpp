@@ -24,8 +24,10 @@ lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random thi
 	k_var = _k_var;
 };
 
-lp_input::lp_input(const lp_input &obj) {
+lp_input::lp_input(const lp_input &obj)  { //something is wrong here with uninitialized A and G matrices
+	#ifdef PREVENT_COPY_CONSTRUCTOR
 	cout << "WARNING: Input copy constructor called." << "\n";
+	#endif
 }
 
 
@@ -63,7 +65,9 @@ lp_settings::lp_settings (int input_max_iter, double input_linear_feas_tol, doub
 	bkscale 			= input_bkscale;
 }
 lp_settings::lp_settings(const lp_settings &obj){
+	#ifdef PREVENT_COPY_CONSTRUCTOR
 	cout << "WARNING: Settings copy constructor being called." <<"\n";
+	#endif
 }
 int lp_settings::get_max_iter()			{return max_iter;}
 double lp_settings::get_linear_feas_tol() 	{return linear_feas_tol;}
@@ -139,7 +143,9 @@ lp_direction::lp_direction(lp_variables &variables)
 
 }
 lp_direction::lp_direction(const lp_direction &obj){
+	#ifdef PREVENT_COPY_CONSTRUCTOR
 	cout << "WARNING: Direction copy constructor called." << "\n";
+	#endif
 }
 double lp_direction::get_alpha() { return alpha; }
 double lp_direction::get_dtau() { return dtau; }
@@ -290,7 +296,9 @@ lp_variables::lp_variables(int n, int m, int k_var) :
 }
 
 lp_variables::lp_variables(const lp_variables &obj){
+	#ifdef PREVENT_COPY_CONSTRUCTOR
 	cout << "WARNING: Variables copy constructor called." << "\n";
+	#endif
 }
 
 lp_variables::~lp_variables() {
@@ -341,7 +349,9 @@ linear_system_rhs::linear_system_rhs( lp_input &problem_data) :
 }
 
 linear_system_rhs::linear_system_rhs(const linear_system_rhs &obj){
+	#ifdef PREVENT_COPY_CONSTRUCTOR
 	cout << "WARNING: Linear system rhs copy constructor called." << "\n";
+	#endif
 }
 linear_system_rhs::~linear_system_rhs() {
 	cout << "destructor for linear system rhs called" << endl;
