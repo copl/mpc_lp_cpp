@@ -24,7 +24,8 @@ lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random thi
 	k_var = _k_var;
 };
 
-lp_input::lp_input(const lp_input &obj)  { //something is wrong here with uninitialized A and G matrices
+lp_input::lp_input(const lp_input &obj)
+	:A(0,0), G(0,0), c(0,2.0), h(0,2.0), b(0,2.0) { //something is wrong here with uninitialized A and G matrices
 	#ifdef PREVENT_COPY_CONSTRUCTOR
 	cout << "WARNING: Input copy constructor called." << "\n";
 	#endif
@@ -358,7 +359,7 @@ linear_system_rhs::~linear_system_rhs() {
 }
 
 void linear_system_rhs::compute_affine_rhs(lp_residuals &residuals, lp_variables &variables){
-	// TOOD
+	// TOOD	
 	
 	// q1 = -r1
 	zeros(q1);
