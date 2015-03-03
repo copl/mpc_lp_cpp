@@ -19,6 +19,7 @@ public:
 	copl_vector c, h, b;
 
 	lp_input(int m, int n, int k_var);
+	lp_input(const lp_input &obj);
 	~lp_input();
 	void var_dump()  ;
 };
@@ -32,6 +33,7 @@ public:
 	double tau, kappa;
 	
 	lp_variables(int n, int m, int k_var);
+	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
 	~lp_variables();
 };
@@ -74,6 +76,7 @@ public:
 		double comp_tol,	
 		double bkscale
 		);
+	lp_settings(const lp_settings &obj); //copy constructor - 
 	int get_max_iter();
 	double get_linear_feas_tol();
 	double get_comp_tol();
@@ -115,6 +118,7 @@ class linear_system_rhs {
 	double q6;
 public:
 	linear_system_rhs( lp_input &problem_data);
+	linear_system_rhs(const linear_system_rhs &obj);
 	~linear_system_rhs();
 	
 	void compute_affine_rhs(lp_residuals &residuals, lp_variables &variables);
@@ -138,6 +142,7 @@ public:
 	double alpha;
 	
 	lp_direction(lp_variables &variables);
+	lp_direction(const lp_direction &obj);
 
 	void compute_affine_direction(	
 		linear_system_rhs &affine_rhs,
