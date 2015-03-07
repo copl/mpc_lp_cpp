@@ -6,6 +6,7 @@
 
 namespace copl_ip
 {
+ofstream LOG_FILE_VARIABLE("../bin/log.txt");
 
 //y<- alpha Ax + beta y with sparse A
 void sp_dgemv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y)
@@ -155,14 +156,14 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 
 	void copl_matrix::var_dump()
 	{
-		cout << *eigenMat << endl;
+		OUTPUT << *eigenMat << endl;
 	}
 	
 	
 	//Destructor 
 	copl_matrix::~copl_matrix()
 	{
-		cout << "deleting eigen matrix" << endl;
+		OUTPUT << "deleting eigen matrix" << endl;
 		delete(eigenMat);
 	}
 

@@ -1,19 +1,21 @@
 #include <copl_core.h>
 #include <copl_linalg.h>
 #include <iostream>
-#include <fstream>
+
+
 using namespace std;
 
 namespace copl_ip {
 
+
 void copl_vector_dump(copl_vector &vec) {
-	cout << "{";
+	OUTPUT << "{";
 	for(int i = 0; i < vec.size() - 1; i++) {
-		cout << vec[i] << ",";
+		OUTPUT << vec[i] << ",";
 	}
-	cout << vec[vec.size() - 1];
-	cout << "}";
-	cout << endl;
+	OUTPUT << vec[vec.size() - 1];
+	OUTPUT << "}";
+	OUTPUT << endl;
 };
 
 //lp_input
@@ -25,35 +27,35 @@ lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random thi
 };
 
 lp_input::lp_input(const lp_input &obj)
-	:A(0,0), G(0,0), c(0,2.0), h(0,2.0), b(0,2.0) { //something is wrong here with uninitialized A and G matrices
+	:A(0,0), G(0,0), c(0,2.0), h(0,2.0), b(0,2.0) { 
 	#ifdef PREVENT_COPY_CONSTRUCTOR
-	cout << "WARNING: Input copy constructor called." << "\n";
+	OUTPUT << "WARNING: Input copy constructor called." << "\n";
 	#endif
 }
 
 
 lp_input::~lp_input() {
-	cout << "deleting lp input" << endl;
-	cout << "constructor not complete" << endl;
+	OUTPUT << "deleting lp input" << endl;
+	OUTPUT << "constructor not complete" << endl;
 };
 
 void lp_input::var_dump()  {
 	
-	cout << "=== BEGIN LP INPUT VAR DUMP ====" << endl;
-	cout << "c = ";
+	OUTPUT << "=== BEGIN LP INPUT VAR DUMP ====" << endl;
+	OUTPUT << "c = ";
 	copl_vector_dump(c);
-	cout << "b = ";
+	OUTPUT << "b = ";
 	copl_vector_dump(b);
-	cout << "h = ";
+	OUTPUT << "h = ";
 	copl_vector_dump(h);
 	
-	cout << "A = ";
+	OUTPUT << "A = ";
 	A.var_dump();
-	cout << "G = ";
+	OUTPUT << "G = ";
 	G.var_dump();
 	
 	// ********* complete for matricies
-	cout << "=== END VAR DUMP ====" << endl;
+	OUTPUT << "=== END VAR DUMP ====" << endl;
 };
 
 //--------End lp_input--------
@@ -67,10 +69,10 @@ lp_settings::lp_settings (int input_max_iter, double input_linear_feas_tol, doub
 }
 lp_settings::lp_settings(const lp_settings &obj){
 	#ifdef PREVENT_COPY_CONSTRUCTOR
-	cout << "WARNING: Settings copy constructor being called." <<"\n";
+	OUTPUT << "WARNING: Settings copy constructor being called." <<"\n";
 	#endif
 }
-int lp_settings::get_max_iter()			{return max_iter;}
+int lp_settings::get_max_iter()				{return max_iter;}
 double lp_settings::get_linear_feas_tol() 	{return linear_feas_tol;}
 double lp_settings::get_comp_tol() 			{return comp_tol;}
 double lp_settings::get_bkscale() 			{return bkscale;}
@@ -116,17 +118,17 @@ void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &vari
 }
 
 void lp_residuals::var_dump() {
-	cout << "DUMP RESIDUALS OBJECT" << endl;
-	cout << "r1:";
+	OUTPUT << "DUMP RESIDUALS OBJECT" << endl;
+	OUTPUT << "r1:";
 	copl_vector_dump(r1);
 	
-	cout << "r2:";
+	OUTPUT << "r2:";
 	copl_vector_dump(r2);
 	
-	cout << "r3:";
+	OUTPUT << "r3:";
 	copl_vector_dump(r3);
 	
-	cout << "r4:" << r4 << endl;
+	OUTPUT << "r4:" << r4 << endl;
 }
 double lp_residuals::get_r1_norm(){return norm2(r1);}
 double lp_residuals::get_r2_norm(){return norm2(r2);}
@@ -145,7 +147,7 @@ lp_direction::lp_direction(lp_variables &variables)
 }
 lp_direction::lp_direction(const lp_direction &obj){
 	#ifdef PREVENT_COPY_CONSTRUCTOR
-	cout << "WARNING: Direction copy constructor called." << "\n";
+	OUTPUT << "WARNING: Direction copy constructor called." << "\n";
 	#endif
 }
 double lp_direction::get_alpha() { return alpha; }
@@ -310,13 +312,13 @@ lp_variables::lp_variables(int n, int m, int k_var) :
 
 lp_variables::lp_variables(const lp_variables &obj){
 	#ifdef PREVENT_COPY_CONSTRUCTOR
-	cout << "WARNING: Variables copy constructor called." << "\n";
+	OUTPUT << "WARNING: Variables copy constructor called." << "\n";
 	#endif
 }
 
 lp_variables::~lp_variables() {
-	cout << "lp variables being deleted" << endl;
-	cout << "destructor not yet complete" << endl;
+	OUTPUT << "lp variables being deleted" << endl;
+	OUTPUT << "destructor not yet complete" << endl;
 }
 
 void lp_variables::take_step(lp_direction &direction){
@@ -363,11 +365,11 @@ linear_system_rhs::linear_system_rhs( lp_input &problem_data) :
 
 linear_system_rhs::linear_system_rhs(const linear_system_rhs &obj){
 	#ifdef PREVENT_COPY_CONSTRUCTOR
-	cout << "WARNING: Linear system rhs copy constructor called." << "\n";
+	OUTPUT << "WARNING: Linear system rhs copy constructor called." << "\n";
 	#endif
 }
 linear_system_rhs::~linear_system_rhs() {
-	cout << "destructor for linear system rhs called" << endl;
+	OUTPUT << "destructor for linear system rhs called" << endl;
 }
 
 void linear_system_rhs::compute_affine_rhs(lp_residuals &residuals, lp_variables &variables){
@@ -434,17 +436,17 @@ void linear_system_rhs::compute_corrector_rhs(lp_residuals &residuals, lp_variab
 }
 
 void linear_system_rhs::var_dump() {
-	cout << "DUMP RHS OBJECT" << endl;
-	cout << "q1";
+	OUTPUT << "DUMP RHS OBJECT" << endl;
+	OUTPUT << "q1";
 	copl_vector_dump(q1);
-	cout << "q2";
+	OUTPUT << "q2";
 	copl_vector_dump(q2);
-	cout << "q3";
+	OUTPUT << "q3";
 	copl_vector_dump(q3);
-	cout << "q4" << q4 << endl;
-	cout << "q5";
+	OUTPUT << "q4" << q4 << endl;
+	OUTPUT << "q5";
 	copl_vector_dump(q5);
-	cout << "q6" << q6 << endl;
+	OUTPUT << "q6" << q6 << endl;
 }
 //--------End linear_system_rhs--------
 

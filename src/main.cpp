@@ -8,6 +8,7 @@
 #include <copl_algorithm.h>
 #include <copl_linalg.h>
 
+
 using namespace std;
 using namespace copl_ip;
 
@@ -22,8 +23,8 @@ int main()
 
 	//copl_vector test(10,10);
 
-	cout << "COPL 2015" << endl;
-	cout << "Interior point algorithm coming" << endl;
+	OUTPUT << "COPL 2015" << endl;
+	OUTPUT << "Interior point algorithm coming" << endl;
 	
 	// Initialize configuration variable
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);

@@ -1,4 +1,3 @@
-
 #include <copl_algorithm.h>
 
 
@@ -71,7 +70,7 @@ namespace copl_ip {
 			
 			print_status(state, direction, variables, residuals, itr);
 		}
-		cout << "IP algorithm finished" << endl;
+		OUTPUT << "IP algorithm finished" << endl;
 	}
 
 	bool termination_criteria_met(lp_settings &settings, algorithm_state &state, lp_residuals &residuals){
@@ -96,7 +95,7 @@ namespace copl_ip {
 	}
 	
 	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr) {
-		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.get_norm_squared() << endl;
+		OUTPUT << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.get_norm_squared() << endl;
 		//@printf("%3i\t%3.3e\t%3.3e\t%3.3e\t%3.3e\t%3.3e\n", itr, state.gap ,state.mu, direction.alpha, variables.tau, residuals.normed_squared)
 	}
 }

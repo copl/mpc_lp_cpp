@@ -2,8 +2,12 @@
 #define PREVENT_COPY_CONSTRUCTOR
 #define INTERIOR_POINT_DATA_STRUCTURES
 
+
 #include <copl_linalg.h>
 #include <iostream>
+
+
+
 namespace copl_ip{
 
 // preliminary definitions //

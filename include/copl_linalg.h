@@ -2,6 +2,7 @@
  * Linear algebra definitions for the copl interior point solver 
  * Santiago Akle 
  */
+#define DEBUG_TO_FILE
 #ifndef COPL_LINALG_H
 #define COPL_LINALG_H
 
@@ -9,10 +10,17 @@
 #include <Eigen/Sparse>
 #include <random>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 namespace copl_ip 
 {
+#ifdef DEBUG_TO_FILE
+extern ofstream LOG_FILE_VARIABLE;
+#define OUTPUT LOG_FILE_VARIABLE
+#else
+#define OUTPUT cout
+#endif
 typedef Eigen::SparseMatrix<double> EigenSpMat_t;
 typedef std::vector<double> copl_vector;
 
