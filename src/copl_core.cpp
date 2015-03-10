@@ -7,7 +7,7 @@ using namespace std;
 
 namespace copl_ip {
 
-
+ofstream LOG_FILE_VARIABLE;
 void copl_vector_dump(copl_vector &vec) {
 	OUTPUT << "{";
 	for(int i = 0; i < vec.size() - 1; i++) {
