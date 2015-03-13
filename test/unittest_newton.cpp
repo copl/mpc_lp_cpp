@@ -32,7 +32,9 @@ TEST(KNEWTON,Assemble)
     G.insert_at(2,3,11.0);
 	
     //Assemble a matrix K
-    
+    k_newton_copl_matrix K();
+    K.assemble_matrix(A,G);
+
 }
 
 
