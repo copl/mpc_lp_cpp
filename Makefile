@@ -10,6 +10,8 @@ GMOCK_DIR=./external/gmock-1.7.0/
 AR=ar -rv
 
 COPL_CPP_FILES := $(wildcard src/*.cpp) 
+#remove src/main.cpp 
+COPL_CPP_FILES := $(filter-out src/main.cpp, $(COPL_CPP_FILES))
 TEST_CPP_FILES := $(wildcard test/*.cpp) 
 COPL_OBJ_FILES := $(addprefix bin/,$(notdir $(COPL_CPP_FILES:.cpp=.o)))
 TEST_OBJ_FILES := $(addprefix testbin/,$(notdir $(TEST_CPP_FILES:.cpp=.o)))
@@ -36,9 +38,14 @@ endif
 
 all: main
 
-main: $(COPL_OBJ_FILES)
+#We treat main differently to all the other files so that when we test we 
+#dont link two files with a main function
+main.o:	
+	$(CPP) $(CFLAGS) $(INCLUDE) $(TEST_INCLUDE) -c ./src/main.cpp -o ./bin/main.o
+
+main: $(COPL_OBJ_FILES) main.o
 	mkdir -p ./bin
-	$(CPP) -stdlib=libc++ -std=c++11 $(COPL_OBJ_FILES) -o ./bin/main$(EXE_NAME).exe
+	$(CPP) -stdlib=libc++ -std=c++11 $(COPL_OBJ_FILES) ./bin/main.o -o ./bin/main$(EXE_NAME).exe
 
 #compile gtest and gmock
 gmock.a: 
