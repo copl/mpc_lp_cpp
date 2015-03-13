@@ -7,7 +7,7 @@ using namespace std;
 
 namespace copl_ip {
 
-
+ofstream LOG_FILE_VARIABLE;
 void copl_vector_dump(copl_vector &vec) {
 	OUTPUT << "{";
 	for(int i = 0; i < vec.size() - 1; i++) {
@@ -163,7 +163,7 @@ void lp_direction::solve_linear_system_for_new_direction(linear_system_rhs& rhs,
 
 }
 
-void  lp_direction::compute_affine_direction(
+void  lp_direction::compute_direction(
 		linear_system_rhs &affine_rhs,
 		lp_input &problem_data,
 		lp_variables &variables,
@@ -207,69 +207,6 @@ void  lp_direction::compute_affine_direction(
 	
 }
 
-void lp_direction::compute_corrector_direction(
-		linear_system_rhs &corrector_rhs,
-		lp_input &problem_data,
-		lp_variables &variables,
-		algorithm_state &state,
-		lp_settings &settings,
-		k_newton_copl_matrix &K_matrix
-		) {
-	
-	this->solve_linear_system_for_new_direction(corrector_rhs, K_matrix);
-	this->compute_step_size(variables,settings);
-	
-	// TO DO
-	/*
-	this.compute_corrector_direction = function(
-									 corrector_rhs::class_linear_system_rhs,
-									 problem_data::class_linear_program_input,
-                                     variables::class_linear_program_variables,
-									 state::class_algorithm_state,
-                                     settings::class_settings,
-									 K_newton_matrix::class_K_newton_matrix)
-		m = problem_data.m
-		n = problem_data.n
-		k = problem_data.k
-		
-		kappa = variables.kappa
-		tau = variables.tau
-		s = variables.s
-		z = variables.z
-		
-		 # this requires clever manipulation in C to prevent use
-		dx_a = this.dx
-		dy_a = this.dy
-		ds_a = this.ds
-		dz_a = this.dz
-		dtau_a = this.dtau
-		dkappa_a = this.dkappa
-		alpha = this.alpha
-		
-		mu = state.mu
-		sigma = state.sigma
-		
-		dir = solveLinearEquation(problem_data, variables, corrector_rhs, K_newton_matrix);
-		
-		this.dx = dir[1:k];
-		this.dy = dir[(k+1):(k+n)];
-		this.dz = dir[(k+n+1):(k+n+m)];
-		this.dtau = dir[(k+n+m+1)];
-		
-		this.ds = ( -z.*s -ds_a.*dz_a + sigma*mu - (this.dz).*s)./z;
-		this.dkappa = (-tau*kappa-dtau_a*dkappa_a + sigma*mu - (this.dtau)*kappa)/tau
-
-		# Update
-		this.alpha = 1;
-		this.compute_min_ratio_alpha(variables.s,this.ds)
-		this.compute_min_ratio_alpha(variables.z,this.dz)
-		this.compute_min_ratio_alpha([variables.kappa],[this.dkappa])
-		this.compute_min_ratio_alpha([variables.tau],[this.dtau])
-		this.alpha = this.alpha*settings.bkscale
-		#this.update_values(dx,dy,dz,dtau,ds,dkappa,alpha)
-	end
-	*/
-}
 
 void lp_direction::compute_step_size(lp_variables& variables, lp_settings& settings) {
 	this->alpha = 1;

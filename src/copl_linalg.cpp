@@ -6,7 +6,6 @@
 
 namespace copl_ip
 {
-ofstream LOG_FILE_VARIABLE("../bin/log.txt");
 
 //y<- alpha Ax + beta y with sparse A
 void sp_dgemv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl_x, copl_vector &copl_y)

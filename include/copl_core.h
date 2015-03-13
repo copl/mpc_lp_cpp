@@ -150,17 +150,8 @@ public:
 	lp_direction(lp_variables &variables);
 	lp_direction(const lp_direction &obj);
 
-	void compute_affine_direction(
+	void compute_direction(
 		linear_system_rhs &affine_rhs,
-		lp_input &problem_data,
-		lp_variables &variables,
-		algorithm_state &state,
-		lp_settings &settings,
-		k_newton_copl_matrix &K_matrix
-		);
-
-	void compute_corrector_direction(
-		linear_system_rhs &corrector_rhs,
 		lp_input &problem_data,
 		lp_variables &variables,
 		algorithm_state &state,

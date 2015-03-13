@@ -11,16 +11,17 @@
 #include <random>
 #include <iostream>
 #include <fstream>
+#include <copl_debug.h>
 using namespace std;
 
 namespace copl_ip 
 {
-#ifdef DEBUG_TO_FILE
-extern ofstream LOG_FILE_VARIABLE;
-#define OUTPUT LOG_FILE_VARIABLE
-#else
-#define OUTPUT cout
-#endif
+// #ifdef DEBUG_TO_FILE
+// extern ofstream LOG_FILE_VARIABLE;
+// #define OUTPUT LOG_FILE_VARIABLE
+// #else
+// #define OUTPUT cout
+// #endif
 typedef Eigen::SparseMatrix<double> EigenSpMat_t;
 typedef std::vector<double> copl_vector;
 
