@@ -39,6 +39,7 @@ class k_newton_copl_matrix {
 
         //Testing classes
         FRIEND_TEST(KNEWTON,Assemble);
+        
 	public:
 		k_newton_copl_matrix( lp_input &problem_data);
 		void factor();

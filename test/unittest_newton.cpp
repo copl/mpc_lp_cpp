@@ -1,7 +1,9 @@
 #include "gtest/gtest.h"
 #include "copl_linalg.h"
+#include "copl_newton.h"
 #include <vector>
 
+using namespace copl_ip;
 //Test member of EigenTest named Assemble
 TEST(KNEWTON,Assemble)
 {
@@ -33,7 +35,7 @@ TEST(KNEWTON,Assemble)
 	
     //Assemble a matrix K
     k_newton_copl_matrix K();
-    K.assemble_matrix(A,G);
+    //K.assemble_matrix(A,G);
 
 }
 

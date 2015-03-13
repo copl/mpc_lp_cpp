@@ -37,6 +37,7 @@ endif
 all: main
 
 main: $(COPL_OBJ_FILES)
+	mkdir -p ./bin
 	$(CPP) -stdlib=libc++ -std=c++11 $(COPL_OBJ_FILES) -o ./bin/main$(EXE_NAME).exe
 
 #compile gtest and gmock
@@ -45,9 +46,12 @@ gmock.a:
            -isystem ${GMOCK_DIR}/include -I${GMOCK_DIR} \
            -pthread -c ${GTEST_DIR}/src/gtest_main.cc -o ./bin/gtest_main.o
 	$(CPP) $(CFLAGS) -isystem ${GTEST_DIR}/include -I${GTEST_DIR} \
+           -isystem ${GMOCK_DIR}/include -I${GMOCK_DIR} \
+           -pthread -c ${GTEST_DIR}/src/gtest-all.cc -o ./bin/gtest-all.o           
+	$(CPP) $(CFLAGS) -isystem ${GTEST_DIR}/include -I${GTEST_DIR} \
       	   -isystem ${GMOCK_DIR}/include -I${GMOCK_DIR} \
            -pthread -c ${GMOCK_DIR}/src/gmock-all.cc -o ./bin/gmock-all.o
-	$(AR) ./bin/libgmock.a ./bin/gtest_main.o ./bin/gmock-all.o 
+	$(AR) ./bin/libgmock.a ./bin/gtest_main.o ./bin/gtest-all.o ./bin/gmock-all.o 
 
 #Compile all test objects
 testbin/%.o: test/%.cpp
@@ -58,14 +62,13 @@ bin/%.o: src/%.cpp
 	$(CPP) $(CFLAGS) $(INCLUDE) $(TEST_INCLUDE) -c $< -o $@
 
 test: $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) gmock.a
-	$(CPP) $(CFLAGS) $(TEST_LIB) ./bin/libgmock.a $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) -o ./bin/unittest.exe
+	mkdir -p bin
+	mkdir -p testbin 
+	$(CPP) $(CFLAGS) $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) bin/libgmock.a -o ./bin/unittest.exe
 
 help:
 	echo $(COPL_CPP_FILES)	
 	echo $(COPL_OBJ_FILES)
 
 clean:
-	rm ./bin/*.o	
-	rm ./testbin/*.o
-	rm ./bin/*.exe
-	cd ./external/gtest-1.7.0; make clean
+	rm ./bin/*; rm ./testbin/*
