@@ -47,6 +47,20 @@ void generate_random_b(int m, Eigen::VectorXd &b)
 		b[i] = rnorm(generator);
 }
 
+void concatenate_test()
+{
+	//Build a sprase Eigien matrix A and G 
+	//Form IA
+ 	//     A0
+	 Eigen::SparseMatrix<double> A(10,100), B(100,100), C(110,110), Z(100,100);
+	 //Call the concatenation operator 	
+	 Z.setIdentity();	 
+	 cout << " Z ("<<Z.rows() << "," << Z.cols() << ")\n";
+	 C.block(0,0,101,101) = Z;
+	 //Test the size of C
+	 cout << " C ("<<C.rows() << "," << C.cols() << ")\n";
+}
+
 int main(void)
 {
 	int m = 10;
@@ -73,4 +87,6 @@ int main(void)
 	cout << "x(0): " << x[0] << "\n";
 	y = AAt*x;
 	cout << "y(0): " << y[0] << "\n";
+
+	concatenate_test();
 }

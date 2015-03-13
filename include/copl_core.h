@@ -5,7 +5,7 @@
 
 #include <copl_linalg.h>
 #include <iostream>
-
+#include <gtest/gtest_prod.h>
 
 
 namespace copl_ip{
@@ -189,22 +189,29 @@ class k_newton_copl_matrix {
     private: 
     	//The assembled eigen matrix 
     	EigenSpMat_t* eigenKMat;	
-		//Indices in the permuted matrix that correspond
-	    //to the entries of the Hessian as read columnwise
-		std::vector<int> permuted_indices;
-		//Called from the ructor to assemble the first
-		//version of the matrix
-		//void assemble(copl_matrix A, copl_matrix G, int m, int n, int p);
-		//Calls the symbolic analysis function
-		//void permute();
-			
+    	
+        //We keep a reference to the object for generating the matices 
+    	//during the updates.
+    	lp_input* pData; 	
+       
+        //Set up the eigen solver object
+    	Eigen::SparseLU<Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::COLAMDOrdering<int> >   solver;
+        
+        //This function assembles the K newton matrix with identities in the diagonals
+        //K = [-I A' G']
+		//    [A -I    ]
+        //    [G     I ]
+        void AssembleK(copl_matrix &A, copl_matrix &G); 
+        
+        //Friend test classes
+        FRIEND_TEST  
+
 	public:
 		k_newton_copl_matrix( lp_input &problem_data);
-		//~k_newton_copl_matrix();
-		//void update(lp_variables variables);
 		void factor();
 	  	void solve(copl_vector &solution, copl_vector &rhs);
 	  	void update(lp_variables &variables);
+	  	~k_newton_copl_matrix();
 };
 
 //--------End lp_direction--------

@@ -31,7 +31,6 @@ namespace copl_ip {
 				break;
 			}
 			
-			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
 			rhs.var_dump();
