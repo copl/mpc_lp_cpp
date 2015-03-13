@@ -43,8 +43,7 @@ public:
 	// number of columns
 	int num_cols();
 	// value at
-	/*
-	double value_at(int i, int j);*/
+	double value_at(int i, int j);
 	// var dump
 	void var_dump();
 	

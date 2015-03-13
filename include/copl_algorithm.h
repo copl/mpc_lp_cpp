@@ -3,6 +3,7 @@
 
 #include <copl_core.h>
 #include <copl_linalg.h>
+#include <copl_newton.h>
 
 namespace copl_ip{
 

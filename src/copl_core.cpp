@@ -387,69 +387,6 @@ void linear_system_rhs::var_dump() {
 }
 //--------End linear_system_rhs--------
 
-
-k_newton_copl_matrix::k_newton_copl_matrix( lp_input &problem_data)
-{
-	//Keep a copy here for the updates
-	pData = &problem_data;
-}
-
-k_newton_copl_matrix::~k_newton_copl_matrix()
-{
-	delete(eigenKMat);
-}
-
-void k_newton_copl_matrix::factor(){
-
-}
-
-void k_newton_copl_matrix::solve(copl_vector &solution, copl_vector &rhs) {
-
-}
-
-void k_newton_copl_matrix::update(lp_variables &variables)
-{
-	//TODO: Move this delta
-	double DELTA = 1.e-4;
-	int nnzK  = 2*(*pData).A.nnz()+2*(*pData).G.nnz()
-			    +(*pData).A.num_cols() + (*pData).A.num_rows() + (*pData).G.num_rows();
-    int n     = (*pData).A.num_cols();
-    int p     = (*pData).A.num_rows();
-    int m     = (*pData).G.num_rows();
-    int nK    = n+p+m;
-
- 	//Build all the parts
- 	EigenSpMat_t D1(n,n),D2(p,p),D3(m,m),Z1(p,m);
- 	D1.setIdentity();
- 	D2.setIdentity();
- 	D3.setIdentity();
- 	D1*=DELTA;
- 	D2*=-DELTA;
- 	D3*=-DELTA;
- 	//Set the diagonals
- 	for(int i = 0;i<m;i++)
- 	{
- 		D3.coeffRef(i,i)-=variables.s[i]/variables.z[i];
- 	}
-	*eigenKMat  = (D1, (*pData).A.eigenMat->transpose(), (*pData).G.eigenMat->transpose(),
-					     *(*pData).A.eigenMat,D2,Z1,
-					     *(*pData).G.eigenMat,D3); 
-	solver.analyzePattern(*eigenKMat);
-	solver.factorize(*eigenKMat);
-	Eigen::ComputationInfo info = solver.info();
-	if(info == Eigen::Success)
-	{
-		cout << "factor success \n";
-		cout << "A("<<p<<","<<n<<")\n"; 		
-		cout << "G("<<m<<","<<n<<")\n"; 
-		cout << "K("<<(*eigenKMat).rows()<<","<<(*eigenKMat).cols()<<")\n";
-	}
-	else
-	{
-		cout << "factor failure \n";
-	}
-}
-
 lp_input* copl_utility::Trivial_Test1() {
 	lp_input * problem_data = new lp_input(2,3,4);
 	

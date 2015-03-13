@@ -36,7 +36,6 @@ public:
 	copl_vector x, s, z, y;
 
 	double tau, kappa;
-	
 	lp_variables(int n, int m, int k_var);
 	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
@@ -173,36 +172,6 @@ public:
 	copl_vector get_dz(); 
 	copl_vector get_ds(); 
 
-};
-
-//k_newton_copl_matrix
-class k_newton_copl_matrix {
-    private: 
-    	//The assembled eigen matrix 
-    	EigenSpMat_t* eigenKMat;	
-    	
-        //We keep a reference to the object for generating the matices 
-    	//during the updates.
-    	lp_input* pData; 	
-       
-        //Set up the eigen solver object
-    	Eigen::SparseLU<Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::COLAMDOrdering<int> >   solver;
-        
-        //This function assembles the K newton matrix with identities in the diagonals
-        //K = [-I A' G']
-		//    [A -I    ]
-        //    [G     I ]
-        void AssembleK(copl_matrix &A, copl_matrix &G); 
-        
-        //Friend test classes
-        FRIEND_TEST  
-
-	public:
-		k_newton_copl_matrix( lp_input &problem_data);
-		void factor();
-	  	void solve(copl_vector &solution, copl_vector &rhs);
-	  	void update(lp_variables &variables);
-	  	~k_newton_copl_matrix();
 };
 
 //--------End lp_direction--------

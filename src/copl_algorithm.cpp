@@ -1,7 +1,5 @@
 #include <copl_algorithm.h>
 
-
-
 using namespace std;
 namespace copl_ip {
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){

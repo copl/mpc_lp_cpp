@@ -148,10 +148,10 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 		return eigenMat->cols();
 	}
 	
-	/*double copl_matrix::value_at(int i, int j)
+	double copl_matrix::value_at(int i, int j)
 	{
-		return eigenMat(i,j);
-	}*/
+		return eigenMat->coeffRef(i,j);
+	}
 
 	void copl_matrix::var_dump()
 	{
