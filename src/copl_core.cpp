@@ -8,6 +8,14 @@ using namespace std;
 namespace copl_ip {
 
 ofstream LOG_FILE_VARIABLE;
+
+lp_input::lp_input(copl_matrix *_A, copl_vector* _b, copl_vector* _c, copl_matrix* _G, copl_vector* _h):A(_A),G(_G),c(_c),b(_b),h(_h) {
+  if(A!=NULL)
+  	k_var = A->num_rows();
+  m = G->num_rows();
+  n = G->num_cols();
+}
+
 void copl_vector_dump(copl_vector &vec) {
 	OUTPUT << "{";
 	for(int i = 0; i < vec.size() - 1; i++) {
@@ -18,41 +26,20 @@ void copl_vector_dump(copl_vector &vec) {
 	OUTPUT << endl;
 };
 
-//lp_input
-lp_input::lp_input(int _m, int _n, int _k_var) // generates things at random this must change!!!
-	: A(_n,_k_var), G(_m,_k_var), c(_k_var,2.0), h(_m,2.0), b(_n,2.0) { // ************
-	m = _m;
-	n = _n;
-	k_var = _k_var;
-};
-
-lp_input::lp_input(const lp_input &obj)
-	:A(0,0), G(0,0), c(0,2.0), h(0,2.0), b(0,2.0) { 
-	#ifdef PREVENT_COPY_CONSTRUCTOR
-	OUTPUT << "WARNING: Input copy constructor called." << "\n";
-	#endif
-}
-
-
-lp_input::~lp_input() {
-	OUTPUT << "deleting lp input" << endl;
-	OUTPUT << "constructor not complete" << endl;
-};
-
 void lp_input::var_dump()  {
 	
 	OUTPUT << "=== BEGIN LP INPUT VAR DUMP ====" << endl;
 	OUTPUT << "c = ";
-	copl_vector_dump(c);
+	copl_vector_dump(*c);
 	OUTPUT << "b = ";
-	copl_vector_dump(b);
+	copl_vector_dump(*b);
 	OUTPUT << "h = ";
-	copl_vector_dump(h);
+	copl_vector_dump(*h);
 	
 	OUTPUT << "A = ";
-	A.var_dump();
+	A->var_dump();
 	OUTPUT << "G = ";
-	G.var_dump();
+	G->var_dump();
 	
 	// ********* complete for matricies
 	OUTPUT << "=== END VAR DUMP ====" << endl;
@@ -66,11 +53,6 @@ lp_settings::lp_settings (int input_max_iter, double input_linear_feas_tol, doub
 	linear_feas_tol 	= input_linear_feas_tol;
 	comp_tol 			= input_comp_tol;
 	bkscale 			= input_bkscale;
-}
-lp_settings::lp_settings(const lp_settings &obj){
-	#ifdef PREVENT_COPY_CONSTRUCTOR
-	OUTPUT << "WARNING: Settings copy constructor being called." <<"\n";
-	#endif
 }
 int lp_settings::get_max_iter()				{return max_iter;}
 double lp_settings::get_linear_feas_tol() 	{return linear_feas_tol;}
@@ -93,28 +75,28 @@ lp_residuals::lp_residuals( lp_input &problem_data) : r1(problem_data.k_var,0.0)
 void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &variables){
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
 	zeros(r1);
-	sp_dgemtv(-1.0, 1.0, problem_data.A, variables.y, r1);
-	sp_dgemtv(-1.0, 1.0, problem_data.G, variables.z, r1);
-	axpy(-variables.tau, problem_data.c, r1);
+	sp_dgemtv(-1.0, 1.0, *problem_data.A, variables.y, r1);
+	sp_dgemtv(-1.0, 1.0, *problem_data.G, variables.z, r1);
+	axpy(-variables.tau, *problem_data.c, r1);
 	
 	// r2 = pd.A*variables.x - pd.b*variables.tau;
 	zeros(r2);
-	sp_dgemv(1.0, 1.0, problem_data.A, variables.x, r2);
-	axpy(-variables.tau, problem_data.b, r2);
+	sp_dgemv(1.0, 1.0, *problem_data.A, variables.x, r2);
+	axpy(-variables.tau, *problem_data.b, r2);
 	//copl_vector_dump(r2);
 	//copl_vector_dump(problem_data.b);
 	
 	// r3 = variables.s + pd.G*variables.x - variables.tau*pd.h;
 	zeros(r3);
 	axpy(1.0, variables.s, r3);
-	sp_dgemv(1.0, 1.0, problem_data.G, variables.x, r3);
-	axpy(-variables.tau, problem_data.h, r3);
+	sp_dgemv(1.0, 1.0, *problem_data.G, variables.x, r3);
+	axpy(-variables.tau, *problem_data.h, r3);
 
 	//r4 = variables.kappa + pd.c'*variables.x + pd.b'*variables.y + + pd.h'*variables.z;
 	r4 = variables.kappa;
-	r4 += dot(problem_data.c, variables.x);
-	r4 += dot(problem_data.b, variables.y);
-	r4 += dot(problem_data.h, variables.z);
+	r4 += dot(*problem_data.c, variables.x);
+	r4 += dot(*problem_data.b, variables.y);
+	r4 += dot(*problem_data.h, variables.z);
 }
 
 void lp_residuals::var_dump() {
@@ -239,10 +221,9 @@ void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, 
 //-----------End lp direction
 
 
-
 // lp_variables
 lp_variables::lp_variables(int n, int m, int k_var) :
-	x(k_var,0.0), s(m,1.0), z(m,1.0), y(n,0.0) {
+	x(n,0.0), s(m,1.0), z(m,1.0), y(k_var,0.0) {
 	tau = 1;
 	kappa = 1;
 }
@@ -282,7 +263,7 @@ algorithm_state::algorithm_state() {
 }
 void algorithm_state::update_gap(lp_variables &variables,  lp_input &problem_data){
 	// ((problem_data.c)'*(variables.x) + (problem_data.h)'*(variables.z) + (problem_data.b)'*(variables.y))
-	gap = dot(problem_data.c,variables.x) + dot(problem_data.h,variables.z) + dot(problem_data.b,variables.y);
+	gap = dot(*problem_data.c,variables.x) + dot(*problem_data.h,variables.z) + dot(*problem_data.b,variables.y);
 }
 
 void algorithm_state::update_mu(lp_variables &variables,  lp_input &problem_data){
@@ -386,37 +367,6 @@ void linear_system_rhs::var_dump() {
 	OUTPUT << "q6" << q6 << endl;
 }
 //--------End linear_system_rhs--------
-
-lp_input* copl_utility::Trivial_Test1() {
-	lp_input * problem_data = new lp_input(2,3,4);
-	
-	problem_data->A.insert_at(0,0,1.0);
-	problem_data->A.insert_at(1,1,1.0);
-	problem_data->A.insert_at(2,2,1.0);
-	problem_data->A.insert_at(2,3,1.0);
-	
-	problem_data->G.insert_at(0,0,1.0);
-	problem_data->G.insert_at(1,1,1.0);
-	problem_data->G.insert_at(0,2,1.0);
-	problem_data->G.insert_at(1,3,1.0);
-	
-	problem_data->c[0] = 1;
-	problem_data->c[1] = 2;
-	problem_data->c[2] = 3;
-	problem_data->c[3] = 4;
-	
-	
-	copl_vector feasible_x(4,1.0);
-	// b = A*x0
-	zeros(problem_data->b);
-	sp_dgemv(1.0, 1.0, problem_data->A, feasible_x, problem_data->b);
-	
-	// h = G*x0
-	zeros(problem_data->h);
-	sp_dgemv(1.0, 1.0, problem_data->G, feasible_x, problem_data->h);
-	
-	return problem_data;
-}
 
 
 #ifdef random

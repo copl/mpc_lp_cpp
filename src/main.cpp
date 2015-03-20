@@ -8,11 +8,15 @@
 #include <copl_algorithm.h>
 #include <copl_linalg.h>
 
-
 using namespace std;
 using namespace copl_ip;
 
 
+void make_trivial_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_vector &b, copl_vector &h)
+{
+
+}
+ 
 
 int main()
 {
@@ -27,58 +31,21 @@ int main()
 	OUTPUT << "Interior point algorithm coming" << endl;
 	
 	// Initialize configuration variable
-	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);
-
-	// We are creating an instance of LP. In practice, we should read the problem data from input stream.
-	/*lp_input problem_data(2,3,4); //= construct_instance1();
-	
-	*/
-	lp_input * problem_data = copl_utility::Trivial_Test1();
+	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);	
+    
+    copl_matrix A(4,5);
+    copl_matrix G(6,5);
+    copl_vector c,b,h;
+    make_trivial_problem(A,G,c,b,h);
+    
+    lp_input problem_data(&A,&b,&c,&G,&h);
 	//copl_utility::loadFromUF("UF_group", "name", &p_problem_data);
 	//lp_input problem_data = *p_problem_data;
 	
-	problem_data->var_dump();
+	problem_data.var_dump();
 		
 	// The main function that run interior point algorithm.
-	interior_point_algorithm(*problem_data,settings);
+	interior_point_algorithm(problem_data,settings);
 	
-	delete problem_data;
 };
 
-
-
-/*
-
-# Constructing a random LP
-function construct_instance1()
-	n = 5;
-	k = 10;
-	m = 10;
-	
-	problem_data = class_linear_program_input()
-	x0 = rand(k,1)
-
-	A = rand(n, k);
-	G = -diagm(ones(m));
-	c = rand(k,1)
-	h = zeros(m);
-	b = A*x0;
-
-
-	problem_data.A = A
-	problem_data.G = G
-	problem_data.c = c
-	problem_data.h = h
-	problem_data.b = b
-	problem_data.m = m
-	problem_data.k = k
-	problem_data.n = n
-	
-	return(problem_data)
-end
-
-######################
-#  run the program   #
-######################
-
-*/

@@ -9,7 +9,7 @@ namespace copl_ip {
 		// create data structures
 		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	
 		algorithm_state state;
-		k_newton_copl_matrix K_matrix(problem_data);
+		k_newton_copl_matrix K_matrix(*problem_data.A,*problem_data.G);
 		lp_direction direction(variables);
 		linear_system_rhs rhs(problem_data);
 		lp_residuals residuals(problem_data);

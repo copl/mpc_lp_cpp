@@ -32,11 +32,14 @@ public:
 	EigenSpMat_t* eigenMat;	
 
 	copl_matrix(int m, int n);
-	//Random sparse matrix with dist p
+	
+    //Random sparse matrix with dist p
 	copl_matrix(int m, int n, double p);
-	//Insert element to sparse matrix, this is slow and we should not use it
+
+    //Insert element to sparse matrix, this is slow and we should not use it
 	void insert_at(int m, int n, double val);
-	//set value of element in sparse matrix, this is slow and we should not use it
+
+    //set value of element in sparse matrix, this is slow and we should not use it
 	//void set_value(int m, int n, double val);
 	// number of rows
 	int num_rows();

@@ -2,35 +2,46 @@
 
 namespace copl_ip{
 
-k_newton_copl_matrix::k_newton_copl_matrix( lp_input &problem_data)
+int k_newton_copl_matrix::nnz()
+{
+	return eigenKMat->nonZeros();
+}
+
+k_newton_copl_matrix::k_newton_copl_matrix(int m, int n)
+{
+	cout << "Testing constructor\n";
+	hessianIx = new std::vector<int>(m);
+	eigenKMat = new EigenSpMat_t(n,n);
+}
+
+k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G)
 {
 	
-	int n = problem_data.A.num_cols();		
-	int p = problem_data.A.num_rows();	
-	int m = problem_data.G.num_rows();	
-
-	//Assemble 	
-	assemble_matrix(problem_data.A, problem_data.G);
+	int p = A.num_rows();	
+	int n = G.num_cols();		
+    int m = G.num_rows();	
 
 	//Now find the indices of the hessian
 	hessianIx = new std::vector<int>(m);
 	eigenKMat = new EigenSpMat_t(n+m+p,n+m+p);
-	//Compress 
+	
+    //Assemble 	
+	assemble_matrix(A, G);
+    
+    //Compress 
 	eigenKMat->makeCompressed();	
-	//The indices are the last nonzero per column for the cols n+p to n+p+m-1
-	int* outerIx = eigenKMat->outerIndexPtr();
-	for(int i = n+p; i < n+p+m; i++ )
-		(*hessianIx)[i] = outerIx[i+1]-1;
 
-	//Now do the symbolic analysis of the matrix 
-	cout << "Will analyze pattern\n";
-	cout.flush();
-	solver.analyzePattern(*eigenKMat);
+    //The indices are the last nonzero per column for the cols n+p to n+p+m-1
+	int* outerIx = eigenKMat->outerIndexPtr();		
+	for(int i = 0; i < m; i++ )
+		 (*hessianIx)[i] = outerIx[i+n+p+1]-1;	
+    
+    solver.analyzePattern(*eigenKMat);
+
 }
 
 void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 {
-
 	//Assemble 
 	int n = A.num_cols();		
 	int p = A.num_rows();	
@@ -46,7 +57,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 	//eventual refactoring	
 	//Get the internal matrices 
 
-	EigenSpMat_t &eA = *(A.eigenMat);	
+   	EigenSpMat_t &eA = *(A.eigenMat);	
 	EigenSpMat_t &eG = *(G.eigenMat);
 	//Count the non zeros per column and row
 	for(int i = 0; i < eA.cols(); i++ )
@@ -75,7 +86,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
     	nnzColsK[j++] += 1 + nzRowG[i];
 	//Reserve space for the nonzeros
 	eigenKMat->reserve(nnzColsK);
-
+    
 	//Now copy the values into K
 	//Start with the diagonal	
 	for(int i = 0; i < n; i++)
@@ -123,7 +134,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 	//These correspond to the diagonals of the hessian
 	for(int i = 0; i < m; i++ )		
 			eigenKMat->insert(n+p+i,n+p+i) = -1.0 - DELTA;
-
+     
 }
 
 k_newton_copl_matrix::~k_newton_copl_matrix()
@@ -158,11 +169,11 @@ void k_newton_copl_matrix::update(lp_variables &variables)
     	throw new std::exception();
     }
 
-	int m = variables.s.size();
 	double* Kvals = eigenKMat->valuePtr();
+    int m = variables.s.size();
 	for(int j = 0; j < m; j++)
 	{
-		Kvals[ (*hessianIx)[j] ] = -variables.s[j]/variables.z[j]-DELTA;
+	    Kvals[ (*hessianIx)[j] ] = -variables.s[j]/variables.z[j]-DELTA;
 	}
 	//Real deal
 	solver.factorize(*eigenKMat);

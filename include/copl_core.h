@@ -18,14 +18,11 @@ class k_newton_copl_matrix;
 class lp_input {
 public:
 	int m, n, k_var;
-	
-	copl_matrix A, G;
-	
-	copl_vector c, h, b;
+	copl_matrix *A, *G;
+	copl_vector *c, *h, *b;
 
-	lp_input(int m, int n, int k_var);
-	lp_input(const lp_input &obj);
-	~lp_input();
+public:
+	lp_input(copl_matrix *A, copl_vector* b, copl_vector* c, copl_matrix* G, copl_vector* h);	
 	void var_dump()  ;
 };
 //--------End lp_input--------
@@ -186,7 +183,6 @@ class copl_utility {
       public:
           // Load problem from "The University of Florida Sparse Matrix Collection"
           // the object would be created and stored in "problem_data"
-		  static lp_input* Trivial_Test1();
           static lp_input* loadFromUF(string UF_group, string UF_name);
 		  
 };

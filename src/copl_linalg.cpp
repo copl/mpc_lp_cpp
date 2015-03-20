@@ -163,7 +163,8 @@ void  generate_random_A(int m, int n, triplet_vector_t &vals, double p)
 	copl_matrix::~copl_matrix()
 	{
 		OUTPUT << "deleting eigen matrix" << endl;
-		delete(eigenMat);
+		if(eigenMat!=NULL)
+			delete(eigenMat);
 	}
 
 	//Return the number of non zeros

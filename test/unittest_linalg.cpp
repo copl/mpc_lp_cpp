@@ -41,7 +41,7 @@ TEST(linalg_copl_marix,dgemv)
   }
   x[10] = 1.0; 
     
-  sp_dgemv(2.0,0.0,A,x,y);
+  //sp_dgemv(2.0,0.0,A,x,y);
   //All entries of y should be 2*0.3 except for the last which should be 0
 
 }
