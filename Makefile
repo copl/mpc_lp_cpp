@@ -24,7 +24,7 @@ endif
 
 ifeq ($(UNAME_S),Darwin)
     CPP = clang++
-    CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -w
+    CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -w -g
 	EXE_NAME = _darwin
 endif
 
@@ -72,10 +72,6 @@ test: $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) gmock.a
 	mkdir -p bin
 	mkdir -p testbin 
 	$(CPP) $(CFLAGS) $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) bin/libgmock.a -o ./bin/unittest.exe
-
-help:
-	echo $(COPL_CPP_FILES)	
-	echo $(COPL_OBJ_FILES)
 
 clean:
 	rm ./bin/*; rm ./testbin/*

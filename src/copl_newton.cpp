@@ -17,9 +17,9 @@ k_newton_copl_matrix::k_newton_copl_matrix(int m, int n)
 k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G)
 {
 	
-	int p = A.num_rows();	
-	int n = G.num_cols();		
-    int m = G.num_rows();	
+	p = A.num_rows();	
+	n = G.num_cols();		
+    m = G.num_rows();	
 
 	//Now find the indices of the hessian
 	hessianIx = new std::vector<int>(m);
@@ -43,10 +43,6 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G)
 void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 {
 	//Assemble 
-	int n = A.num_cols();		
-	int p = A.num_rows();	
-	int m = G.num_rows();	
-
 	//Count the number of non zeros per row and col of A and G
 	std::vector<int> nzRowA(p);		
 	std::vector<int> nzRowG(m);	
@@ -179,6 +175,39 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 	solver.factorize(*eigenKMat);
 	//Solve the fixed rhs
 	isFactored = true;
+}
+
+//Homogeneous solver implementation 
+ homogeneous_solver::homogeneous_solver(copl_matrix &A, 
+                       				    copl_matrix &G,
+                                        copl_vector &c,
+                                        copl_vector &b,
+                                        copl_vector &h):_c(c),
+ 														_h(h),
+ 														_b(b),
+ 														rhs_2(m+n+p),
+ 														k_newton_copl_matrix(A,G) {
+
+//Build the RHS for the first system [-c; b; h]'
+
+ 	int j = 0;
+ 	for(int i = 0; i < n; i++)
+ 		rhs_2[j++] = -c[i];
+ 	for(int i = 0; i < p; i++)
+ 		rhs_2[j++] = b[i]; 	
+ 	for(int i = 0; i < m; i++) 		
+ 		rhs_2[j++] = h[i]; 	
+
+}
+
+void homogeneous_solver::update(lp_variables &variables) {
+	k_newton_copl_matrix::update(variables);
+	//Solve the first rhs system
+	k_newton_copl_matrix::solve(sol_1,rhs_2);
+}
+
+void solve(lp_direction &dir, linear_system_rhs& rhs) {
+
 }
 
 }

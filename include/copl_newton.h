@@ -11,12 +11,12 @@ namespace copl_ip {
 //to solve the linear systems of the iterations
 class k_newton_copl_matrix {
         
-	public:        
+	protected:        
         //TODO: Move this to settings
-        double DELTA = 1.e-4;
-        
+        double DELTA = 1.e-4; 
         bool isFactored = false;	
-      
+
+        int m,n,p;      
         //Hessian entries 
         std::vector<int> *hessianIx;	
      
@@ -35,11 +35,45 @@ class k_newton_copl_matrix {
         void assemble_matrix(copl_matrix &A, copl_matrix &G);          
         k_newton_copl_matrix(int m, int n);
 
+        //Friend tests
+        FRIEND_TEST(KNEWTON,Assemble);
+        FRIEND_TEST(KNEWTON,NonZeroPerCols);
+        FRIEND_TEST(KNEWTON,nnz);
+        FRIEND_TEST(KNEWTON,Constructor);
+        FRIEND_TEST(KNEWTON,Update);
+        FRIEND_TEST(KNEWTON,solve);
+
+    public: 
         int nnz();
 		k_newton_copl_matrix(copl_matrix& A, copl_matrix& G);
 	  	void solve(copl_vector &solution, copl_vector &rhs);
 	  	void update(lp_variables &variables);
 	  	~k_newton_copl_matrix();
+};
+
+//Extends the k_newton matrix and implements the methods to solve homogeneous systems.
+class homogeneous_solver : protected k_newton_copl_matrix {
+    
+    copl_vector &_c, &_h, &_b;
+    copl_vector rhs_2;
+    copl_vector sol_1;
+    copl_vector sol_2;
+
+    //The homogeneous system is 
+    //[0   A' G' c]
+    //[A        -b]
+    //[G        -h]
+    //[-c' b' h   ]
+    homogeneous_solver(copl_matrix &A, 
+                       copl_matrix &G,
+                       copl_vector &c,
+                       copl_vector &b,
+                       copl_vector &h); 
+
+    void update(lp_variables &variables);
+
+    void solve(lp_direction &dir, linear_system_rhs& rhs);
+
 };
 
 }
