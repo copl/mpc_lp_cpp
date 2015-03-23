@@ -1,0 +1,24 @@
+The linear system that determines the directions is given by 
+[   A G    c]dx   0    r1
+[A        -b]dy   0    r2
+[G        -h]dz + ds = r3
+[-c' b' h'  ]dt   dk   r4
+
+Hdz   + ds         = r5
+k/tdt + dk         = r6
+
+To solve we first eliminate ds,dk to form 
+[    A   G    c]dx    r1
+[A           -b]dy    r2
+[G      -H   -h]dz  = r3 - r5
+[-c' b' h' -k/t]dt    r4 - r6
+
+If we were to know dt then the solution would be given by 
+[    A   G]   dx    r1             [-c]
+[A        ]   dy    r2      + dt * [ b] 
+[G      -H]   dz  = r3 - r5        [ h]
+
+
+After solving we recover 
+ds from :  ds = r3-r5 - Hdz 
+dk from :  dk = r4-r6-k/t dt

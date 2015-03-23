@@ -9,21 +9,23 @@ int k_newton_copl_matrix::nnz()
 
 k_newton_copl_matrix::k_newton_copl_matrix(int m, int n)
 {
-	cout << "Testing constructor\n";
+	cout << "Testing constructor (m,n) " <<m <<","<<n <<"\n";
 	hessianIx = new std::vector<int>(m);
-	eigenKMat = new EigenSpMat_t(n,n);
+	eigenKMat = new copl_matrix(n,n);
+    cout << "This constructor should only be used in testing";
+    cout.flush();
 }
 
 k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G)
 {
 	
-	p = A.num_rows();	
-	n = G.num_cols();		
-    m = G.num_rows();	
+	k = A.rows();	
+	n = G.cols();		
+    m = G.rows();	
 
 	//Now find the indices of the hessian
 	hessianIx = new std::vector<int>(m);
-	eigenKMat = new EigenSpMat_t(n+m+p,n+m+p);
+	eigenKMat = new copl_matrix(n+m+k,n+m+k);
 	
     //Assemble 	
 	assemble_matrix(A, G);
@@ -34,7 +36,7 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G)
     //The indices are the last nonzero per column for the cols n+p to n+p+m-1
 	int* outerIx = eigenKMat->outerIndexPtr();		
 	for(int i = 0; i < m; i++ )
-		 (*hessianIx)[i] = outerIx[i+n+p+1]-1;	
+		 (*hessianIx)[i] = outerIx[i+n+k+1]-1;	
     
     solver.analyzePattern(*eigenKMat);
 
@@ -44,26 +46,24 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 {
 	//Assemble 
 	//Count the number of non zeros per row and col of A and G
-	std::vector<int> nzRowA(p);		
+	std::vector<int> nzRowA(k);		
 	std::vector<int> nzRowG(m);	
 	std::vector<int> nzColA(n);		
 	std::vector<int> nzColG(n);	
-	std::vector<int> nnzColsK(m+n+p);	
+	std::vector<int> nnzColsK(m+n+k);	
 	//TODO this depends on EIGENs iterators and will need 
 	//eventual refactoring	
 	//Get the internal matrices 
-
-   	EigenSpMat_t &eA = *(A.eigenMat);	
-	EigenSpMat_t &eG = *(G.eigenMat);
-	//Count the non zeros per column and row
-	for(int i = 0; i < eA.cols(); i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(eA,i); it; ++it)	
+	
+    //Count the non zeros per column and row
+	for(int i = 0; i < A.cols(); i++ )
+		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
 		{
 			nzRowA[it.row()]++;
 			nzColA[it.col()]++;
 		}
-	for(int i = 0; i < eG.cols(); i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(eG,i); it; ++it)	
+	for(int i = 0; i < G.cols(); i++ )
+		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
 		{
 			nzRowG[it.row()]++;
 			nzColG[it.col()]++;
@@ -76,10 +76,11 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 	int j = 0;
     for(int i = 0; i < n; i++)
     	nnzColsK[j++] += 1 + nzColA[i] + nzColG[i];
-    for(int i = 0; i < p; i++)    
+    for(int i = 0; i < k; i++)    
     	nnzColsK[j++] += 1 + nzRowA[i];
 	for(int i = 0; i < m; i++)    
     	nnzColsK[j++] += 1 + nzRowG[i];
+
 	//Reserve space for the nonzeros
 	eigenKMat->reserve(nnzColsK);
     
@@ -89,7 +90,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 		eigenKMat->insert(i,i) = DELTA;
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(eA,i); it; ++it)	
+		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
 		{
 			int c,r;
 			c = it.col();
@@ -97,16 +98,16 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 			eigenKMat->insert(r+n,c) = it.value();
 		}
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(eG,i); it; ++it)	
+		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
 		{
 			int c,r;
 			c = it.col();
 			r = it.row();
-			eigenKMat->insert(r+n+p,c) = it.value();	
+			eigenKMat->insert(r+n+k,c) = it.value();	
 		}
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(eA,i); it; ++it)	
+		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
 		{
 			int c,r;
 			r = it.col();
@@ -114,22 +115,22 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 			eigenKMat->insert(r,n+c) = it.value();
 		}	
 
-	for(int i = 0; i < p; i++ )		
+	for(int i = 0; i < k; i++ )		
 			eigenKMat->insert(n+i,n+i) = -DELTA;
 
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(eG,i); it; ++it)	
+		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
 		{
 			int c,r;
 			r = it.col();
 			c = it.row();
-			eigenKMat->insert(r,n+p+c) = it.value();
+			eigenKMat->insert(r,n+k+c) = it.value();
 		}	
 
 	//These correspond to the diagonals of the hessian
 	for(int i = 0; i < m; i++ )		
-			eigenKMat->insert(n+p+i,n+p+i) = -1.0 - DELTA;
+			eigenKMat->insert(n+k+i,n+k+i) = -1.0 - DELTA;
      
 }
 
@@ -145,11 +146,8 @@ void k_newton_copl_matrix::solve(copl_vector &solution, copl_vector &rhs) {
 		std::cout << "TRIED TO USE SOLVE BEFORE UPDATE";
 		throw new std::exception();
 	}
-
-	int m = rhs.size();
-	Eigen::Map<Eigen::VectorXd> rhsEigen(&rhs[0],m), solEigen(&solution[0],m);	
-	//TODO: log this
-	solEigen = solver.solve(rhsEigen);
+    
+	solution = solver.solve(rhs);
 	//TODO: iterative refinement with MINRES
 }
 
@@ -178,36 +176,65 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 }
 
 //Homogeneous solver implementation 
- homogeneous_solver::homogeneous_solver(copl_matrix &A, 
-                       				    copl_matrix &G,
-                                        copl_vector &c,
-                                        copl_vector &b,
-                                        copl_vector &h):_c(c),
- 														_h(h),
- 														_b(b),
- 														rhs_2(m+n+p),
- 														k_newton_copl_matrix(A,G) {
+ homogeneous_solver::homogeneous_solver(lp_input &prob):_c(prob.c),
+ 														_h(prob.h),
+ 														_b(prob.b),
+ 														rhs_1(m+n+k),
+ 														k_newton_copl_matrix(prob.A,prob.G) {
 
 //Build the RHS for the first system [-c; b; h]'
-
- 	int j = 0;
- 	for(int i = 0; i < n; i++)
- 		rhs_2[j++] = -c[i];
- 	for(int i = 0; i < p; i++)
- 		rhs_2[j++] = b[i]; 	
- 	for(int i = 0; i < m; i++) 		
- 		rhs_2[j++] = h[i]; 	
+    rhs_1.segment(0,n) = -prob.c;
+    rhs_1.segment(n,k) = prob.b;
+    rhs_1.segment(n+k,m) = prob.h;
 
 }
 
 void homogeneous_solver::update(lp_variables &variables) {
 	k_newton_copl_matrix::update(variables);
+    tau = variables.tau;
+    kappa = variables.kappa;
+
 	//Solve the first rhs system
-	k_newton_copl_matrix::solve(sol_1,rhs_2);
+	k_newton_copl_matrix::solve(sol_1,rhs_1);
+ 
+     // dtau_denom = kap/tau - (c'*x1 + by1 + h'*z1); 
+	 dtau_denom = kappa/tau 
+            - _c.dot(sol_1.segment(0,n)) -_b.dot(sol_1.segment(n,k)) -_h.dot(sol_1.segment(n+k,m));
 }
 
-void solve(lp_direction &dir, linear_system_rhs& rhs) {
+//Warning: call to this method mutates rhs!
+void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var) {
+    
+      //Solve for the right hand side
+     k_newton_copl_matrix::solve(sol_2,rhs.q123); 
+     // dtau = (-q4+q6 + c'*x2 + by2 + h'*z2)/dtau_denom
+     dir.dtau = -rhs.q4 + rhs.q6 + _c.dot(sol_2.segment(0,n)) + _b.dot(sol_2.segment(n,k)) + _h.dot(sol_2.segment(n+k,m));
+     dir.dtau /= dtau_denom;
 
+     //d2+dtau d1
+     sol_2+=dir.dtau*sol_1;
+     //sol_2 contains dx,dy,dz, copy them to the solution. 
+     dir.dx = sol_2.segment(0,n);
+     dir.dy = sol_2.segment(n,k);
+     dir.dz = sol_2.segment(n+k,m);
+
+ }
+
+void homogeneous_solver::reduce_rhs(linear_system_rhs  &rhs)
+{
+   //Now calculate -r3+s and place it in the last entry of q123
+    rhs.q123.segment(n+k,m) -= rhs.q5;
+    //And the same for the scalar entry of the last row
+    rhs.q4 -= rhs.q6;
 }
+
+void homogeneous_solver::back_substitute(lp_direction &dir, linear_system_rhs  &rhs, lp_variables &var)
+{
+    //Compute s from Hdz + ds = q5
+     dir.ds = rhs.q5-(dir.dz.array()*var.s.array()/var.z.array()).matrix();
+     //Compute dk from k/t dt + dk = q6
+     dir.dkappa = rhs.q6 - kappa/tau*dir.dtau;
+}
+       
 
 }

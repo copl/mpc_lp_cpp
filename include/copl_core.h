@@ -18,11 +18,11 @@ class k_newton_copl_matrix;
 class lp_input {
 public:
 	int m, n, k_var;
-	copl_matrix *A, *G;
-	copl_vector *c, *h, *b;
+	copl_matrix &A, &G;
+	copl_vector &c, &h, &b;
 
 public:
-	lp_input(copl_matrix *A, copl_vector* b, copl_vector* c, copl_matrix* G, copl_vector* h);	
+	lp_input(copl_matrix &_A, copl_vector & _b, copl_vector  &c, copl_matrix &G, copl_vector &h);	
 	void var_dump()  ;
 };
 //--------End lp_input--------
@@ -33,7 +33,7 @@ public:
 	copl_vector x, s, z, y;
 
 	double tau, kappa;
-	lp_variables(int n, int m, int k_var);
+	lp_variables(int m, int n, int k_var);
 	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
 	~lp_variables();
@@ -68,9 +68,6 @@ class lp_settings {
 		//ant length of the 
 		//maximum combined step to the boundary to use
 		double bkscale;
-public:
-	//Configuration for solver
-	//linear_solver_lp_settings 
 
 	lp_settings(
 		int max_iter,
@@ -78,11 +75,6 @@ public:
 		double comp_tol,	
 		double bkscale
 		);
-	lp_settings(const lp_settings &obj); //copy constructor - 
-	int get_max_iter();
-	double get_linear_feas_tol();
-	double get_comp_tol();
-	double get_bkscale();
 };
 
 //--------End settings--------
@@ -100,11 +92,10 @@ public:
 	lp_residuals( lp_input &problem_data);
 	void compute_residuals( lp_input &problem_data, lp_variables &variables);
 
-	double get_r1_norm();
-	double get_r2_norm();
-	double get_r3_norm();
-	double get_norm_squared();
-	
+    //Variables for the norms 
+    double hn1, hn2, hn3; //Homogeneous residual norms A'y+G'z, Ax, Gx+s
+    double n1,  n2,  n3, n4;  //Residual norms A'y+G'z + tc , Ax-tb , Gx+s-th
+
 	void var_dump();
 };
 //--------End lp_residuals--------
@@ -112,20 +103,25 @@ public:
 
 //linear_system_rhs
 class linear_system_rhs {
-	copl_vector q1;
-	copl_vector q2;
-	copl_vector q3;
+    //Use one vector for [q1, q2, q3] and q4
+	copl_vector q123;
 	double q4;
 	copl_vector q5;
 	double q6;
+    int m,n,k;
+    friend class homogeneous_solver;
+    FRIEND_TEST(KNEWTON,reduce_rhs_test);
+    FRIEND_TEST(KNEWTON,back_substitute_test);
 public:
 	linear_system_rhs( lp_input &problem_data);
 	linear_system_rhs(const linear_system_rhs &obj);
 	~linear_system_rhs();
 	
 	void compute_affine_rhs(lp_residuals &residuals, lp_variables &variables);
-	void compute_corrector_rhs(lp_residuals &residuals, lp_variables &variables, algorithm_state &state, lp_direction &direction,  lp_input &problem_data);
-
+	void compute_combined_rhs(lp_residuals &residuals, lp_variables &variables, 
+                                                       lp_direction &dir_affine,
+                                                       double sigma,
+                                                       double mu);
 	void var_dump();
 };
 
@@ -134,6 +130,7 @@ public:
 
 //lp_direction
 class lp_direction {
+
 public:
 	copl_vector dx;
 	copl_vector dy;
@@ -155,20 +152,10 @@ public:
 		k_newton_copl_matrix &K_matrix
 		);
 		
-	void solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix);
-	
+	void solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix);	
 	void compute_step_size(lp_variables& variables, lp_settings& settings);
 	void compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val);
 	void compute_min_ratio_alpha(double var, double dvar, double& alpha_val);
-	
-	double get_alpha();
-	double get_dtau(); 
-	double get_dkappa(); 
-	copl_vector get_dx(); 
-	copl_vector get_dy(); 
-	copl_vector get_dz(); 
-	copl_vector get_ds(); 
-
 };
 
 //--------End lp_direction--------

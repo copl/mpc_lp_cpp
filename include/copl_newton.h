@@ -16,7 +16,9 @@ class k_newton_copl_matrix {
         double DELTA = 1.e-4; 
         bool isFactored = false;	
 
-        int m,n,p;      
+        //Problem size
+        int m,n,k;      
+
         //Hessian entries 
         std::vector<int> *hessianIx;	
      
@@ -25,7 +27,7 @@ class k_newton_copl_matrix {
                //Private empty constructor for testing
 
         //The assembled eigen matrix 
-        EigenSpMat_t* eigenKMat;    
+        copl_matrix* eigenKMat;    
   
         //TODO: move these two to private and  
         //This function assembles the K newton matrix with identities in the diagonals
@@ -54,25 +56,28 @@ class k_newton_copl_matrix {
 //Extends the k_newton matrix and implements the methods to solve homogeneous systems.
 class homogeneous_solver : protected k_newton_copl_matrix {
     
-    copl_vector &_c, &_h, &_b;
-    copl_vector rhs_2;
-    copl_vector sol_1;
-    copl_vector sol_2;
+    protected:
+        copl_vector &_c, &_h, &_b;
+        copl_vector rhs_1;
+        copl_vector sol_1;
+        copl_vector sol_2;
+        double tau, kappa, dtau_denom;
+        void reduce_rhs(linear_system_rhs  &rhs);
+        void back_substitute(lp_direction &dir, linear_system_rhs  &rhs, lp_variables &var);
+        FRIEND_TEST(KNEWTON,reduce_rhs_test);
+        FRIEND_TEST(KNEWTON,back_substitute_test);
 
+    public:
     //The homogeneous system is 
     //[0   A' G' c]
     //[A        -b]
     //[G        -h]
     //[-c' b' h   ]
-    homogeneous_solver(copl_matrix &A, 
-                       copl_matrix &G,
-                       copl_vector &c,
-                       copl_vector &b,
-                       copl_vector &h); 
+    homogeneous_solver(lp_input &prob);
 
     void update(lp_variables &variables);
 
-    void solve(lp_direction &dir, linear_system_rhs& rhs);
+    void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var);
 
 };
 

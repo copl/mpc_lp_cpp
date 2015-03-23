@@ -9,21 +9,33 @@ namespace copl_ip {
 		// create data structures
 		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	
 		algorithm_state state;
-		k_newton_copl_matrix K_matrix(*problem_data.A,*problem_data.G);
-		lp_direction direction(variables);
-		linear_system_rhs rhs(problem_data);
+        
+        //Create and analyze the newton matrix 
+        homogeneous_solver K_matrix(A,G,c,b,h);
+	    
+        //This stores the search directions
+        lp_direction direction(variables);
+        
+        //Helps generate the rhs for the linear solves	
+        linear_system_rhs rhs(problem_data);
+        
+        //Contains the linear residuals
 		lp_residuals residuals(problem_data);
-		
+	    
+        //Compute initial mu
 		state.update_mu(variables, problem_data);
 		
 		// Begin iteration
 		int MAX_IT = settings.get_max_iter();
 		for (int itr = 1; itr <= MAX_IT; itr++){
+
 			// To be sent to Tiago's Linear Solver
 			K_matrix.update(variables);
+
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
-			residuals.var_dump();
+		
+            residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
@@ -32,7 +44,8 @@ namespace copl_ip {
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
 			rhs.var_dump();
-			// --- BEGIN NOT WORKING --- //
+			
+            // --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
 			direction.compute_direction(
 				rhs,

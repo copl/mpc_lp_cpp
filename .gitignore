@@ -1,5 +1,9 @@
 #Any compiled files
 bin/
+testbin/
 
 #This file 
 .gitignore
+
+#vim files
+*.sw*
