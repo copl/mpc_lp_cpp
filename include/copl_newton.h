@@ -24,7 +24,6 @@ class k_newton_copl_matrix {
      
         //Set up the eigen solver object
     	Eigen::SparseLU<Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::AMDOrdering<int> >   solver;
-               //Private empty constructor for testing
 
         //The assembled eigen matrix 
         copl_matrix* eigenKMat;    
@@ -53,7 +52,16 @@ class k_newton_copl_matrix {
 	  	~k_newton_copl_matrix();
 };
 
-//Extends the k_newton matrix and implements the methods to solve homogeneous systems.
+/* Extends the k_newton matrix and implements methods to solve 
+ * the system of the simplfied homogeneous self dual search directions (homogeneous system)
+ 
+ * [0   A'   G' c]dz         q1
+ * [-A          b]dy        =q2
+ * [-G          h]dz  -ds    q3
+ * [-c' -b' -h   ]dt  -dk    q4
+ *  H dz + ds                q5 
+ *  kappa/tau dt + dk        q6
+*/
 class homogeneous_solver : protected k_newton_copl_matrix {
     
     protected:
@@ -63,20 +71,32 @@ class homogeneous_solver : protected k_newton_copl_matrix {
         copl_vector sol_2;
         double tau, kappa, dtau_denom;
         void reduce_rhs(linear_system_rhs  &rhs);
+
+	//Solves with the system
+        //[0   A'   G'  c]dz      q1
+        //[A           -b]dy    = q2
+        //[G       -H  -h]dz      q3
+        //[-c' -b' -h k/t]dt      q4 
+        void solve_reduced(lp_direction &dir, linear_system_rhs &rhs);
+
+	//Given dx,dy,dz,dt calculate ds,dk
         void back_substitute(lp_direction &dir, linear_system_rhs  &rhs, lp_variables &var);
+
         FRIEND_TEST(KNEWTON,reduce_rhs_test);
         FRIEND_TEST(KNEWTON,back_substitute_test);
-
+	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve);
+	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_reduced);
     public:
-    //The homogeneous system is 
-    //[0   A' G' c]
-    //[A        -b]
-    //[G        -h]
-    //[-c' b' h   ]
+
+   
     homogeneous_solver(lp_input &prob);
-
+   	
+    //Updates the value of the Hessian block and the tau and kappa variables 
+    //in the matrix. Factors a matrix derived from the homogenos system
+    // and solves one system with the factored matrix.
     void update(lp_variables &variables);
-
+    
+    //Solves the homogeneous system
     void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var);
 
 };

@@ -77,7 +77,7 @@ READY_TEST_OBJECTS = ./testbin/unittest_core.o ./testbin/unittest_newton.o
 
 READY_OBJECTS = ./bin/copl_newton.o ./bin/copl_core.o
 
-newton: $(READY_OBJECTS) $(READY_TEST_OBJECTS)
+newton: $(READY_OBJECTS) $(READY_TEST_OBJECTS) bin/libgmock.a
 	$(CPP) $(CFLAGS) $(READY_OBJECTS) $(READY_TEST_OBJECTS) bin/libgmock.a -o ./bin/unittest.exe
 
 clean:

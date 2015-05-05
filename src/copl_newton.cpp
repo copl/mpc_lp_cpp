@@ -177,36 +177,50 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 
 //Homogeneous solver implementation 
  homogeneous_solver::homogeneous_solver(lp_input &prob):_c(prob.c),
- 														_h(prob.h),
- 														_b(prob.b),
- 														rhs_1(m+n+k),
- 														k_newton_copl_matrix(prob.A,prob.G) {
-
-//Build the RHS for the first system [-c; b; h]'
+							_h(prob.h),
+							_b(prob.b),
+							rhs_1(m+n+k),
+							k_newton_copl_matrix(prob.A,prob.G) {
+    //Build the RHS for the first system [-c; b; h]'
     rhs_1.segment(0,n) = -prob.c;
     rhs_1.segment(n,k) = prob.b;
     rhs_1.segment(n+k,m) = prob.h;
 
 }
 
+/* Updates the values of the hessian block of the augmented system and 
+ * solves the equation 
+ * [  A' G'][dx]   [-c]
+ * [A      ][dy] = [b]
+ * [G   -H ][dz]   [h]
+ * And solves the solution in sol_1 */
+
 void homogeneous_solver::update(lp_variables &variables) {
 	k_newton_copl_matrix::update(variables);
-    tau = variables.tau;
-    kappa = variables.kappa;
+        tau = variables.tau;
+    	kappa = variables.kappa;
 
 	//Solve the first rhs system
 	k_newton_copl_matrix::solve(sol_1,rhs_1);
  
-     // dtau_denom = kap/tau - (c'*x1 + by1 + h'*z1); 
-	 dtau_denom = kappa/tau 
-            - _c.dot(sol_1.segment(0,n)) -_b.dot(sol_1.segment(n,k)) -_h.dot(sol_1.segment(n+k,m));
+        // dtau_denom = kap/tau - (c'*x1 + by1 + h'*z1); 
+	dtau_denom = kappa/tau 
+        - _c.dot(sol_1.segment(0,n)) -_b.dot(sol_1.segment(n,k)) -_h.dot(sol_1.segment(n+k,m));
 }
 
-//Warning: call to this method mutates rhs!
+/* Warning mutates rhs. 
+ * This method solves the homogeneous equation defined by var and rhs and saves the result on dir.
+ * It assumes that sol_1 is populated with the solution of the system 
+ * [  A' G'][dx]   [-c]
+ * [A      ][dy] = [b]
+ * [G   -H ][dz]   [h]
+ * Given the solution */
+
 void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var) {
     
-      //Solve for the right hand side
+     //Solve for the right hand side
      k_newton_copl_matrix::solve(sol_2,rhs.q123); 
+     
      // dtau = (-q4+q6 + c'*x2 + by2 + h'*z2)/dtau_denom
      dir.dtau = -rhs.q4 + rhs.q6 + _c.dot(sol_2.segment(0,n)) + _b.dot(sol_2.segment(n,k)) + _h.dot(sol_2.segment(n+k,m));
      dir.dtau /= dtau_denom;
@@ -219,6 +233,31 @@ void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_var
      dir.dz = sol_2.segment(n+k,m);
 
  }
+
+
+//Solves with the system
+//[0   A'   G'  c]dz      q1
+//[A           -b]dy    = q2
+//[G       -H  -h]dz      q3
+//[-c' -b' -h k/t]dt      q4 
+
+void homogeneous_solver::solve_reduced(lp_direction &dir, linear_system_rhs &rhs) {
+     //Solve with the right hand side formed with the top of the reduced rhs
+     k_newton_copl_matrix::solve(sol_2,rhs.q123); 
+     
+     // dtau = (-q4+q6 + c'*x2 + by2 + h'*z2)/dtau_denom
+     dir.dtau = -rhs.q4 + rhs.q6 + _c.dot(sol_2.segment(0,n)) + _b.dot(sol_2.segment(n,k)) + _h.dot(sol_2.segment(n+k,m));
+     dir.dtau /= dtau_denom;
+
+     //d2+dtau d1
+     sol_2+=dir.dtau*sol_1;
+     //sol_2 contains dx,dy,dz, copy them to the solution. 
+     dir.dx = sol_2.segment(0,n);
+     dir.dy = sol_2.segment(n,k);
+     dir.dz = sol_2.segment(n+k,m);
+}
+
+
 
 void homogeneous_solver::reduce_rhs(linear_system_rhs  &rhs)
 {

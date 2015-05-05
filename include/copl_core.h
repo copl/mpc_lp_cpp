@@ -100,7 +100,6 @@ public:
 };
 //--------End lp_residuals--------
 
-
 //linear_system_rhs
 class linear_system_rhs {
     //Use one vector for [q1, q2, q3] and q4
@@ -112,6 +111,9 @@ class linear_system_rhs {
     friend class homogeneous_solver;
     FRIEND_TEST(KNEWTON,reduce_rhs_test);
     FRIEND_TEST(KNEWTON,back_substitute_test);
+    FRIEND_TEST(HOMOGENEOUS_SOLVER,solve);
+    FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_reduced);
+
 public:
 	linear_system_rhs( lp_input &problem_data);
 	linear_system_rhs(const linear_system_rhs &obj);
