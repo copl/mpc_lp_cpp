@@ -14,7 +14,22 @@ using namespace copl_ip;
 
 void make_trivial_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_vector &b, copl_vector &h)
 {
+	srand (0);
+	for (int i = 0; i  < 4; i++)
+		for (int j = 0; j  < 5; j++)
+			A.insert_at(i,j,rand() % 10 + 1);
+	for (int i = 0; i  < 6; i++)
+		for (int j = 0; j  < 5; j++)
+			G.insert_at(i,j,rand() % 10 + 1);
 
+	for (int i = 0; i  < 5; i++)
+		c.at(i) = rand() % 10 + 1;
+
+	for (int i = 0; i  < 4; i++)
+		b.at(i) = rand() % 10 + 1;
+
+	for (int i = 0; i  < 6; i++)
+		h.at(i) = rand() % 10 + 1;	
 }
  
 
@@ -35,7 +50,7 @@ int main()
     
     copl_matrix A(4,5);
     copl_matrix G(6,5);
-    copl_vector c,b,h;
+    copl_vector c(5),b(4),h(6);
     make_trivial_problem(A,G,c,b,h);
     
     lp_input problem_data(&A,&b,&c,&G,&h);

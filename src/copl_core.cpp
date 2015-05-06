@@ -17,9 +17,10 @@ lp_input::lp_input(copl_matrix *_A, copl_vector* _b, copl_vector* _c, copl_matri
 }
 
 void copl_vector_dump(copl_vector &vec) {
+	
 	OUTPUT << "{";
 	for(int i = 0; i < vec.size() - 1; i++) {
-		OUTPUT << vec[i] << ",";
+		OUTPUT << vec.at(i) << ",";
 	}
 	OUTPUT << vec[vec.size() - 1];
 	OUTPUT << "}";
@@ -76,9 +77,9 @@ void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &vari
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
 	zeros(r1);
 	sp_dgemtv(-1.0, 1.0, *problem_data.A, variables.y, r1);
+	return;
 	sp_dgemtv(-1.0, 1.0, *problem_data.G, variables.z, r1);
 	axpy(-variables.tau, *problem_data.c, r1);
-	
 	// r2 = pd.A*variables.x - pd.b*variables.tau;
 	zeros(r2);
 	sp_dgemv(1.0, 1.0, *problem_data.A, variables.x, r2);

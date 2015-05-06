@@ -23,11 +23,13 @@ namespace copl_ip {
 			K_matrix.update(variables);
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
+			return;
 			residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
 			}
+
 			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);

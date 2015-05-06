@@ -20,7 +20,7 @@ namespace copl_ip
 // extern ofstream LOG_FILE_VARIABLE;
 // #define OUTPUT LOG_FILE_VARIABLE
 // #else
-// #define OUTPUT cout
+#define OUTPUT cout
 // #endif
 typedef Eigen::SparseMatrix<double> EigenSpMat_t;
 typedef std::vector<double> copl_vector;

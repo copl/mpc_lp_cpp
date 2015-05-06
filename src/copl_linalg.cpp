@@ -25,7 +25,9 @@ void sp_dgemtv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl
 	Eigen::Map<Eigen::VectorXd> x(&copl_x[0],copl_x.size());
 	Eigen::Map<Eigen::VectorXd> y(&copl_y[0],copl_y.size());
 	EigenSpMat_t A = *(copl_A.eigenMat);
-	y = alpha*(A.transpose()*x)+beta*y;	
+	OUTPUT << A.innerSize() << "\t" << A.outerSize() << "\t" << x.size()<<"---\n";
+	y = A.transpose()*x; //alpha*(A.transpose()*x)+beta*y;	
+
 }
 
 //Scale the vector
