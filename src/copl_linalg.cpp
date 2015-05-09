@@ -25,7 +25,6 @@ void sp_dgemtv(double alpha, double beta, copl_matrix &copl_A, copl_vector &copl
 	Eigen::Map<Eigen::VectorXd> x(&copl_x[0],copl_x.size());
 	Eigen::Map<Eigen::VectorXd> y(&copl_y[0],copl_y.size());
 	EigenSpMat_t A = *(copl_A.eigenMat);
-	OUTPUT << A.innerSize() << "\t" << A.outerSize() << "\t" << x.size()<<"---\n";
 	y = alpha*(A.transpose()*x)+beta*y;	
 
 }
@@ -45,7 +44,14 @@ void axpy(double alpha, copl_vector &copl_x, copl_vector &copl_y)
 	Eigen::Map<Eigen::VectorXd> y(&copl_y[0],copl_y.size());
 	y = alpha*x+y;
 }
-
+// z = a*x + y
+void addat(double alpha, copl_vector &copl_x, copl_vector &copl_y, copl_vector &copl_z, int idx_x, int idx_y)
+{
+	Eigen::Map<Eigen::VectorXd> x(&copl_x[idx_x],copl_z.size());
+	Eigen::Map<Eigen::VectorXd> y(&copl_y[idx_y],copl_z.size());
+	Eigen::Map<Eigen::VectorXd> z(&copl_z[0],copl_z.size());
+	z = alpha*x+y;
+}
 // x^Ty
 double dot(copl_vector &copl_y, copl_vector &copl_x)
 {
@@ -54,6 +60,13 @@ double dot(copl_vector &copl_y, copl_vector &copl_x)
 	return y.dot(x);
 }
 
+// x^Ty
+double dotat(copl_vector &copl_y, copl_vector &copl_x, int idx)
+{
+	Eigen::Map<Eigen::VectorXd> x(&copl_x[0],copl_x.size());
+	Eigen::Map<Eigen::VectorXd> y(&copl_y[idx],copl_x.size());
+	return y.dot(x);
+}
 //Zero out 
 void zeros(copl_vector &y)
 {

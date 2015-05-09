@@ -11,7 +11,11 @@ namespace copl_ip {
 //to solve the linear systems of the iterations
 class k_newton_copl_matrix {
         
-	protected:        
+	protected:    
+	    // These two variables are reserved for solution of the two LEs (when the main LE is split to two).
+		//copl_vector d_var1;
+		//copl_vector d_var2;
+		
         //TODO: Move this to settings
         double DELTA = 1.e-4; 
         bool isFactored = false;	
@@ -47,14 +51,16 @@ class k_newton_copl_matrix {
         int nnz();
 		k_newton_copl_matrix(copl_matrix& A, copl_matrix& G);
 	  	void solve(copl_vector &solution, copl_vector &rhs);
+	    void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables);
 	  	void update(lp_variables &variables);
 	  	~k_newton_copl_matrix();
 };
 
 //Extends the k_newton matrix and implements the methods to solve homogeneous systems.
-class homogeneous_solver : protected k_newton_copl_matrix {
+class homogeneous_solver : public k_newton_copl_matrix {
     
     copl_vector &_c, &_h, &_b;
+    copl_vector rhs_1;
     copl_vector rhs_2;
     copl_vector sol_1;
     copl_vector sol_2;
@@ -64,6 +70,8 @@ class homogeneous_solver : protected k_newton_copl_matrix {
     //[A        -b]
     //[G        -h]
     //[-c' b' h   ]
+    
+public:
     homogeneous_solver(copl_matrix &A, 
                        copl_matrix &G,
                        copl_vector &c,
@@ -72,7 +80,8 @@ class homogeneous_solver : protected k_newton_copl_matrix {
 
     void update(lp_variables &variables);
 
-    void solve(lp_direction &dir, linear_system_rhs& rhs);
+    void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables);
+    void build_rhs2(linear_system_rhs& rhs, lp_variables &variables);
 
 };
 

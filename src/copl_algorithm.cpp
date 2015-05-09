@@ -9,7 +9,7 @@ namespace copl_ip {
 		// create data structures
 		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	
 		algorithm_state state;
-		k_newton_copl_matrix K_matrix(*problem_data.A,*problem_data.G);
+		homogeneous_solver K_matrix(*problem_data.A,*problem_data.G, *problem_data.c, *problem_data.b, *problem_data.h);
 		lp_direction direction(variables);
 		linear_system_rhs rhs(problem_data);
 		lp_residuals residuals(problem_data);
@@ -23,7 +23,6 @@ namespace copl_ip {
 			K_matrix.update(variables);
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
-			return;
 			residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
@@ -34,6 +33,7 @@ namespace copl_ip {
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
 			rhs.var_dump();
+			return;
 			// --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
 			direction.compute_direction(

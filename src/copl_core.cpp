@@ -1,5 +1,6 @@
 #include <copl_core.h>
 #include <copl_linalg.h>
+#include <copl_newton.h>
 #include <iostream>
 
 
@@ -77,7 +78,6 @@ void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &vari
 	// r1 = -pd.A'*variables.y - pd.G'*variables.z - pd.c*variables.tau;
 	zeros(r1);
 	sp_dgemtv(-1.0, 1.0, *problem_data.A, variables.y, r1);
-	return;
 	sp_dgemtv(-1.0, 1.0, *problem_data.G, variables.z, r1);
 	axpy(-variables.tau, *problem_data.c, r1);
 	// r2 = pd.A*variables.x - pd.b*variables.tau;
@@ -124,7 +124,7 @@ double lp_residuals::get_norm_squared() {return -1.0;} // TO DO
 
 // lp direction
 lp_direction::lp_direction(lp_variables &variables) 
-	: dx(variables.x.size(),0.0), ds(variables.s.size(),1.0), dz(variables.z.size(),1.0), dy(variables.y.size(),0.0) 
+	: dx(variables.x.size(),0.0), ds(variables.s.size(),1.0), dz(variables.z.size(),1.0), dy(variables.y.size(),0.0)
 {
 
 }
@@ -142,8 +142,8 @@ copl_vector lp_direction::get_dz() { return dz; }
 copl_vector lp_direction::get_ds() { return ds; }
 
 
-void lp_direction::solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix) {
-
+void lp_direction::solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix, lp_variables &variables) {
+	K_matrix.solve(*this, rhs, variables);
 }
 
 void  lp_direction::compute_direction(
@@ -155,7 +155,7 @@ void  lp_direction::compute_direction(
 		k_newton_copl_matrix &K_matrix
 		) {
 		
-	this->solve_linear_system_for_new_direction(affine_rhs, K_matrix);
+	this->solve_linear_system_for_new_direction(affine_rhs, K_matrix, variables);
 	this->compute_step_size(variables,settings);
 	/*
 	this.compute_affine_direction = function(affine_rhs::class_linear_system_rhs,

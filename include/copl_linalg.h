@@ -74,8 +74,12 @@ void scal(copl_vector &copl_x, double alpha );
 //y<- alpha*x + y
 void axpy(double alpha, copl_vector &copl_x, copl_vector &copl_y);
 
+// z = alpha*x + y
+void addat(double alpha, copl_vector &copl_x, copl_vector &copl_y, copl_vector &copl_z, int idx_x, int idx_y);
+
 // x^Ty
 double dot(copl_vector &copl_y, copl_vector &copl_x);
+double dotat(copl_vector &copl_y, copl_vector &copl_x, int idx);
 
 //Zero out 
 void zeros(copl_vector &y);

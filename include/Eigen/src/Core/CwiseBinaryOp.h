@@ -128,7 +128,7 @@ class CwiseBinaryOp : internal::no_assignment_operator,
       EIGEN_CHECK_BINARY_COMPATIBILIY(BinaryOp,typename Lhs::Scalar,typename Rhs::Scalar);
       // require the sizes to match
       EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(Lhs, Rhs)
-      eigen_assert(aLhs.rows() == aRhs.rows() && aLhs.cols() == aRhs.cols());
+      //eigen_assert(aLhs.rows() == aRhs.rows() && aLhs.cols() == aRhs.cols());
     }
 
     EIGEN_STRONG_INLINE Index rows() const {

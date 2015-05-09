@@ -153,6 +153,11 @@ void k_newton_copl_matrix::solve(copl_vector &solution, copl_vector &rhs) {
 	//TODO: iterative refinement with MINRES
 }
 
+void k_newton_copl_matrix::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables) {
+
+}
+
+
 void k_newton_copl_matrix::update(lp_variables &variables)
 {
 
@@ -182,32 +187,67 @@ void k_newton_copl_matrix::update(lp_variables &variables)
                        				    copl_matrix &G,
                                         copl_vector &c,
                                         copl_vector &b,
-                                        copl_vector &h):_c(c),
+                                        copl_vector &h):k_newton_copl_matrix(A,G),
+                                        				_c(c),
  														_h(h),
  														_b(b),
+ 														rhs_1(m+n+p),
  														rhs_2(m+n+p),
- 														k_newton_copl_matrix(A,G) {
+ 														sol_1(m+n+p),
+ 														sol_2(m+n+p)
+ 														 {
 
-//Build the RHS for the first system [-c; b; h]'
+//Build the RHS for the first system -[c; b; h]'
 
  	int j = 0;
  	for(int i = 0; i < n; i++)
- 		rhs_2[j++] = -c[i];
+ 		rhs_1[j++] = -c[i];
  	for(int i = 0; i < p; i++)
- 		rhs_2[j++] = b[i]; 	
+ 		rhs_1[j++] = -b[i]; 	
  	for(int i = 0; i < m; i++) 		
- 		rhs_2[j++] = h[i]; 	
+ 		rhs_1[j++] = -h[i]; 	
 
 }
 
 void homogeneous_solver::update(lp_variables &variables) {
 	k_newton_copl_matrix::update(variables);
 	//Solve the first rhs system
-	k_newton_copl_matrix::solve(sol_1,rhs_2);
+	//k_newton_copl_matrix::solve(sol_1,rhs_2);
 }
 
-void solve(lp_direction &dir, linear_system_rhs& rhs) {
+void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables) {
+	k_newton_copl_matrix::solve(sol_1,rhs_1);//can be moved to homogeneous_solver::update
+	this->build_rhs2(rhs, variables);
+	k_newton_copl_matrix::solve(sol_2,rhs_2);
+	
+	double q8 = rhs.q4-rhs.q6/variables.tau;
+	
+	dir.dtau = (-q8 + dotat(_c, rhs_2, 0) + dotat(_b, rhs_2, n) + dotat(_h, rhs_2, n+p))/
+			(variables.kappa/variables.tau - dotat(_c, rhs_1, 0) - dotat(_b, rhs_1, n) - dotat(_h, rhs_1, n+p) );
+	
+	addat(dir.dtau, rhs_1, rhs_2, dir.dx, 0, 0);
+	addat(dir.dtau, rhs_1, rhs_2, dir.dy, n, n);
+	addat(dir.dtau, rhs_1, rhs_2, dir.dz, n+p, n+p);
+	dir.dkappa = (rhs.q6-dir.dtau*variables.kappa)/variables.tau;
+	
+	for(int i = 0; i < m ; i++)
+	 		dir.ds[i] = (rhs.q5[i] - dir.dz[i]*variables.s[i])/variables.z[i]; 	
+	
+}
 
+void homogeneous_solver::build_rhs2(linear_system_rhs& rhs, lp_variables &variables) {
+	
+	//Build the RHS for the second system -[c; b; h]'
+
+	 	int j = 0;
+	 	for(int i = 0; i < n; i++)
+	 		rhs_2[j++] = -rhs.q1[i];
+	 	for(int i = 0; i < p; i++)
+	 		rhs_2[j++] = -rhs.q1[i]; 	
+	 	for(int i = 0; i < m; i++) 		
+	 		rhs_2[j++] = -(rhs.q3[i]-rhs.q5[i]/variables.z[i]); 	
+
+	
 }
 
 }

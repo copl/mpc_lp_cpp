@@ -112,13 +112,13 @@ public:
 
 //linear_system_rhs
 class linear_system_rhs {
+public:
 	copl_vector q1;
 	copl_vector q2;
 	copl_vector q3;
 	double q4;
 	copl_vector q5;
 	double q6;
-public:
 	linear_system_rhs( lp_input &problem_data);
 	linear_system_rhs(const linear_system_rhs &obj);
 	~linear_system_rhs();
@@ -135,6 +135,7 @@ public:
 //lp_direction
 class lp_direction {
 public:
+
 	copl_vector dx;
 	copl_vector dy;
 	copl_vector dz;
@@ -155,7 +156,7 @@ public:
 		k_newton_copl_matrix &K_matrix
 		);
 		
-	void solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix);
+	void solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix, lp_variables &variables);
 	
 	void compute_step_size(lp_variables& variables, lp_settings& settings);
 	void compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val);
