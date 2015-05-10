@@ -33,7 +33,6 @@ namespace copl_ip {
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
 			rhs.var_dump();
-			return;
 			// --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
 			direction.compute_direction(
@@ -59,7 +58,7 @@ namespace copl_ip {
 				);
 			
 			// --- END NOT WORKING --- //
-			
+	
 			// take step in the corrector direction
 			variables.take_step(direction);
 			
