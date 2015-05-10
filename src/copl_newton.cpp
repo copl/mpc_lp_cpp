@@ -154,6 +154,7 @@ void k_newton_copl_matrix::solve(copl_vector &solution, copl_vector &rhs) {
 }
 
 void k_newton_copl_matrix::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables) {
+	OUTPUT << "IN k_newton_copl_matrix::solve now..." << endl;
 
 }
 
@@ -216,6 +217,7 @@ void homogeneous_solver::update(lp_variables &variables) {
 }
 
 void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables) {
+	OUTPUT << "IN homogeneous_solver::solve now..." << endl;
 	k_newton_copl_matrix::solve(sol_1,rhs_1);//can be moved to homogeneous_solver::update
 	this->build_rhs2(rhs, variables);
 	k_newton_copl_matrix::solve(sol_2,rhs_2);

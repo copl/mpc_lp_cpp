@@ -64,7 +64,7 @@ double lp_settings::get_bkscale() 			{return bkscale;}
 //--------End lp_settings--------
 
 // lp_residuals
-lp_residuals::lp_residuals( lp_input &problem_data) : r1(problem_data.k_var,0.0), r2(problem_data.n,0.0), r3(problem_data.m,0.0) {
+lp_residuals::lp_residuals( lp_input &problem_data) : r1(problem_data.n,0.0), r2(problem_data.k_var,0.0), r3(problem_data.m,0.0) {
 
 }
 
@@ -219,6 +219,23 @@ void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, 
 	}
 }
 
+void lp_direction::var_dump() {
+	
+	OUTPUT << "DUMP DIRECTION OBJECT" << endl;
+	OUTPUT << "dx ";
+	copl_vector_dump(dx);
+	OUTPUT << "dy ";
+	copl_vector_dump(dy);
+	OUTPUT << "dz ";
+	copl_vector_dump(dz);
+	OUTPUT << "ds ";
+	copl_vector_dump(ds);
+	OUTPUT << "dtau " << dtau << endl;
+	OUTPUT << "dkappa " << dkappa << endl;
+	OUTPUT << "alpha " << alpha << endl;
+	
+}
+
 //-----------End lp direction
 
 
@@ -277,7 +294,7 @@ void algorithm_state::update_mu(lp_variables &variables,  lp_input &problem_data
 // linear_system_rhs
 
 linear_system_rhs::linear_system_rhs( lp_input &problem_data) :
-	q1(problem_data.k_var,0), q2(problem_data.n,0), q3(problem_data.m,0), q5(problem_data.m,0)
+	q1(problem_data.n,0), q2(problem_data.k_var,0), q3(problem_data.m,0), q5(problem_data.m,0)
 {
 	
 }

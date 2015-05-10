@@ -169,6 +169,7 @@ public:
 	copl_vector get_dy(); 
 	copl_vector get_dz(); 
 	copl_vector get_ds(); 
+	void var_dump();
 
 };
 

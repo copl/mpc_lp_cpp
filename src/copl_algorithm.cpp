@@ -43,7 +43,7 @@ namespace copl_ip {
 				settings,
 				K_matrix
 				); // are these the same ???
-			
+			direction.var_dump();
 			// update corrector rhs using new affine direction
 			rhs.compute_corrector_rhs(residuals,variables,state,direction,problem_data);
 

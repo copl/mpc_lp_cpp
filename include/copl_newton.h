@@ -51,7 +51,7 @@ class k_newton_copl_matrix {
         int nnz();
 		k_newton_copl_matrix(copl_matrix& A, copl_matrix& G);
 	  	void solve(copl_vector &solution, copl_vector &rhs);
-	    void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables);
+	    virtual void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables);
 	  	void update(lp_variables &variables);
 	  	~k_newton_copl_matrix();
 };
