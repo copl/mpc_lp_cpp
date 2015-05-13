@@ -7,13 +7,30 @@ using namespace std;
 
 namespace copl_ip {
 
-//This class is used by the optimization code 
-//to solve the linear systems of the iterations
+/*  
+   Defines the methods used to solve 
+   for the search directions.
+*/
+
+/*
+  Used to solve with the symmetric  
+  quasi definte system defined by 
+  [  A' G'][dx]   
+  [A      ][dy]
+  [G   -H ][dz].
+  This class regularizes the above system to generate 
+  a strongly quasidefinite matrix that can be factored without 
+  pivoting. 
+  TODO: Use the factored matrix as a preconditioner for MINRES
+  The present implementation is inefficient in two fronts, 
+  the factorization calculates the permutation at each iteration and 
+  uses an algorithm that will potentially pivot (super lu)
+*/
 class k_newton_copl_matrix {
         
 	protected:        
         //TODO: Move this to settings
-        double DELTA = 1.e-4; 
+        double DELTA = 1.e-7; 
         bool isFactored = false;	
 
         //Problem size
@@ -22,21 +39,21 @@ class k_newton_copl_matrix {
         //Hessian entries 
         std::vector<int> *hessianIx;	
      
-        //Set up the eigen solver object
+        //Set up the eigen solver object with AMD ordering
     	Eigen::SparseLU<Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::AMDOrdering<int> >   solver;
 
         //The assembled eigen matrix 
         copl_matrix* eigenKMat;    
   
-        //TODO: move these two to private and  
         //This function assembles the K newton matrix with identities in the diagonals
         //K = [-I A' G']
         //    [A -I    ]
         //    [G     I ]
         void assemble_matrix(copl_matrix &A, copl_matrix &G);          
-        k_newton_copl_matrix(int m, int n);
-
-        //Friend tests
+       	//This constructor is used in some testing routines 
+	k_newton_copl_matrix(int m, int n);
+        
+	//Tests
         FRIEND_TEST(KNEWTON,Assemble);
         FRIEND_TEST(KNEWTON,NonZeroPerCols);
         FRIEND_TEST(KNEWTON,nnz);
@@ -45,11 +62,16 @@ class k_newton_copl_matrix {
         FRIEND_TEST(KNEWTON,solve);
 
     public: 
+	//Number of nonzeros
         int nnz();
-		k_newton_copl_matrix(copl_matrix& A, copl_matrix& G);
-	  	void solve(copl_vector &solution, copl_vector &rhs);
-	  	void update(lp_variables &variables);
-	  	~k_newton_copl_matrix();
+	//Constructor
+	k_newton_copl_matrix(copl_matrix& A, copl_matrix& G);
+	//Solve with the symmetric system
+	void solve(copl_vector &solution, copl_vector &rhs);
+	//Update the variables and recalculate the hessian block
+	void update(lp_variables &variables);
+        //Destructor	
+	~k_newton_copl_matrix();
 };
 
 /* Extends the k_newton matrix and implements methods to solve 
@@ -86,18 +108,18 @@ class homogeneous_solver : protected k_newton_copl_matrix {
         FRIEND_TEST(KNEWTON,back_substitute_test);
 	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve);
 	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_reduced);
-    public:
+	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs);
 
-   
-    homogeneous_solver(lp_input &prob);
+    public: 
+    	homogeneous_solver(lp_input &prob);
    	
-    //Updates the value of the Hessian block and the tau and kappa variables 
-    //in the matrix. Factors a matrix derived from the homogenos system
-    // and solves one system with the factored matrix.
-    void update(lp_variables &variables);
-    
-    //Solves the homogeneous system
-    void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var);
+    	//Updates the value of the Hessian block and the tau and kappa variables 
+    	//in the matrix. Factors a matrix derived from the homogenos system
+    	// and solves one system with the factored matrix.
+    	void update(lp_variables &variables);
+    	
+    	//Solves the homogeneous system
+    	void solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var);
 
 };
 

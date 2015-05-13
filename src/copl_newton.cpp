@@ -171,7 +171,6 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 	}
 	//Real deal
 	solver.factorize(*eigenKMat);
-	//Solve the fixed rhs
 	isFactored = true;
 }
 
@@ -182,8 +181,8 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 							rhs_1(m+n+k),
 							k_newton_copl_matrix(prob.A,prob.G) {
     //Build the RHS for the first system [-c; b; h]'
-    rhs_1.segment(0,n) = -prob.c;
-    rhs_1.segment(n,k) = prob.b;
+    rhs_1.segment(0,n)   = -prob.c;
+    rhs_1.segment(n,k)   = prob.b;
     rhs_1.segment(n+k,m) = prob.h;
 
 }
@@ -203,9 +202,9 @@ void homogeneous_solver::update(lp_variables &variables) {
 	//Solve the first rhs system
 	k_newton_copl_matrix::solve(sol_1,rhs_1);
  
-        // dtau_denom = kap/tau - (c'*x1 + by1 + h'*z1); 
+        // dtau_denom = kap/tau + (c'*x1 + by1 + h'*z1); 
 	dtau_denom = kappa/tau 
-        - _c.dot(sol_1.segment(0,n)) -_b.dot(sol_1.segment(n,k)) -_h.dot(sol_1.segment(n+k,m));
+        + _c.dot(sol_1.segment(0,n)) +_b.dot(sol_1.segment(n,k)) +_h.dot(sol_1.segment(n+k,m));
 }
 
 /* Warning mutates rhs. 
@@ -245,8 +244,8 @@ void homogeneous_solver::solve_reduced(lp_direction &dir, linear_system_rhs &rhs
      //Solve with the right hand side formed with the top of the reduced rhs
      k_newton_copl_matrix::solve(sol_2,rhs.q123); 
      
-     // dtau = (-q4+q6 + c'*x2 + by2 + h'*z2)/dtau_denom
-     dir.dtau = -rhs.q4 + rhs.q6 + _c.dot(sol_2.segment(0,n)) + _b.dot(sol_2.segment(n,k)) + _h.dot(sol_2.segment(n+k,m));
+     // dtau  = (q4+q6 + c'*x2 + by2 + h'*z2)/dtau_denom
+     dir.dtau = rhs.q4 + _c.dot(sol_2.segment(0,n)) + _b.dot(sol_2.segment(n,k)) + _h.dot(sol_2.segment(n+k,m));
      dir.dtau /= dtau_denom;
 
      //d2+dtau d1

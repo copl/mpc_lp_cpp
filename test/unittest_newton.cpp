@@ -479,6 +479,74 @@ TEST(KNEWTON,back_substitute_test)
     ASSERT_LT(error.norm(),1.e-15);
 }
 
+//Validate that after update sol1 has the solution to 
+//[0   A'   G' ]dz      c
+//[A           ]dy    = -b
+//[G       -H  ]dz      -h
+
+TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs)
+{
+    //Populate A,G,c,b,h
+    copl_matrix A(2,4);
+    copl_matrix G(3,4);
+    copl_vector c(4),b(2),h(3);
+    c  << 1,2,3,4;
+    b  << 5,6;
+    h  << 7,8,9;
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0; 
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+    
+    lp_input lp_problem(A,b,c,G,h);
+    linear_system_rhs rhs(lp_problem);
+
+    //Fill the rhs with stuff
+    rhs.q123.setConstant(2.0);
+    rhs.q4 = 2.0;
+    rhs.q5.setConstant(10.0);
+    rhs.q6 = 10.0;
+
+    lp_variables vars(3,4,2);
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+ 
+    //Allocate space for the solution 
+    lp_direction dir(vars);
+ 
+    homogeneous_solver K_solver(lp_problem);
+    K_solver.update(vars);//Solves and populates sol_1
+    //Vector to compute the error 
+    copl_vector errorx(4);
+    copl_vector errory(2);
+    copl_vector errorz(3);
+    errorx = A.transpose()*K_solver.sol_1.segment(4,2)  + 
+	     K_solver.DELTA*K_solver.sol_1.segment(0,4) +
+             G.transpose()*K_solver.sol_1.segment(6,3)  + c;
+    errory = A*K_solver.sol_1.segment(0,4) -
+             K_solver.DELTA*K_solver.sol_1.segment(4,2) - b;
+    errorz = G*K_solver.sol_1.segment(0,4) - 
+             K_solver.DELTA*K_solver.sol_1.segment(6,3) -
+             (vars.s.array()/vars.z.array()*K_solver.sol_1.segment(6,3).array()).matrix() - h;
+    EXPECT_LT(errorx.norm(),1e-14);  
+    EXPECT_LT(errory.norm(),1e-14); 
+    EXPECT_LT(errorz.norm(),1e-14); 
+
+}
+
+
 TEST(HOMOGENEOUS_SOLVER,solve_reduced)
 {
     //Populate A,G,c,b,h
@@ -514,7 +582,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;
     vars.s << 0.5,0.6,0.9;
-    vars.z << 0.5,1.e-3,1.7;
+    vars.z << 0.5,1e-3,1.7;
     vars.tau = 0.4;
     vars.kappa = 1.e-4;
  
@@ -524,51 +592,27 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
     homogeneous_solver K_solver(lp_problem);
     K_solver.update(vars);//Solves and populates sol_1
     K_solver.solve_reduced(dir,rhs);
-    
-}
 
-TEST(HOMOGENEOUS_SOLVER,solve)
-{
-    //Populate A,G,c,b,h
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
-    copl_vector c(4),b(2),h(3);
-    c  << 1,2,3,4;
-    b  << 5,6;
-    h  << 7,8,9;
-    A.insert(0,0) = 1.0;
-    A.insert(0,1) = 2.0;
-    A.insert(1,0) = 3.0;
-    A.insert(1,2) = 4.0;    
-    A.insert(1,3) = 5.0; 
-    G.insert(0,3) = 6.0;    
-    G.insert(1,2) = 7.0;
-    G.insert(2,0) = 8.0;
-    G.insert(2,1) = 9.0;
-    G.insert(2,2) = 10.0;
-    G.insert(2,3) = 11.0;
-    
-    lp_input lp_problem(A,b,c,G,h);
-    linear_system_rhs rhs(lp_problem);
+    //Vector to compute the error 
+    copl_vector errorx(4);
+    copl_vector errory(2);
+    copl_vector errorz(3);
+    double errort;
 
-    //Fill the rhs with stuff
-    rhs.q123.setConstant(2.0);
-    rhs.q4 = 2.0;
-    rhs.q5.setConstant(10.0);
-    rhs.q6 = 10.0;
+    errorx = A.transpose()*dir.dy+G.transpose()*dir.dz+dir.dtau*c +
+	     K_solver.DELTA*dir.dx - rhs.q123.segment(0,4);
+    errory = A*dir.dx-dir.dtau*b   -
+	     K_solver.DELTA*dir.dy -
+	     rhs.q123.segment(4,2);
+    errorz = G*dir.dx - dir.dtau*h - 
+	     K_solver.DELTA*dir.dz -
+             rhs.q123.segment(6,3)-(vars.s.array()/vars.z.array()*dir.dz.array()).matrix();
+    errort = -c.dot(dir.dx) - b.dot(dir.dy) - h.dot(dir.dz) + vars.kappa/vars.tau*dir.dtau - rhs.q4;
+    EXPECT_LT(errorx.norm(),1e-14);  
+    EXPECT_LT(errory.norm(),1e-14); 
+    EXPECT_LT(errorz.norm(),1e-14); 
+    ASSERT_LT(errort,1e-15); 
 
-    lp_variables vars(3,4,2);
-    //Set the variables to some state
-    vars.x << 0.5,0.6,0.7,0.8;
-    vars.y << 0.9,1.1;
-    vars.s << 0.5,0.6,0.9;
-    vars.z << 0.5,1.e-3,1.7;
-    vars.tau = 0.4;
-    vars.kappa = 1.e-4;
- 
-    homogeneous_solver K_solver(lp_problem);
-    K_solver.update(vars);//Solves and populates sol_1
-    K_solver.reduce_rhs(rhs);   
 }
 
 }
