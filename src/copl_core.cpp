@@ -155,16 +155,17 @@ lp_residuals::lp_residuals( lp_input &problem_data) : r1(problem_data.n),
 void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &variables){
     r1 = -problem_data.A.transpose()*variables.y 
          -problem_data.G.transpose()*variables.z;
+
     hn1 = r1.norm();
     r1 += -problem_data.c*variables.tau;
     n1  = r1.norm();
 
-	r2 = problem_data.A*variables.x;	
+    r2 = problem_data.A*variables.x;	
     hn2 = r2.norm();
     r2 += - problem_data.b*variables.tau;
     n2 = r2.norm();
 
-	r3 = variables.s + problem_data.G*variables.x;
+    r3 = variables.s + problem_data.G*variables.x;
     hn3 = r3.norm();
     r3 += - variables.tau*problem_data.h;
     n3 = r3.norm();

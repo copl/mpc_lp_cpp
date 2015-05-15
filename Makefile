@@ -69,16 +69,7 @@ bin/%.o: src/%.cpp
 	$(CPP) $(CFLAGS) $(INCLUDE) $(TEST_INCLUDE) -c $< -o $@
 
 test: $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) bin/libgmock.a
-	mkdir -p bin
-	mkdir -p testbin 
 	$(CPP) $(CFLAGS) $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) bin/libgmock.a -o ./bin/unittest.exe
-
-READY_TEST_OBJECTS = ./testbin/unittest_core.o ./testbin/unittest_newton.o
-
-READY_OBJECTS = ./bin/copl_newton.o ./bin/copl_core.o
-
-newton: $(READY_OBJECTS) $(READY_TEST_OBJECTS) bin/libgmock.a
-	$(CPP) $(CFLAGS) $(READY_OBJECTS) $(READY_TEST_OBJECTS) bin/libgmock.a -o ./bin/unittest.exe
 
 clean:
 	rm ./bin/*; rm ./testbin/*

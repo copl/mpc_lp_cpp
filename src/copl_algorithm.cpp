@@ -7,11 +7,11 @@ namespace copl_ip {
 		problem_data.var_dump();
 		
 		// create data structures
-		lp_variables variables (problem_data.n,problem_data.m,problem_data.k_var);	
+		lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
 		algorithm_state state;
         
         //Create and analyze the newton matrix 
-        homogeneous_solver K_matrix(A,G,c,b,h);
+        homogeneous_solver K_matrix(problem_data);
 	    
         //This stores the search directions
         lp_direction direction(variables);
@@ -26,8 +26,7 @@ namespace copl_ip {
 		state.update_mu(variables, problem_data);
 		
 		// Begin iteration
-		int MAX_IT = settings.get_max_iter();
-		for (int itr = 1; itr <= MAX_IT; itr++){
+		for (int itr = 1; itr <= settings.max_iter; itr++){
 
 			// To be sent to Tiago's Linear Solver
 			K_matrix.update(variables);
@@ -44,33 +43,16 @@ namespace copl_ip {
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
 			rhs.var_dump();
-			
-            // --- BEGIN NOT WORKING --- //
-			// compute affine direction using new affine rhs
-			direction.compute_direction(
-				rhs,
-				problem_data,
-				variables,
-				state,
-				settings,
-				K_matrix
-				); // are these the same ???
-			
-			// update corrector rhs using new affine direction
-			rhs.compute_corrector_rhs(residuals,variables,state,direction,problem_data);
 
-			// update corrector direction using new corrector rhs
-			direction.compute_direction(
-				rhs,
-				problem_data,
-				variables,
-				state,
-				settings,
-				K_matrix
-				);
-			
-			// --- END NOT WORKING --- //
-			
+			//Solve the system and compute the affine direction	
+			K_matrix.solve(direction,rhs,variables);
+     	
+			// update corrector rhs using new affine direction
+			rhs.compute_combined_rhs(residuals,variables,direction,state.sigma,state.mu);
+
+			//Solve the system and compute the combined direction	
+			K_matrix.solve(direction,rhs,variables);
+		
 			// take step in the corrector direction
 			variables.take_step(direction);
 			
@@ -93,10 +75,10 @@ namespace copl_ip {
 		#unbounded and infeasible problems.
 		*/
 		
-		if (residuals.get_r1_norm() < settings.get_linear_feas_tol() && 
-			residuals.get_r2_norm() < settings.get_linear_feas_tol() &&
-			residuals.get_r3_norm() < settings.get_linear_feas_tol() && 
-			state.mu < settings.get_comp_tol())
+		if (residuals.n1 < settings.linear_feas_tol && 
+			residuals.n2 < settings.linear_feas_tol &&
+			residuals.n3 < settings.linear_feas_tol && 
+			state.mu < settings.comp_tol)
 			 return true;
 		else
 			return false;
@@ -105,7 +87,7 @@ namespace copl_ip {
 	}
 	
 	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr) {
-		OUTPUT << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.get_norm_squared() << endl;
+		OUTPUT << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.n1<<","<<residuals.n2<<","<<residuals.n3 << ","<<residuals.n4 << endl;
 		//@printf("%3i\t%3.3e\t%3.3e\t%3.3e\t%3.3e\t%3.3e\n", itr, state.gap ,state.mu, direction.alpha, variables.tau, residuals.normed_squared)
 	}
 }
