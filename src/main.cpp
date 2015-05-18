@@ -37,7 +37,7 @@ void make_trivial_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_v
 
 int main()
 {
-	const int max_iter			    = 5;
+	const int max_iter			    = 50;
 	const double linear_feas_tol 	= 1e-8; //Assuming possible Integer Overflow
 	const double comp_tol			= 1e-8; //Assuming possible Integer Overflow
 	const double bkscale			= 0.95;

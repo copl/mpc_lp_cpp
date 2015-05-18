@@ -1,7 +1,7 @@
 
 #ifndef COPL_DEBUG_H
 #define COPL_DEBUG_H
-#define DEBUG_TO_FILE
+//#define DEBUG_TO_FILE
 
 #include <fstream>
 #include <iostream>

@@ -4,31 +4,31 @@ using namespace std;
 namespace copl_ip {
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){
 	
-	problem_data.var_dump();
-		
-	// create data structures
-	lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
-	algorithm_state state;
-        
-        //Create and analyze the newton matrix 
-        homogeneous_solver K_matrix(problem_data,settings);
-	    
-        //This stores the search directions
-        lp_direction direction(variables);
-        
-        //Helps generate the rhs for the linear solves	
-        linear_system_rhs rhs(problem_data);
-        
-        //Contains the linear residuals
-		lp_residuals residuals(problem_data);
-	    
-        //Compute initial mu
-		state.update_mu(variables, problem_data);
+        	problem_data.var_dump();
+        		
+        	//Allocate the variables
+        	lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
+        	algorithm_state state;
+                
+                //Create and analyze the newton matrix 
+                homogeneous_solver K_matrix(problem_data,settings);
+        	    
+                //This stores the search directions
+                lp_direction direction(variables);
+                
+                //Helps generate the rhs for the linear solves	
+                linear_system_rhs rhs(problem_data);
+                
+                //Contains the linear residuals
+        	lp_residuals residuals(problem_data);
+        	    
+                //Compute initial mu
+        	state.update_mu(variables, problem_data);
 		
 		// Begin iteration
+		print_status(state, direction, variables, residuals, 0);
 		for (int itr = 1; itr <= settings.max_iter; itr++){
-
-			// To be sent to Tiago's Linear Solver
+			//Update the linear system with the present value
 			K_matrix.update(variables);
 
 			// compute residuals
@@ -46,13 +46,22 @@ namespace copl_ip {
 
 			//Solve the system and compute the affine direction	
 			K_matrix.solve(direction,rhs,variables);
-     	
+     			
+			//Calculate sigma 
+			direction.compute_step_size(variables,settings);		
+			
+			state.sigma = (1-direction.alpha);
+			state.sigma *= (1-direction.alpha);
+			state.sigma *= (1-direction.alpha);
+			
 			// update corrector rhs using new affine direction
 			rhs.compute_combined_rhs(residuals,variables,direction,state.sigma,state.mu);
 
 			//Solve the system and compute the combined direction	
 			K_matrix.solve(direction,rhs,variables);
 		
+			direction.compute_step_size(variables,settings);		
+			
 			// take step in the corrector direction
 			variables.take_step(direction);
 			

@@ -186,36 +186,36 @@ void lp_residuals::var_dump() {
 }
 
 ////--------End lp_residuals--------
-//
-//
-//void lp_direction::compute_step_size(lp_variables& variables, lp_settings& settings) {
-//	this->alpha = 1;
-//	compute_min_ratio_alpha(variables.s,variables.s,this->alpha); // TO DO change to dz
-//	compute_min_ratio_alpha(variables.z,variables.z,this->alpha);
-//	compute_min_ratio_alpha(variables.kappa,variables.kappa,this->alpha);
-//	compute_min_ratio_alpha(variables.tau,variables.tau,this->alpha);
-//	this->alpha = this->alpha*settings.bkscale;
-//}
-//
-//void lp_direction::compute_min_ratio_alpha(double var, double dvar, double& alpha_val) {
-//	if (dvar != 0) { // GREATER THAN TOL ??????
-//		double candidate_alpha = -var/dvar;
-//		if (candidate_alpha > 0) {
-//			alpha_val = min(alpha_val, candidate_alpha);
-//		}
-//	}
-//}
-//
-//void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val) {
-//	assert(var.size() == dvar.size());
-//	
-//	for (int i = 0; i < var.size(); i++) {
-//		double var_double = var[i];
-//		double dvar_double = var[i];
-//		compute_min_ratio_alpha(var_double, dvar_double, alpha_val);
-//	}
-//}
-//
+//TODO: Testing routines for these three methods
+void lp_direction::compute_step_size(lp_variables &variables, 
+                                     lp_settings  &settings) {
+	this->alpha = 1;
+	compute_min_ratio_alpha(variables.s,ds,this->alpha);
+	compute_min_ratio_alpha(variables.z,dz,this->alpha);
+	compute_min_ratio_alpha(variables.kappa,dkappa,this->alpha);
+	compute_min_ratio_alpha(variables.tau,dtau,this->alpha);
+	this->alpha = this->alpha*settings.bkscale;
+}
+
+void lp_direction::compute_min_ratio_alpha(double var, double dvar, double& alpha_val) {
+	if (dvar != 0) { // GREATER THAN TOL ??????
+		double candidate_alpha = -var/dvar;
+		if (candidate_alpha > 0) {
+			alpha_val = min(alpha_val, candidate_alpha);
+		}
+	}
+}
+
+void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val) {
+	assert(var.size() == dvar.size());
+	
+	for (int i = 0; i < var.size(); i++) {
+		double var_double = var[i];
+		double dvar_double = var[i];
+		compute_min_ratio_alpha(var_double, dvar_double, alpha_val);
+	}
+}
+
 ////-----------End lp direction
 //
 
