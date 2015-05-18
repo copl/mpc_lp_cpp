@@ -41,6 +41,7 @@ int main()
 	const double linear_feas_tol 	= 1e-8; //Assuming possible Integer Overflow
 	const double comp_tol			= 1e-8; //Assuming possible Integer Overflow
 	const double bkscale			= 0.95;
+	const double regularization     = 1e-7;
 
 	//copl_vector test(10,10);
 
@@ -48,7 +49,7 @@ int main()
 	OUTPUT << "Interior point algorithm coming" << endl;
 	
 	// Initialize configuration variable
-	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale);	
+	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale,regularization);	
     
     copl_matrix A(2,4);
     copl_matrix G(3,4);

@@ -29,8 +29,7 @@ namespace copl_ip {
 class k_newton_copl_matrix {
         
 	protected:        
-        //TODO: Move this to settings
-        double DELTA = 1.e-7; 
+        double DELTA; 
         bool isFactored = false;	
 
         //Problem size
@@ -50,8 +49,9 @@ class k_newton_copl_matrix {
         //    [A -I    ]
         //    [G     I ]
         void assemble_matrix(copl_matrix &A, copl_matrix &G);          
-       	//This constructor is used in some testing routines 
-	k_newton_copl_matrix(int m, int n);
+       	
+	//This constructor is used in some testing routines 
+	k_newton_copl_matrix(int m, int n, double DELTA);
         
 	//Tests
         FRIEND_TEST(KNEWTON,Assemble);
@@ -65,7 +65,7 @@ class k_newton_copl_matrix {
 	//Number of nonzeros
         int nnz();
 	//Constructor
-	k_newton_copl_matrix(copl_matrix& A, copl_matrix& G);
+	k_newton_copl_matrix(copl_matrix& A, copl_matrix& G, lp_settings& settings);
 	//Solve with the symmetric system
 	void solve(copl_vector &solution, copl_vector &rhs);
 	//Update the variables and recalculate the hessian block
@@ -111,7 +111,7 @@ class homogeneous_solver : protected k_newton_copl_matrix {
 	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs);
 
     public: 
-    	homogeneous_solver(lp_input &prob);
+    	homogeneous_solver(lp_input &prob, lp_settings &settings);
    	
     	//Updates the value of the Hessian block and the tau and kappa variables 
     	//in the matrix. Factors a matrix derived from the homogenos system

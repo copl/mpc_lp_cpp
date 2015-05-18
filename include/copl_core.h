@@ -68,12 +68,15 @@ class lp_settings {
 		//ant length of the 
 		//maximum combined step to the boundary to use
 		double bkscale;
+		//Regularization for the SQD matrix 
+		double regularization;
 
 	lp_settings(
 		int max_iter,
 		double linear_feas_tol,	
 		double comp_tol,	
-		double bkscale
+		double bkscale,
+		double regularization
 		);
 };
 

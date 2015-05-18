@@ -132,15 +132,15 @@ void lp_direction::solve_linear_system_for_new_direction(linear_system_rhs& rhs,
 //--------End lp_input--------
 
 // lp_settings
-lp_settings::lp_settings (int input_max_iter,
-                          double input_linear_feas_tol,
-                          double input_comp_tol,
-                          double input_bkscale) {
-	max_iter 			= input_max_iter;
-	linear_feas_tol 	= input_linear_feas_tol;
-	comp_tol 			= input_comp_tol;
-	bkscale 			= input_bkscale;
-}
+lp_settings::lp_settings (int _max_iter,
+                          double _linear_feas_tol,
+                          double _comp_tol,
+                          double _bkscale,
+			  double _regularization):max_iter(_max_iter),
+						  linear_feas_tol(_linear_feas_tol),
+						  comp_tol(_comp_tol),
+						  bkscale(_bkscale),
+						  regularization(_regularization){}
 
 //--------End lp_settings--------
 

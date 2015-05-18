@@ -4,14 +4,14 @@ using namespace std;
 namespace copl_ip {
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){
 	
-		problem_data.var_dump();
+	problem_data.var_dump();
 		
-		// create data structures
-		lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
-		algorithm_state state;
+	// create data structures
+	lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
+	algorithm_state state;
         
         //Create and analyze the newton matrix 
-        homogeneous_solver K_matrix(problem_data);
+        homogeneous_solver K_matrix(problem_data,settings);
 	    
         //This stores the search directions
         lp_direction direction(variables);

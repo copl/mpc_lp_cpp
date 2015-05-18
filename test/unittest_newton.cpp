@@ -39,7 +39,7 @@ TEST(KNEWTON,Assemble)
     G.insert(2,3) = 11.0;
 	
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(4,9); 
+    k_newton_copl_matrix k_mat(4,9,1.E-7); 
     k_mat.m = G.rows();
     k_mat.n = G.cols();
     k_mat.k = A.rows();
@@ -79,7 +79,7 @@ TEST(KNEWTON,NonZeroPerCols)
     G.insert(2,3) = 11.0;
 	
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(4,9); 
+    k_newton_copl_matrix k_mat(4,9,1.e-7); 
     k_mat.m = G.rows();
     k_mat.n = G.cols();
     k_mat.k = A.rows();
@@ -129,7 +129,7 @@ TEST(KNEWTON,nnz){
     G.insert(2,3) = 11.0;
 	 
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(4,9); 
+    k_newton_copl_matrix k_mat(4,9,1.e-7); 
     k_mat.m = G.rows();
     k_mat.n = G.cols();
     k_mat.k = A.rows();
@@ -168,9 +168,9 @@ TEST(KNEWTON,Constructor)
 	
 	
     copl_vector c,b,h;
-    
+    lp_settings settings(1,1,1,1,1.e-7);
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G); 
+    k_newton_copl_matrix k_mat(A,G,settings); 
    
     //Just make sure it does not crash when constructing
     EXPECT_EQ( (*k_mat.hessianIx)[0], 23);
@@ -207,8 +207,9 @@ TEST(KNEWTON,Update)
 	 	
     copl_vector c,b,h;
     
+    lp_settings settings(1,1,1,1,1.e-7);
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G); 
+    k_newton_copl_matrix k_mat(A,G,settings); 
     int m = 3;
     int n = 4;
     int k = 2;
@@ -281,8 +282,9 @@ TEST(KNEWTON,solve)
 	
     copl_vector c,b,h;
     
+    lp_settings settings(1,1,1,1,1e-7);
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G); 
+    k_newton_copl_matrix k_mat(A,G,settings); 
     int m = 3;
     int n = 4;
     int k = 2;
@@ -352,7 +354,8 @@ TEST(KNEWTON,solveException)
     copl_vector c,b,h;
     
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G); 
+    lp_settings settings(1,1,1,1,1.e-7);
+    k_newton_copl_matrix k_mat(A,G,settings); 
     copl_vector x(9);
     copl_vector y(9);
     ASSERT_ANY_THROW(k_mat.solve(y,x));
@@ -404,8 +407,9 @@ TEST(KNEWTON,reduce_rhs_test)
     vars.z << 0.5,1.e-3,1.7;
     vars.tau = 0.4;
     vars.kappa = 1.e-4;
- 
-    homogeneous_solver K_solver(lp_problem);
+
+    lp_settings settings(1,1,1,1,1.e-7); 
+    homogeneous_solver K_solver(lp_problem,settings);
     K_solver.update(vars);
     K_solver.reduce_rhs(rhs);
     //check the last entires of q123, it should now read  -8
@@ -468,8 +472,9 @@ TEST(KNEWTON,back_substitute_test)
     //Set the rhs
     rhs.q5 << 0.5,1.5,2.5;
     rhs.q6 = 1.5;
-
-    homogeneous_solver K_solver(lp_problem);
+    
+    lp_settings settings(1,1,1,1,1.e-7);
+    homogeneous_solver K_solver(lp_problem,settings);
     K_solver.update(vars);
     K_solver.back_substitute(dir, rhs, vars);
    
@@ -525,8 +530,10 @@ TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs)
  
     //Allocate space for the solution 
     lp_direction dir(vars);
- 
-    homogeneous_solver K_solver(lp_problem);
+  
+    lp_settings settings(1,1,1,1,1.e-7);
+    homogeneous_solver K_solver(lp_problem,settings);
+    
     K_solver.update(vars);//Solves and populates sol_1
     //Vector to compute the error 
     copl_vector errorx(4);
@@ -588,8 +595,10 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
  
     //Allocate space for the solution 
     lp_direction dir(vars);
- 
-    homogeneous_solver K_solver(lp_problem);
+  
+    lp_settings settings(1,1,1,1,1.e-7);
+    homogeneous_solver K_solver(lp_problem,settings);
+    
     K_solver.update(vars);//Solves and populates sol_1
     K_solver.solve_reduced(dir,rhs);
 

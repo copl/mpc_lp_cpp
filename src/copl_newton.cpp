@@ -7,18 +7,19 @@ int k_newton_copl_matrix::nnz()
 	return eigenKMat->nonZeros();
 }
 
-k_newton_copl_matrix::k_newton_copl_matrix(int m, int n)
+k_newton_copl_matrix::k_newton_copl_matrix(int m, int n, double regularization)
 {
 	cout << "Testing constructor (m,n) " <<m <<","<<n <<"\n";
+	DELTA     = regularization;
 	hessianIx = new std::vector<int>(m);
 	eigenKMat = new copl_matrix(n,n);
     cout << "This constructor should only be used in testing";
     cout.flush();
 }
 
-k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G)
+k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_settings& settings)
 {
-	
+	DELTA = settings.regularization;	
 	k = A.rows();	
 	n = G.cols();		
     m = G.rows();	
@@ -175,11 +176,13 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 }
 
 //Homogeneous solver implementation 
- homogeneous_solver::homogeneous_solver(lp_input &prob):_c(prob.c),
+ homogeneous_solver::homogeneous_solver(lp_input &prob, lp_settings &settings):_c(prob.c),
 							_h(prob.h),
 							_b(prob.b),
 							rhs_1(m+n+k),
-							k_newton_copl_matrix(prob.A,prob.G) {
+							k_newton_copl_matrix(prob.A,
+									     prob.G,
+									     settings) {
     //Build the RHS for the first system [-c; b; h]'
     rhs_1.segment(0,n)   = -prob.c;
     rhs_1.segment(n,k)   = prob.b;
