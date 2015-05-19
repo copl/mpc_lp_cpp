@@ -1,5 +1,5 @@
 % For Oli:
-/cygdrive/c/Users/Oliver/Documents/GitHub/mpc_lp_cpp
+/cygdrive/c/Users/Oliver/Google Drive/Stanford/Research/Programming Projects/mpc_lp_cpp
 
 Davood:
 To Run, I had to

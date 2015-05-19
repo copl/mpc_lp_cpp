@@ -19,6 +19,7 @@ namespace copl_ip {
 		// Begin iteration
 		int MAX_IT = settings.get_max_iter();
 		for (int itr = 1; itr <= MAX_IT; itr++){
+			OUTPUT << "mu: " << state.mu << endl;
 			// To be sent to Tiago's Linear Solver
 			K_matrix.update(variables);
 			// compute residuals
