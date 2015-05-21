@@ -2,7 +2,7 @@
  * Linear algebra definitions for the copl interior point solver 
  * Santiago Akle 
  */
-#define DEBUG_TO_FILE
+//#define DEBUG_TO_FILE
 #ifndef COPL_LINALG_H
 #define COPL_LINALG_H
 
