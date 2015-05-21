@@ -60,12 +60,12 @@ namespace copl_ip {
 			//Solve the system and compute the combined direction	
 			K_matrix.solve(direction,rhs,variables);
 		
-			direction.compute_step_size(variables,settings);		
+			direction.compute_step_size(variables,settings);				
 			
 			// take step in the corrector direction
 			variables.take_step(direction);
 			
-			// compute the gap after the step
+	    	        // compute the gap after the step
 			state.update_mu(variables,problem_data);
 			state.update_gap(variables,problem_data);
 			
@@ -96,7 +96,7 @@ namespace copl_ip {
 	}
 	
 	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr) {
-		OUTPUT << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.n1<<","<<residuals.n2<<","<<residuals.n3 << ","<<residuals.n4 << endl;
+		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " sigma: " << state.sigma << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.n1<<","<<residuals.n2<<","<<residuals.n3 << ","<<residuals.n4 << endl;
 		//@printf("%3i\t%3.3e\t%3.3e\t%3.3e\t%3.3e\t%3.3e\n", itr, state.gap ,state.mu, direction.alpha, variables.tau, residuals.normed_squared)
 	}
 }

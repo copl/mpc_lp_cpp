@@ -42,8 +42,8 @@ lp_variables::lp_variables(int m, int n, int k_var) :
     y.setZero();
     s.setConstant(1.0);
     z.setConstant(1.0);
-	tau   = 1;
-	kappa = 1;
+	tau   = 1.0;
+	kappa = 1.0;
 }
 
 lp_variables::lp_variables(const lp_variables &obj){
@@ -189,31 +189,22 @@ void lp_residuals::var_dump() {
 //TODO: Testing routines for these three methods
 void lp_direction::compute_step_size(lp_variables &variables, 
                                      lp_settings  &settings) {
-	this->alpha = 1;
-	compute_min_ratio_alpha(variables.s,ds,this->alpha);
-	compute_min_ratio_alpha(variables.z,dz,this->alpha);
-	compute_min_ratio_alpha(variables.kappa,dkappa,this->alpha);
-	compute_min_ratio_alpha(variables.tau,dtau,this->alpha);
+	double var, dvar, ratio;
+	copl_vector s = variables.s;
+	copl_vector z = variables.z;
+
+	this->alpha = 1.0;
+	for(int i=0; i<variables.s.size(); i++)
+	{
+		ratio = -s[i]/ds[i];
+		this->alpha = ratio > 0 ? min(this->alpha,ratio) : this->alpha;	
+		ratio = -z[i]/dz[i];
+		this->alpha = ratio > 0 ? min(this->alpha,ratio) : this->alpha;	
+
+	}
+	if(dtau < 0 ) this->alpha = min(-variables.tau/dtau,this->alpha);
+	if(dkappa < 0 ) this->alpha = min(-variables.kappa/dkappa,this->alpha);
 	this->alpha = this->alpha*settings.bkscale;
-}
-
-void lp_direction::compute_min_ratio_alpha(double var, double dvar, double& alpha_val) {
-	if (dvar != 0) { // GREATER THAN TOL ??????
-		double candidate_alpha = -var/dvar;
-		if (candidate_alpha > 0) {
-			alpha_val = min(alpha_val, candidate_alpha);
-		}
-	}
-}
-
-void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val) {
-	assert(var.size() == dvar.size());
-	
-	for (int i = 0; i < var.size(); i++) {
-		double var_double = var[i];
-		double dvar_double = var[i];
-		compute_min_ratio_alpha(var_double, dvar_double, alpha_val);
-	}
 }
 
 ////-----------End lp direction

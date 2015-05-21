@@ -63,13 +63,15 @@ TEST(CORE,test_step)
     vars.y.setConstant(2.0);
     vars.s.setConstant(3.0);
     vars.z.setConstant(4.0);
-
+    vars.tau = 5.0;
+    vars.kappa = 6.0;
     //Set the direction 
     dir.dx.setConstant(1.0);
     dir.dy.setConstant(2.0);
     dir.ds.setConstant(3.0);
     dir.dz.setConstant(4.0);
-    
+    dir.dtau = 5.0;
+    dir.dkappa = 6.0; 
     dir.alpha = 0.5;
     //Take a step along the direction  
     vars.take_step(dir);
@@ -86,7 +88,55 @@ TEST(CORE,test_step)
     ASSERT_THAT(y,Each(3.0));
     ASSERT_THAT(s,Each(4.5));
     ASSERT_THAT(z,Each(6.0));
+    ASSERT_THAT(vars.tau,7.5);
+    ASSERT_THAT(vars.kappa,9.0);
 }
+
+//Test the code that first calculatest the step size and then updates the step 
+TEST(CORE,test_stepsize_andstep)
+{
+    int m = 10;
+    int n = 3;
+    int k = 5;
+    lp_variables vars(m,n,k);
+    lp_direction dir(vars); 
+    
+    vars.x.setConstant(1.0);
+    vars.y.setConstant(2.0);
+    vars.s.setConstant(3.0);
+    vars.z.setConstant(4.0);
+    vars.tau = 5.0;
+    vars.kappa = 6.0;
+    //Set the direction 
+    dir.dx.setConstant(-1.0);
+    dir.dy.setConstant(-2.0);
+    dir.ds.setConstant(-3.0);
+    dir.dz.setConstant(-4.0);
+    dir.dtau = -5.0;
+    dir.dkappa = -6.0; 
+     
+    lp_settings settings(10,1.e-10,1.e-10,1.0,1.e-7);
+    dir.compute_step_size(vars,settings);
+    
+    //Take a step along the direction  
+    vars.take_step(dir);
+
+    //Copy to stl to use gmock 
+    std::vector<double> x(n),y(k),z(m),s(m);
+    std::copy(&vars.x[0],&vars.x[0]+n,x.begin());
+    std::copy(&vars.y[0],&vars.y[0]+k,y.begin());
+    std::copy(&vars.s[0],&vars.s[0]+m,s.begin());
+    std::copy(&vars.z[0],&vars.z[0]+m,z.begin());
+    
+    //Check that the entries are correct
+    ASSERT_THAT(x,Each(0.0));
+    ASSERT_THAT(y,Each(0.0));
+    ASSERT_THAT(s,Each(0.0));
+    ASSERT_THAT(z,Each(0.0));
+    ASSERT_THAT(vars.tau,0.0);
+    ASSERT_THAT(vars.kappa,0.0);
+}
+
 
 TEST(CORE,residuals_constructor)
 {
@@ -193,6 +243,31 @@ TEST(CORE,residuals)
     double err_norm = error1.norm()+error2.norm()+error3.norm()+fabs(error4);
     ASSERT_LT(err_norm, 1.e-15);
   }
+
+ TEST(CORE,step_size)
+ {
+    int m = 3;
+    int n = 4;
+    int k = 2;
+    lp_variables vars(m,n,k);
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1.e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+    lp_direction dir(vars); 
+    dir.ds << -0.1,-0.1,-0.1;
+    dir.dz << -0.1,-0.1,-0.1;
+    dir.dtau = 0.1;
+    dir.dkappa = 0.1;
+    lp_settings settings(10,1.e-10,1.e-10,1.0,1.e-7);
+    dir.compute_step_size(vars,settings);
+    
+    //The step size should be 10 times the smallest of s and z
+    ASSERT_EQ(1.e-2,dir.alpha);
+ }
 
  TEST(CORE,residual_norms)
  {

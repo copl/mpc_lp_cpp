@@ -160,8 +160,6 @@ public:
 		
 	void solve_linear_system_for_new_direction(linear_system_rhs& rhs, k_newton_copl_matrix& K_matrix);	
 	void compute_step_size(lp_variables& variables, lp_settings& settings);
-	void compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, double& alpha_val);
-	void compute_min_ratio_alpha(double var, double dvar, double& alpha_val);
 };
 
 //--------End lp_direction--------

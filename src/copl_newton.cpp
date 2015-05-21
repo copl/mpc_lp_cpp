@@ -218,22 +218,14 @@ void homogeneous_solver::update(lp_variables &variables) {
  * [G   -H ][dz]   [h]
  * Given the solution */
 
+//TODO: Test method for this
 void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var) {
-    
-     //Solve for the right hand side
-     k_newton_copl_matrix::solve(sol_2,rhs.q123); 
-     
-     // dtau = (-q4+q6 + c'*x2 + by2 + h'*z2)/dtau_denom
-     dir.dtau = -rhs.q4 + rhs.q6 + _c.dot(sol_2.segment(0,n)) + _b.dot(sol_2.segment(n,k)) + _h.dot(sol_2.segment(n+k,m));
-     dir.dtau /= dtau_denom;
-
-     //d2+dtau d1
-     sol_2+=dir.dtau*sol_1;
-     //sol_2 contains dx,dy,dz, copy them to the solution. 
-     dir.dx = sol_2.segment(0,n);
-     dir.dy = sol_2.segment(n,k);
-     dir.dz = sol_2.segment(n+k,m);
-
+	//Prepare the rhs 
+	reduce_rhs(rhs);
+	//Solve the reduced system 
+	solve_reduced(dir,rhs);
+	//Backsubstitute     
+	back_substitute(dir, rhs,var);
  }
 
 
