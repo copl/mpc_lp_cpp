@@ -211,7 +211,7 @@ void lp_direction::compute_min_ratio_alpha(copl_vector &var, copl_vector &dvar, 
 	
 	for (int i = 0; i < var.size(); i++) {
 		double var_double = var[i];
-		double dvar_double = var[i];
+		double dvar_double = dvar[i];
 		compute_min_ratio_alpha(var_double, dvar_double, alpha_val);
 	}
 }

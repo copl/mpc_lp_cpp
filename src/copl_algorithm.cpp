@@ -3,26 +3,27 @@
 using namespace std;
 namespace copl_ip {
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){
-	
+			OUTPUT << "start" << endl;
+			
         	problem_data.var_dump();
         		
         	//Allocate the variables
         	lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
         	algorithm_state state;
                 
-                //Create and analyze the newton matrix 
-                homogeneous_solver K_matrix(problem_data,settings);
-        	    
-                //This stores the search directions
-                lp_direction direction(variables);
+			//Create and analyze the newton matrix 
+			homogeneous_solver K_matrix(problem_data,settings);
+			
+			//This stores the search directions
+			lp_direction direction(variables);
+			
+			//Helps generate the rhs for the linear solves	
+			linear_system_rhs rhs(problem_data);
                 
-                //Helps generate the rhs for the linear solves	
-                linear_system_rhs rhs(problem_data);
-                
-                //Contains the linear residuals
+            //Contains the linear residuals
         	lp_residuals residuals(problem_data);
         	    
-                //Compute initial mu
+            //Compute initial mu
         	state.update_mu(variables, problem_data);
 		
 		// Begin iteration
