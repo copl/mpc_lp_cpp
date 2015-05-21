@@ -285,3 +285,7 @@ TEST(CORE,residuals)
  //TODO test mu update   
  cout << "Missing test\n";
  }
+
+ TEST(CORE, affine_rhs)
+ {
+ }

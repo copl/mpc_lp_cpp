@@ -219,6 +219,14 @@ void homogeneous_solver::update(lp_variables &variables) {
  * Given the solution */
 
 //TODO: Test method for this
+//Solves with the system
+//[0   A'   G'  c]dz      q1
+//[-A           b]dy    = q2
+//[-G           h]dz      q3
+//[-c' -b' -h    ]dt      q4 
+//Hdz + ds                q5
+//k/tdt +  dk             q6
+
 void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var) {
 	//Prepare the rhs 
 	reduce_rhs(rhs);

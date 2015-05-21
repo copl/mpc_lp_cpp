@@ -245,7 +245,7 @@ linear_system_rhs::~linear_system_rhs() {
 }
 
 void linear_system_rhs::compute_affine_rhs(lp_residuals &residuals, lp_variables &variables){
-	// TOOD	
+	// TODO: Test	
     	
 	// q1 = -r1
 	// q2 = -r2

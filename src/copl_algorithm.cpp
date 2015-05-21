@@ -33,8 +33,9 @@ namespace copl_ip {
 
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
-		
-            residuals.var_dump();
+
+			//Debug call
+            		residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
@@ -50,7 +51,7 @@ namespace copl_ip {
 			//Calculate sigma 
 			direction.compute_step_size(variables,settings);		
 			
-			state.sigma = (1-direction.alpha);
+			state.sigma =  (1-direction.alpha);
 			state.sigma *= (1-direction.alpha);
 			state.sigma *= (1-direction.alpha);
 			
