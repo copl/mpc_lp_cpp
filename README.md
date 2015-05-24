@@ -5,6 +5,7 @@ Davood:
 To Run, I had to
 comment out line 131 of ./include/Eigen/src/Core/CwiseBinaryOp.h
 
+Fixed bugs: 
 Kvals[ (*hessianIx)[j] ] = -variables.s[j]/variables.z[j]-DELTA; -->
 Kvals[ (*hessianIx)[j] ] = variables.s[j]/variables.z[j]-DELTA;
 
