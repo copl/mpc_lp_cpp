@@ -2,6 +2,17 @@
 
 namespace copl_ip{
 
+void copl_vector_dump1(copl_vector &vec) {
+	
+	OUTPUT << "{";
+	for(int i = 0; i < vec.size() - 1; i++) {
+		OUTPUT << vec.at(i) << ",";
+	}
+	OUTPUT << vec[vec.size() - 1];
+	OUTPUT << "}";
+	OUTPUT << endl;
+};
+
 int k_newton_copl_matrix::nnz()
 {
 	return eigenKMat->nonZeros();
@@ -94,7 +105,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 			int c,r;
 			c = it.col();
 			r = it.row();
-			eigenKMat->insert(r+n,c) = it.value();
+			eigenKMat->insert(r+n,c) = -it.value();
 		}
 	for(int i = 0; i < n; i++ )
 		for(Eigen::SparseMatrix<double>::InnerIterator it(eG,i); it; ++it)	
@@ -102,7 +113,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 			int c,r;
 			c = it.col();
 			r = it.row();
-			eigenKMat->insert(r+n+p,c) = it.value();	
+			eigenKMat->insert(r+n+p,c) = -it.value();	
 		}
 
 	for(int i = 0; i < n; i++ )
@@ -175,7 +186,7 @@ void k_newton_copl_matrix::update(lp_variables &variables)
     int m = variables.s.size();
 	for(int j = 0; j < m; j++)
 	{
-	    Kvals[ (*hessianIx)[j] ] = -variables.s[j]/variables.z[j]-DELTA;
+	    Kvals[ (*hessianIx)[j] ] = variables.s[j]/variables.z[j]-DELTA;
 	}
 	//Real deal
 	solver.factorize(*eigenKMat);
@@ -219,17 +230,34 @@ void homogeneous_solver::update(lp_variables &variables) {
 void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &variables) {
 	OUTPUT << "IN homogeneous_solver::solve now..." << endl;
 	k_newton_copl_matrix::solve(sol_1,rhs_1);//can be moved to homogeneous_solver::update
+	
+	// for debuging
+	
+	OUTPUT <<  "rhs_1";
+	copl_vector_dump1(rhs_1);
+	OUTPUT <<  "sol_1";
+	copl_vector_dump1(sol_1);
+	
+	
+
 	this->build_rhs2(rhs, variables);
 	k_newton_copl_matrix::solve(sol_2,rhs_2);
+
+	OUTPUT <<  "rhs_2";
+	copl_vector_dump1(rhs_2);
+	OUTPUT <<  "sol_2";
+	copl_vector_dump1(sol_2);
+
 	
 	double q8 = rhs.q4-rhs.q6/variables.tau;
-	
-	dir.dtau = (-q8 + dotat(_c, rhs_2, 0) + dotat(_b, rhs_2, n) + dotat(_h, rhs_2, n+p))/
-			(variables.kappa/variables.tau - dotat(_c, rhs_1, 0) - dotat(_b, rhs_1, n) - dotat(_h, rhs_1, n+p) );
-	
-	addat(dir.dtau, rhs_1, rhs_2, dir.dx, 0, 0);
-	addat(dir.dtau, rhs_1, rhs_2, dir.dy, n, n);
-	addat(dir.dtau, rhs_1, rhs_2, dir.dz, n+p, n+p);
+	dir.dtau = (-q8 + dotat(_c, sol_2, 0) + dotat(_b, sol_2, n) + dotat(_h, sol_2, n+p))/
+			(variables.kappa/variables.tau - dotat(_c, sol_1, 0) - dotat(_b, sol_1, n) - dotat(_h, sol_1, n+p) );
+
+	OUTPUT <<  "dir.dtau " << dir.dtau << endl;
+
+	addat(dir.dtau, sol_1, sol_2, dir.dx, 0, 0);
+	addat(dir.dtau, sol_1, sol_2, dir.dy, n, n);
+	addat(dir.dtau, sol_1, sol_2, dir.dz, n+p, n+p);
 	dir.dkappa = (rhs.q6-dir.dtau*variables.kappa)/variables.tau;
 	
 	for(int i = 0; i < m ; i++)
@@ -245,7 +273,7 @@ void homogeneous_solver::build_rhs2(linear_system_rhs& rhs, lp_variables &variab
 	 	for(int i = 0; i < n; i++)
 	 		rhs_2[j++] = -rhs.q1[i];
 	 	for(int i = 0; i < p; i++)
-	 		rhs_2[j++] = -rhs.q1[i]; 	
+	 		rhs_2[j++] = -rhs.q2[i]; 	
 	 	for(int i = 0; i < m; i++) 		
 	 		rhs_2[j++] = -(rhs.q3[i]-rhs.q5[i]/variables.z[i]); 	
 

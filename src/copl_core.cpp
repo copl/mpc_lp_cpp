@@ -193,10 +193,10 @@ void  lp_direction::compute_direction(
 
 void lp_direction::compute_step_size(lp_variables& variables, lp_settings& settings) {
 	this->alpha = 1;
-	compute_min_ratio_alpha(variables.s,variables.s,this->alpha); // TO DO change to dz
-	compute_min_ratio_alpha(variables.z,variables.z,this->alpha);
-	compute_min_ratio_alpha(variables.kappa,variables.kappa,this->alpha);
-	compute_min_ratio_alpha(variables.tau,variables.tau,this->alpha);
+	compute_min_ratio_alpha(variables.s,this->ds,this->alpha); // TO DO change to dz
+	compute_min_ratio_alpha(variables.z,this->dz,this->alpha);
+	compute_min_ratio_alpha(variables.kappa,this->dkappa,this->alpha);
+	compute_min_ratio_alpha(variables.tau,this->dtau,this->alpha);
 	this->alpha = this->alpha*settings.bkscale;
 }
 

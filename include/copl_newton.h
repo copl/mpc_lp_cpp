@@ -17,7 +17,7 @@ class k_newton_copl_matrix {
 		//copl_vector d_var2;
 		
         //TODO: Move this to settings
-        double DELTA = 1.e-4; 
+        double DELTA = 1.e-8; 
         bool isFactored = false;	
 
         int m,n,p;      

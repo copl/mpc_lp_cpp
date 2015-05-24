@@ -61,7 +61,7 @@ double dot(copl_vector &copl_y, copl_vector &copl_x)
 }
 
 // x^Ty
-double dotat(copl_vector &copl_y, copl_vector &copl_x, int idx)
+double dotat(copl_vector &copl_x, copl_vector &copl_y, int idx)
 {
 	Eigen::Map<Eigen::VectorXd> x(&copl_x[0],copl_x.size());
 	Eigen::Map<Eigen::VectorXd> y(&copl_y[idx],copl_x.size());
