@@ -45,7 +45,8 @@ main.o:
 
 main: $(COPL_OBJ_FILES) main.o
 	mkdir -p ./bin
-	$(CPP) -stdlib=libc++ -std=c++11 $(COPL_OBJ_FILES) ./bin/main.o -o ./bin/main$(EXE_NAME).exe
+	$(CPP) -std=c++11 $(COPL_OBJ_FILES) ./bin/main.o -o ./bin/main$(EXE_NAME).exe
+#	$(CPP) -stdlib=libc++ -std=c++11 $(COPL_OBJ_FILES) ./bin/main.o -o ./bin/main$(EXE_NAME).exe
 
 #compile gtest and gmock
 gmock.a: 

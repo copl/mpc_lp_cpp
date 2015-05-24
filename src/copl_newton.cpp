@@ -140,7 +140,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 
 	//These correspond to the diagonals of the hessian
 	for(int i = 0; i < m; i++ )		
-			eigenKMat->insert(n+p+i,n+p+i) = -1.0 - DELTA;
+		eigenKMat->insert(n+p+i,n+p+i) = -1.0 - DELTA;
      
 }
 
