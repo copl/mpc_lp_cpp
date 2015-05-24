@@ -272,6 +272,12 @@ void lp_variables::take_step(lp_direction &direction){
 
 }
 
+void lp_variables::var_dump(){
+	OUTPUT << "DUMP SOLUTION OBJECT" << endl;
+	OUTPUT << "x";
+	copl_vector_dump(x);	
+}
+
 // algorithm_state
 
 algorithm_state::algorithm_state() {

@@ -19,7 +19,6 @@ namespace copl_ip {
 		// Begin iteration
 		int MAX_IT = settings.get_max_iter();
 		for (int itr = 1; itr <= MAX_IT; itr++){
-			OUTPUT << "mu: " << state.mu << endl;
 			// To be sent to Tiago's Linear Solver
 			K_matrix.update(variables);
 			// compute residuals
@@ -29,12 +28,11 @@ namespace copl_ip {
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
 			}
-
+			
 			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
 			//rhs.var_dump();
-			// --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
 			direction.compute_direction(
 				rhs,
@@ -43,7 +41,7 @@ namespace copl_ip {
 				state,
 				settings,
 				K_matrix
-				); // are these the same ???
+				); 
 			//direction.var_dump();
 			// update corrector rhs using new affine direction
 			rhs.compute_corrector_rhs(residuals,variables,state,direction,problem_data);
@@ -70,6 +68,8 @@ namespace copl_ip {
 			print_status(state, direction, variables, residuals, itr);
 		}
 		OUTPUT << "IP algorithm finished" << endl;
+		variables.var_dump();
+
 	}
 
 	bool termination_criteria_met(lp_settings &settings, algorithm_state &state, lp_residuals &residuals){

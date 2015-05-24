@@ -36,6 +36,7 @@ public:
 	lp_variables(int n, int m, int k_var);
 	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
+	void var_dump();
 	~lp_variables();
 };
 //--------End lp_variables--------
