@@ -231,29 +231,13 @@ void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_var
 	OUTPUT << "IN homogeneous_solver::solve now..." << endl;
 	k_newton_copl_matrix::solve(sol_1,rhs_1);//can be moved to homogeneous_solver::update
 	
-	// for debuging
-	
-	OUTPUT <<  "rhs_1";
-	copl_vector_dump1(rhs_1);
-	OUTPUT <<  "sol_1";
-	copl_vector_dump1(sol_1);
-	
-	
-
 	this->build_rhs2(rhs, variables);
 	k_newton_copl_matrix::solve(sol_2,rhs_2);
-
-	OUTPUT <<  "rhs_2";
-	copl_vector_dump1(rhs_2);
-	OUTPUT <<  "sol_2";
-	copl_vector_dump1(sol_2);
-
 	
 	double q8 = rhs.q4-rhs.q6/variables.tau;
 	dir.dtau = (-q8 + dotat(_c, sol_2, 0) + dotat(_b, sol_2, n) + dotat(_h, sol_2, n+p))/
 			(variables.kappa/variables.tau - dotat(_c, sol_1, 0) - dotat(_b, sol_1, n) - dotat(_h, sol_1, n+p) );
 
-	OUTPUT <<  "dir.dtau " << dir.dtau << endl;
 
 	addat(dir.dtau, sol_1, sol_2, dir.dx, 0, 0);
 	addat(dir.dtau, sol_1, sol_2, dir.dy, n, n);

@@ -20,7 +20,7 @@ void make_trivial_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_v
 			A.insert_at(i,j,rand() % 10 + 1);
 	for (int i = 0; i  < 6; i++)
 		for (int j = 0; j  < 5; j++)
-			G.insert_at(i,j,rand() % 10 + 1);
+			G.insert_at(i,j,-rand() % 10 + 1);
 
 	for (int i = 0; i  < 5; i++)
 		c.at(i) = rand() % 10 + 1;

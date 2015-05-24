@@ -24,7 +24,7 @@ namespace copl_ip {
 			K_matrix.update(variables);
 			// compute residuals
 			residuals.compute_residuals(problem_data, variables);
-			residuals.var_dump();
+			//residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
@@ -33,7 +33,7 @@ namespace copl_ip {
 			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
-			rhs.var_dump();
+			//rhs.var_dump();
 			// --- BEGIN NOT WORKING --- //
 			// compute affine direction using new affine rhs
 			direction.compute_direction(
@@ -44,7 +44,7 @@ namespace copl_ip {
 				settings,
 				K_matrix
 				); // are these the same ???
-			direction.var_dump();
+			//direction.var_dump();
 			// update corrector rhs using new affine direction
 			rhs.compute_corrector_rhs(residuals,variables,state,direction,problem_data);
 
