@@ -220,12 +220,12 @@ void homogeneous_solver::update(lp_variables &variables) {
 
 //TODO: Test method for this
 //Solves with the system
-//[0   A'   G'  c]dz      q1
-//[-A           b]dy    = q2
-//[-G           h]dz      q3
-//[-c' -b' -h    ]dt      q4 
-//Hdz + ds                q5
-//k/tdt +  dk             q6
+//[0   A'   G'  c]dz         q1
+//[-A           b]dy       = q2
+//[-G           h]dz - ds    q3
+//[-c' -b' -h    ]dt - dk    q4 
+//Hdz + ds                   q5
+//k/tdt +  dk                q6
 
 void homogeneous_solver::solve(lp_direction &dir, linear_system_rhs& rhs, lp_variables &var) {
 	//Prepare the rhs 
@@ -267,6 +267,9 @@ void homogeneous_solver::reduce_rhs(linear_system_rhs  &rhs)
     rhs.q123.segment(n+k,m) -= rhs.q5;
     //And the same for the scalar entry of the last row
     rhs.q4 -= rhs.q6;
+    //Change the sign of the second and thrird right hand side equations
+    rhs.q123.segment(n,m+k) *=-1.0;
+    rhs.q4 *= -1.0; 
 }
 
 void homogeneous_solver::back_substitute(lp_direction &dir, linear_system_rhs  &rhs, lp_variables &var)

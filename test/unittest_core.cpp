@@ -185,6 +185,12 @@ TEST(CORE,residuals_constructor)
 
 TEST(CORE,residuals)
 {
+/*
+ * [0   A'   G' c]dz         r1
+ * [-A          b]dy        =r2
+ * [-G          h]dz  -ds    r3
+ * [-c' -b' -h   ]dt  -dk    r4
+*/
     int m = 3;
     int n = 4;
     int k = 2;
@@ -236,10 +242,10 @@ TEST(CORE,residuals)
     copl_vector error1(n), error2(k), error3(m); 
     double error4;
 
-    error1 = res.r1 + (A.transpose()*vars.y + G.transpose()*vars.z + c*vars.tau);
-    error2 = res.r2 + (-A*vars.x + vars.tau*b);
-    error3 = res.r3 + (-G*vars.x - vars.s + vars.tau*h);
-    error4 = res.r4 + (- c.dot(vars.x) - b.dot(vars.y) - h.dot(vars.z) - vars.kappa); 
+    error1 = res.r1 - (A.transpose()*vars.y + G.transpose()*vars.z + c*vars.tau);
+    error2 = res.r2 - (-A*vars.x + vars.tau*b);
+    error3 = res.r3 - (-G*vars.x - vars.s + vars.tau*h);
+    error4 = res.r4 - (- c.dot(vars.x) - b.dot(vars.y) - h.dot(vars.z) - vars.kappa); 
     double err_norm = error1.norm()+error2.norm()+error3.norm()+fabs(error4);
     ASSERT_LT(err_norm, 1.e-15);
   }

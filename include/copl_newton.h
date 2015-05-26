@@ -106,9 +106,9 @@ class homogeneous_solver : protected k_newton_copl_matrix {
 
         FRIEND_TEST(KNEWTON,reduce_rhs_test);
         FRIEND_TEST(KNEWTON,back_substitute_test);
-	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve);
 	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_reduced);
 	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs);
+	FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_full);
 
     public: 
     	homogeneous_solver(lp_input &prob, lp_settings &settings);

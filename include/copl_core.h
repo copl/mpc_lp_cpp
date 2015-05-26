@@ -114,9 +114,9 @@ class linear_system_rhs {
     friend class homogeneous_solver;
     FRIEND_TEST(KNEWTON,reduce_rhs_test);
     FRIEND_TEST(KNEWTON,back_substitute_test);
-    FRIEND_TEST(HOMOGENEOUS_SOLVER,solve);
     FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_reduced);
     FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs);
+    FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_full);
 
 public:
 	linear_system_rhs( lp_input &problem_data);

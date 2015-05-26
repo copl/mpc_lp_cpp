@@ -365,9 +365,9 @@ TEST(KNEWTON,reduce_rhs_test)
 {
 //This method should form the rhs for 
 //[    A   G    c]dx    r1
-//[A           -b]dy    r2
-//[G      -H   -h]dz  = r3 - r5
-//[-c' b' h' -k/t]dt    r4 - r6
+//[A           -b]dy    -r2
+//[G       -H  -h]dz  = -r3 + r5
+//[-c' -b' -h' -k/t]dt    r4 - r6
 
 
     copl_matrix A(2,4);
@@ -415,17 +415,20 @@ TEST(KNEWTON,reduce_rhs_test)
     //check the last entires of q123, it should now read  -8
     
     //Copy to stl to use gmock 
-    std::vector<double> qs(6);
+    std::vector<double> qs(4);
+    std::vector<double> qx(2);
     std::vector<double> qe(3);
     std::vector<double> q5(3);
-    std::copy(&rhs.q123[0],&rhs.q123[0]+6,qs.begin());
+    std::copy(&rhs.q123[0],&rhs.q123[0]+4,qs.begin());
+    std::copy(&rhs.q123[4],&rhs.q123[0]+6,qx.begin());
     std::copy(&rhs.q123[6],&rhs.q123[6]+3,qe.begin());
     std::copy(&rhs.q5[0],&rhs.q5[0]+3,q5.begin());
      
     //Check that the entries are correct
-    ASSERT_THAT(qs,Each(2.0));
-    ASSERT_THAT(qe,Each(-8.0));
-    ASSERT_THAT(rhs.q4,-8.0);
+    EXPECT_THAT(qs,Each(2.0));
+    EXPECT_THAT(qx,Each(-2.0));
+    EXPECT_THAT(qe,Each(8.0));
+    EXPECT_THAT(rhs.q4,8.0);
     ASSERT_THAT(q5,Each(10.0));
 }
 
@@ -623,5 +626,102 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
     ASSERT_LT(errort,1e-15); 
 
 }
+
+TEST(HOMOGENEOUS_SOLVER,solve_full)
+{
+/*
+ * [0   A'   G' c]dz         q1
+ * [-A          b]dy        =q2
+ * [-G          h]dz  -ds    q3
+ * [-c' -b' -h   ]dt  -dk    q4
+ *  H dz + ds                q5 
+ *  kappa/tau dt + dk        q6
+*/
+    //Populate A,G,c,b,h
+    copl_matrix A(2,4);
+    copl_matrix G(3,4);
+    copl_vector c(4),b(2),h(3);
+    c  << 1,2,3,4;
+    b  << 5,6;
+    h  << 7,8,9;
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0; 
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+    
+    lp_input lp_problem(A,b,c,G,h);
+    linear_system_rhs rhs(lp_problem);
+    linear_system_rhs rhs_copy(lp_problem);
+
+    //Fill the rhs with stuff
+    rhs.q123.setConstant(2.0);
+    rhs.q4 = 2.0;
+    rhs.q5.setConstant(10.0);
+    rhs.q6 = 10.0;
+  
+    //Fill the rhs copy with the same stuff
+    rhs_copy.q123.setConstant(2.0);
+    rhs_copy.q4 = 2.0;
+    rhs_copy.q5.setConstant(10.0);
+    rhs_copy.q6 = 10.0;
+
+    lp_variables vars(3,4,2);
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+ 
+    //Allocate space for the solution 
+    lp_direction dir(vars);
+  
+    lp_settings settings(1,1,1,1,1.e-7);
+    homogeneous_solver K_solver(lp_problem,settings);
+    
+    K_solver.update(vars);//Solves and populates sol_1
+    K_solver.solve(dir,rhs,vars);
+
+    //Vector to compute the error 
+    copl_vector errorx(4);
+    copl_vector errory(2);
+    copl_vector errorz(3);
+    copl_vector errors(3);
+    double errort;
+    double errork;
+     
+    //Repopulate the rhs 
+    errorx = A.transpose()*dir.dy+G.transpose()*dir.dz+dir.dtau*c +
+	     K_solver.DELTA*dir.dx - rhs_copy.q123.segment(0,4);
+
+    errory = -A*dir.dx+dir.dtau*b  +
+	     K_solver.DELTA*dir.dy -
+	     rhs_copy.q123.segment(4,2);
+
+    errorz = -G*dir.dx + dir.dtau*h - 
+	     -K_solver.DELTA*dir.dz - dir.ds -
+             rhs_copy.q123.segment(6,3);
+
+    errort = -c.dot(dir.dx) - b.dot(dir.dy) - h.dot(dir.dz) - dir.dkappa - rhs_copy.q4;
+    errors = (vars.s.array()/vars.z.array()*dir.dz.array()).matrix()+dir.ds-rhs_copy.q5;
+    errork = vars.kappa/vars.tau*dir.dtau + dir.dkappa-rhs_copy.q6;
+
+    EXPECT_LT(errork,1e-15); 
+    EXPECT_LT(errorx.norm(),1e-14);  
+    EXPECT_LT(errory.norm(),1e-14); 
+    EXPECT_LT(errorz.norm(),1e-14); 
+    EXPECT_LT(errors.norm(),1e-14); 
+    EXPECT_LT(errort,1e-15); 
+
+}
+
 
 }
