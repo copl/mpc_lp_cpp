@@ -366,8 +366,8 @@ TEST(KNEWTON,reduce_rhs_test)
 //This method should form the rhs for 
 //[    A   G    c]dx    r1
 //[A           -b]dy    -r2
-//[G       -H  -h]dz  = -r3 + r5
-//[-c' -b' -h' -k/t]dt    r4 - r6
+//[G       -H  -h]dz  = -(r3 + r5)
+//[-c' -b' -h' k/t]dt  r4 + r6
 
 
     copl_matrix A(2,4);
@@ -427,8 +427,8 @@ TEST(KNEWTON,reduce_rhs_test)
     //Check that the entries are correct
     EXPECT_THAT(qs,Each(2.0));
     EXPECT_THAT(qx,Each(-2.0));
-    EXPECT_THAT(qe,Each(8.0));
-    EXPECT_THAT(rhs.q4,8.0);
+    EXPECT_THAT(qe,Each(-12.0));
+    EXPECT_THAT(rhs.q4,12.0);
     ASSERT_THAT(q5,Each(10.0));
 }
 
@@ -483,8 +483,11 @@ TEST(KNEWTON,back_substitute_test)
    
     copl_vector error(3);
     //Hdz + ds = rhs
-    error = vars.s.array()/vars.z.array()*dir.dz.array() - rhs.q5.array() + dir.ds.array();
-    ASSERT_LT(error.norm(),1.e-15);
+    error  = vars.s.array()/vars.z.array()*dir.dz.array() - rhs.q5.array() + dir.ds.array();
+    double error2 = vars.kappa/vars.tau*dir.dtau + dir.dkappa - rhs.q6;
+    error2 = fabs(error2);
+    EXPECT_LT(error.norm(),1.e-15);
+    ASSERT_LT(error2,1.e-15);
 }
 
 //Validate that after update sol1 has the solution to 
@@ -620,10 +623,13 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
 	     K_solver.DELTA*dir.dz -
              rhs.q123.segment(6,3)-(vars.s.array()/vars.z.array()*dir.dz.array()).matrix();
     errort = -c.dot(dir.dx) - b.dot(dir.dy) - h.dot(dir.dz) + vars.kappa/vars.tau*dir.dtau - rhs.q4;
+    errort = fabs(errort);
+    
     EXPECT_LT(errorx.norm(),1e-14);  
     EXPECT_LT(errory.norm(),1e-14); 
     EXPECT_LT(errorz.norm(),1e-14); 
     ASSERT_LT(errort,1e-15); 
+	
 
 }
 
@@ -665,7 +671,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_full)
     rhs.q4 = 2.0;
     rhs.q5.setConstant(10.0);
     rhs.q6 = 10.0;
-  
+    
     //Fill the rhs copy with the same stuff
     rhs_copy.q123.setConstant(2.0);
     rhs_copy.q4 = 2.0;
@@ -706,20 +712,23 @@ TEST(HOMOGENEOUS_SOLVER,solve_full)
 	     K_solver.DELTA*dir.dy -
 	     rhs_copy.q123.segment(4,2);
 
-    errorz = -G*dir.dx + dir.dtau*h - 
-	     -K_solver.DELTA*dir.dz - dir.ds -
-             rhs_copy.q123.segment(6,3);
+    errorz = -G*dir.dx + dir.dtau*h -
+	     K_solver.DELTA*dir.dz - 
+             dir.ds
+             -rhs_copy.q123.segment(6,3); 
 
     errort = -c.dot(dir.dx) - b.dot(dir.dy) - h.dot(dir.dz) - dir.dkappa - rhs_copy.q4;
+    errort = fabs(errort);
     errors = (vars.s.array()/vars.z.array()*dir.dz.array()).matrix()+dir.ds-rhs_copy.q5;
     errork = vars.kappa/vars.tau*dir.dtau + dir.dkappa-rhs_copy.q6;
+    errork = fabs(errork);
 
     EXPECT_LT(errork,1e-15); 
+    EXPECT_LT(errort,1e-15); 
     EXPECT_LT(errorx.norm(),1e-14);  
     EXPECT_LT(errory.norm(),1e-14); 
     EXPECT_LT(errorz.norm(),1e-14); 
     EXPECT_LT(errors.norm(),1e-14); 
-    EXPECT_LT(errort,1e-15); 
 
 }
 

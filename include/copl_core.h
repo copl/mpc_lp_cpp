@@ -117,6 +117,8 @@ class linear_system_rhs {
     FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_reduced);
     FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs);
     FRIEND_TEST(HOMOGENEOUS_SOLVER,solve_full);
+    FRIEND_TEST(CORE,affine_rhs);
+    FRIEND_TEST(CORE, residual_test);
 
 public:
 	linear_system_rhs( lp_input &problem_data);

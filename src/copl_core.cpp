@@ -278,7 +278,7 @@ void linear_system_rhs::compute_combined_rhs(lp_residuals &residuals,
 	q4 = -(1-sigma)*residuals.r4;
 	
 	// q5 = -s+sigma mu/z + (ds.*dz)./z
-    q5 = (-variables.s.array()+sigma*mu/variables.z.array() - affine_dir.ds.array()*affine_dir.dz.array()/variables.z.array()).matrix();
+        q5 = (-variables.s.array()+sigma*mu/variables.z.array() - affine_dir.ds.array()*affine_dir.dz.array()/variables.z.array()).matrix();
 	
 	// q6 = -k+sigma*mu/tau
 	q6 = -variables.kappa+sigma*mu/variables.tau - affine_dir.dtau*affine_dir.dkappa/variables.tau;

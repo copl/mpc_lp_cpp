@@ -2,10 +2,11 @@
 #include "gmock/gmock.h"
 #include <vector>
 #include <copl_linalg.h>
+#include <copl_newton.h>
 #include <copl_core.h>
 #include <math.h>
 
-using namespace copl_ip;
+namespace copl_ip{
 using namespace testing;
 TEST(Core,input)
 {
@@ -275,6 +276,186 @@ TEST(CORE,residuals)
     ASSERT_EQ(1.e-2,dir.alpha);
  }
 
+//TODO: This test checks that the affine direction reduces the residuals linearly
+TEST(CORE, affine_linear_residual_reduction)
+{
+
+    copl_matrix A(2,4);
+    copl_matrix G(3,4);
+    copl_vector c(4),b(2),h(3);
+    c  << 1,2,3,4;
+    b  << 5,6;
+    h  << 7,8,9;
+
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0;
+         
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+    
+        
+    lp_input lp_problem(A,b,c,G,h);
+    lp_variables vars(3,4,2);
+    lp_direction direction(vars);
+    lp_residuals residuals(lp_problem);
+    lp_residuals new_residuals(lp_problem);
+    linear_system_rhs rhs(lp_problem);
+    lp_settings settings(1,1,1,1,1.e-7);
+
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1.e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+    homogeneous_solver K_solver(lp_problem,settings); 
+    K_solver.update(vars);//Solves and populates sol_1
+ 
+    //Call the residual calculation method 
+    residuals.compute_residuals(lp_problem, vars);
+    rhs.compute_affine_rhs(residuals, vars); 
+    K_solver.solve(direction,rhs,vars); 
+    direction.alpha = 1.0-1.e-7;
+    //take a full step, the residuals should be small after this
+    vars.take_step(direction);
+    new_residuals.compute_residuals(lp_problem, vars);
+    EXPECT_LT(new_residuals.n1/residuals.n1,1.e-7);
+    EXPECT_LT(new_residuals.n2/residuals.n2,1.e-7);
+    EXPECT_LT(new_residuals.n3/residuals.n3,1.e-7);
+    ASSERT_LT(new_residuals.n4/residuals.n4,1.e-7);
+}
+
+//TODO: This test checks that the affine direction reduces the residuals linearly
+TEST(CORE, residual_test)
+{
+
+    copl_matrix A(2,4);
+    copl_matrix G(3,4);
+    copl_vector c(4),b(2),h(3);
+    c  << 1,2,3,4;
+    b  << 5,6;
+    h  << 7,8,9;
+
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0;
+         
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+    
+        
+    lp_input lp_problem(A,b,c,G,h);
+    lp_variables vars(3,4,2);
+    lp_direction direction(vars);
+    lp_residuals residuals(lp_problem);
+    lp_residuals new_residuals(lp_problem);
+    linear_system_rhs rhs(lp_problem);
+    lp_settings settings(1,1,1,1,1.e-7);
+
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1.e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+    homogeneous_solver K_solver(lp_problem,settings); 
+    K_solver.update(vars);//Solves and populates sol_1
+ 
+    //Call the residual calculation method 
+    residuals.compute_residuals(lp_problem, vars);
+    rhs.compute_affine_rhs(residuals, vars); 
+    double q4_c = rhs.q4;
+    K_solver.solve(direction,rhs,vars); 
+    double expected_rhs = -(-c.dot(vars.x) -b.dot(vars.y) -h.dot(vars.z) - vars.kappa);
+    double achieved_rhs = -c.dot(direction.dx) - b.dot(direction.dy) - h.dot(direction.dz) - direction.dkappa;
+    double err = expected_rhs - achieved_rhs;
+    cout << "E " << expected_rhs << endl;
+    cout << "rhs - A " << q4_c - achieved_rhs << endl;
+    cout << "A " << achieved_rhs << endl;
+    cout << "E-A " << err << endl;
+    ASSERT_EQ(false,true);
+}
+
+//TODO: This test checks that the combined direction reduces the residuals linearly
+TEST(CORE, combined_linear_residual_reduction)
+{
+    copl_matrix A(2,4);
+    copl_matrix G(3,4);
+    copl_vector c(4),b(2),h(3);
+    c  << 1,2,3,4;
+    b  << 5,6;
+    h  << 7,8,9;
+
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0;
+         
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+    
+        
+    lp_input lp_problem(A,b,c,G,h);
+    lp_variables vars(3,4,2);
+    lp_direction direction(vars);
+
+    lp_direction zero_direction(vars); 
+    zero_direction.ds.setConstant(0.0);
+    zero_direction.dz.setConstant(0.0);
+    zero_direction.dtau = 0.0;
+    zero_direction.dkappa = 0.0;
+    lp_residuals residuals(lp_problem);
+    lp_residuals new_residuals(lp_problem);
+    linear_system_rhs rhs(lp_problem);
+    lp_settings settings(1,1,1,1,1.e-7);
+
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1.e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 10.0;
+    homogeneous_solver K_solver(lp_problem,settings); 
+    K_solver.update(vars);//Solves and populates sol_1
+ 
+    //Call the residual calculation method 
+    residuals.compute_residuals(lp_problem, vars);
+    double sigma = 0.0;
+    double mu = 1.0;
+    rhs.compute_combined_rhs(residuals, vars, zero_direction,sigma, mu); 
+    K_solver.solve(direction,rhs,vars); 
+    direction.alpha = 1.0;
+    //take a full step, the residuals should be small after this
+    vars.take_step(direction);
+    
+    new_residuals.compute_residuals(lp_problem, vars);
+    EXPECT_LT(new_residuals.n1/residuals.n1,1.e-7);
+    EXPECT_LT(new_residuals.n2/residuals.n2,1.e-7);
+    EXPECT_LT(new_residuals.n3/residuals.n3,1.e-7);
+    ASSERT_LT(new_residuals.n4/residuals.n4,1.e-7);
+
+}
  TEST(CORE,residual_norms)
  {
  //TODO: Test that the norms are correctly calculated, in compute_residuals
@@ -292,6 +473,68 @@ TEST(CORE,residuals)
  cout << "Missing test\n";
  }
 
- TEST(CORE, affine_rhs)
+ TEST(CORE,affine_rhs)
  {
+    copl_matrix A(2,4);
+    copl_matrix G(3,4);
+    copl_vector c(4),b(2),h(3);
+    c  << 1,2,3,4;
+    b  << 5,6;
+    h  << 7,8,9;
+
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0;
+         
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+     
+    lp_input lp_problem(A,b,c,G,h);
+    lp_variables vars(3,4,2);
+    lp_direction direction(vars);
+    lp_residuals residuals(lp_problem);
+    lp_residuals new_residuals(lp_problem);
+    linear_system_rhs rhs(lp_problem);
+    lp_settings settings(1,1,1,1,1.e-7);
+
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1.e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+    homogeneous_solver K_solver(lp_problem,settings); 
+    K_solver.update(vars);//Solves and populates sol_1
+ 
+    //Call the residual calculation method 
+    residuals.compute_residuals(lp_problem, vars);
+    rhs.compute_affine_rhs(residuals, vars); 
+    //Check the rhs residuasl
+    copl_vector ex(4);
+    copl_vector ey(2);
+    copl_vector ez(3);
+    copl_vector es(3);
+    double      ek;
+    double      et;
+    ex = -rhs.q123.segment(0,4) - lp_problem.A.transpose()*vars.y - lp_problem.G.transpose()*vars.z - lp_problem.c*vars.tau;
+    ey = -rhs.q123.segment(4,2) + lp_problem.A*vars.x -lp_problem.b*vars.tau;
+    ez = -rhs.q123.segment(6,3) + lp_problem.G*vars.x -lp_problem.h*vars.tau + vars.s;
+    et = -rhs.q4                + lp_problem.c.dot(vars.x) + lp_problem.b.dot(vars.y) + lp_problem.h.dot(vars.z) + vars.kappa;
+    es = -rhs.q5 - vars.s;
+    ek = -rhs.q6 - vars.kappa;
+    EXPECT_LT(ex.norm(),1.e-14);    
+    EXPECT_LT(ey.norm(),1.e-14);    
+    EXPECT_LT(ez.norm(),1.e-14);    
+    EXPECT_LT(es.norm(),1.e-14);    
+    EXPECT_LT(fabs(et) ,1.e-14);   
+    EXPECT_LT(fabs(ek) ,1.e-14);    
+
  }
+}
