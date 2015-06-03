@@ -22,7 +22,7 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_se
 	DELTA = settings.regularization;	
 	k = A.rows();	
 	n = G.cols();		
-    m = G.rows();	
+    	m = G.rows();	
 
 	//Now find the indices of the hessian
 	hessianIx = new std::vector<int>(m);
@@ -43,8 +43,10 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_se
 
 }
 
+
 void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 {
+	//TODO: can we use a self adjoint view to use half the memory??
 	//Assemble 
 	//Count the number of non zeros per row and col of A and G
 	std::vector<int> nzRowA(k);		
@@ -71,7 +73,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 		}		
 	//Calculate the number of non zeros per column of K
 	// d A'  G'
-    // A -d  0
+        // A -d  0
 	// G 0  -d - H
 	//The d represent dI delta times identity 
 	int j = 0;

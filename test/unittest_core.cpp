@@ -251,6 +251,7 @@ TEST(CORE,residuals)
     ASSERT_LT(err_norm, 1.e-15);
   }
 
+
  TEST(CORE,step_size)
  {
     int m = 3;
