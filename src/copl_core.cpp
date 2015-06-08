@@ -36,17 +36,22 @@ void lp_input::var_dump()  {
 };
 
 // lp_variables
-lp_variables::lp_variables(int m, int n, int k_var) :
-	x(n), s(m), z(m), y(k_var) {  
-    x.setZero();
-    y.setZero();
-    s.setConstant(1.0);
-    z.setConstant(1.0);
+	lp_variables::lp_variables(copl_external_vector &_x,
+				     copl_external_vector &_y,
+				     copl_external_vector &_s,
+				     copl_external_vector &_z, double &_tau, double &_kappa):
+	x(_x),y(_y),s(_s),z(_z),tau(_tau),kappa(_kappa){
+ 
+	x.setZero();
+    	y.setZero();
+    	s.setConstant(1.0);
+    	z.setConstant(1.0);
 	tau   = 1.0;
 	kappa = 1.0;
 }
 
-lp_variables::lp_variables(const lp_variables &obj){
+lp_variables::lp_variables(const lp_variables &obj):
+	x(obj.x),y(obj.y),s(obj.s),z(obj.z),tau(obj.tau),kappa(obj.kappa){
 	#ifdef PREVENT_COPY_CONSTRUCTOR
 	OUTPUT << "WARNING: Variables copy constructor called." << "\n";
 	#endif

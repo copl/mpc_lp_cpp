@@ -30,10 +30,16 @@ public:
 //lp_variables
 class lp_variables {
 public:
-	copl_vector x, s, z, y;
-
-	double tau, kappa;
-	lp_variables(int m, int n, int k_var);
+	copl_external_vector &x;
+	copl_external_vector &s; 
+	copl_external_vector &z; 
+	copl_external_vector &y;
+	double &tau;
+	double &kappa;
+	lp_variables(copl_external_vector &_x,
+		     copl_external_vector &_y,
+		     copl_external_vector &_s,
+		     copl_external_vector &_z, double &_tau, double &_kappa);
 	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
 	~lp_variables();

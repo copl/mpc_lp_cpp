@@ -1,15 +1,29 @@
 #include <copl_algorithm.h>
-
+#include <vector>
 using namespace std;
 namespace copl_ip {
-	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){
+
+	void interior_point_algorithm_no_answer(lp_input &problem_data, lp_settings &settings)
+	{
+		std::vector<double> x(problem_data.n);
+		std::vector<double> y(problem_data.k_var);
+		std::vector<double> s(problem_data.m);
+		std::vector<double> z(problem_data.m);
+		double tau, kappa;
+		copl_external_vector cx(&x[0],problem_data.n);	
+		copl_external_vector cy(&y[0],problem_data.k_var);
+		copl_external_vector cs(&s[0],problem_data.m);
+		copl_external_vector cz(&z[0],problem_data.m);
+
+        	lp_variables variables (cx,cy,cs,cz,tau,kappa);	 
+	}
+
+	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings, lp_variables &variables){
 			OUTPUT << "start" << endl;
 			
         	problem_data.var_dump();
         		
-        	//Allocate the variables
-        	lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
-        	algorithm_state state;
+	       	algorithm_state state;
                 
 			//Create and analyze the newton matrix 
 			homogeneous_solver K_matrix(problem_data,settings);

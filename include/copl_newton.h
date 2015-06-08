@@ -42,7 +42,7 @@ class k_newton_copl_matrix {
     	Eigen::SparseLU<Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::AMDOrdering<int> >   solver;
 
         //The assembled eigen matrix 
-        copl_matrix* eigenKMat;    
+        Eigen::SparseMatrix<double>* eigenKMat;    
   
         //This function assembles the K newton matrix with identities in the diagonals
         //K = [-I A' G']

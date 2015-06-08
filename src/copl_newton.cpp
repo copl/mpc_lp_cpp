@@ -12,7 +12,7 @@ k_newton_copl_matrix::k_newton_copl_matrix(int m, int n, double regularization)
 	cout << "Testing constructor (m,n) " <<m <<","<<n <<"\n";
 	DELTA     = regularization;
 	hessianIx = new std::vector<int>(m);
-	eigenKMat = new copl_matrix(n,n);
+	eigenKMat = new Eigen::SparseMatrix<double>(n,n);
     cout << "This constructor should only be used in testing";
     cout.flush();
 }
@@ -26,7 +26,7 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_se
 
 	//Now find the indices of the hessian
 	hessianIx = new std::vector<int>(m);
-	eigenKMat = new copl_matrix(n+m+k,n+m+k);
+	eigenKMat = new Eigen::SparseMatrix<double>(n+m+k,n+m+k);
 	
     //Assemble 	
 	assemble_matrix(A, G);
