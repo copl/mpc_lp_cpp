@@ -5,6 +5,10 @@ namespace copl_ip {
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings){
 			OUTPUT << "start" << endl;
 			
+			lp_timer interior_point_timer;
+
+			interior_point_timer.start();
+
         	problem_data.var_dump();
         		
         	//Allocate the variables
@@ -28,7 +32,11 @@ namespace copl_ip {
 		
 		// Begin iteration
 		print_status(state, direction, variables, residuals, 0);
+
+		lp_timer iteration_timer;
 		for (int itr = 1; itr <= settings.max_iter; itr++){
+			OUTPUT << "Beginning Iteration " << itr << endl;
+			iteration_timer.start();
 			//Update the linear system with the present value
 			K_matrix.update(variables);
 
@@ -70,10 +78,14 @@ namespace copl_ip {
 	    	        // compute the gap after the step
 			state.update_mu(variables,problem_data);
 			state.update_gap(variables,problem_data);
-			
+			iteration_timer.end();
 			print_status(state, direction, variables, residuals, itr);
+			OUTPUT << "Iteration " << itr << " elapsed time: " << iteration_timer.get_total_time() << " seconds" << endl;
+			OUTPUT << "------------------------------" << endl;
 		}
+		interior_point_timer.end();
 		OUTPUT << "IP algorithm finished" << endl;
+		OUTPUT << "Total time elapsed: " << interior_point_timer.get_total_time() << " seconds" << endl;
 	}
 
 	bool termination_criteria_met(lp_settings &settings, algorithm_state &state, lp_residuals &residuals){
@@ -98,7 +110,7 @@ namespace copl_ip {
 	}
 	
 	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr) {
-		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " sigma: " << state.sigma << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.n1<<","<<residuals.n2<<","<<residuals.n3 << ","<<residuals.n4 << endl;
+		cout << "it:" << itr << " gap:" << state.gap << " mu:" << state.mu << " sigma:" << state.sigma << " alpha:" << direction.alpha << " tau:" << variables.tau << " residuals:" << residuals.n1<<","<<residuals.n2<<","<<residuals.n3 << ","<<residuals.n4 << endl;
 		//@printf("%3i\t%3.3e\t%3.3e\t%3.3e\t%3.3e\t%3.3e\n", itr, state.gap ,state.mu, direction.alpha, variables.tau, residuals.normed_squared)
 	}
 }

@@ -10,6 +10,18 @@
 
 namespace copl_ip{
 
+class lp_timer {
+	clock_t lp_start;
+	clock_t lp_end;
+public:
+
+	double get_total_time();
+	void start();
+	void end();
+	lp_timer();
+
+};
+
 // preliminary definitions //
 class lp_direction;
 class k_newton_copl_matrix;
@@ -23,7 +35,7 @@ public:
 
 public:
 	lp_input(copl_matrix &_A, copl_vector & _b, copl_vector  &c, copl_matrix &G, copl_vector &h);	
-	void var_dump()  ;
+	void var_dump();
 };
 //--------End lp_input--------
 

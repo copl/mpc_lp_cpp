@@ -8,6 +8,20 @@ using namespace std;
 namespace copl_ip {
 
 ofstream LOG_FILE_VARIABLE;
+lp_timer::lp_timer(){
+	OUTPUT << 'Timer created' << endl;
+}
+void lp_timer::start(){
+	lp_start = clock();
+}
+
+void lp_timer::end(){
+	lp_end = clock();
+
+}
+double lp_timer::get_total_time(){
+	return (double)(lp_end-lp_start)/CLOCKS_PER_SEC; //calculates the elapsed CPU runtime from system specific variable CLOCKS_PER_SEC
+}
 
 lp_input::lp_input(copl_matrix &_A, 
 				   copl_vector &_b,
@@ -179,10 +193,10 @@ void lp_residuals::compute_residuals( lp_input &problem_data, lp_variables &vari
 
 void lp_residuals::var_dump() {
 	OUTPUT << "DUMP RESIDUALS OBJECT" << endl;
-	OUTPUT << "r1:" << r1 << endl;
-	OUTPUT << "r2:" << r2 << endl;
-	OUTPUT << "r3:" << r3 << endl;
-	OUTPUT << "r4:" << r4 << endl;
+	OUTPUT << "r1:\n" << r1 << "\n" << endl;
+	OUTPUT << "r2:\n" << r2 << "\n" << endl;
+	OUTPUT << "r3:\n" << r3 << "\n" << endl;
+	OUTPUT << "r4:\n" << r4 << "\n" << endl;
 }
 
 ////--------End lp_residuals--------
@@ -286,10 +300,10 @@ void linear_system_rhs::compute_combined_rhs(lp_residuals &residuals,
 
 void linear_system_rhs::var_dump() {
 	OUTPUT << "DUMP RHS OBJECT" << endl;
-	OUTPUT << "q123" << q123 << endl;
-	OUTPUT << "q4"   << q4 << endl;
-	OUTPUT << "q5"   << q5 << endl;
-	OUTPUT << "q6" << q6 << endl;
+	OUTPUT << "q123:\n" << q123 << "\n" << endl;
+	OUTPUT << "q4:\n"   << q4 << "\n" << endl;
+	OUTPUT << "q5:\n"   << q5 << "\n" << endl;
+	OUTPUT << "q6:\n" << q6 << "\n" << endl;
 }
 
 //Utility functions
