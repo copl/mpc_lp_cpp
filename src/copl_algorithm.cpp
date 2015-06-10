@@ -15,7 +15,8 @@ namespace copl_ip {
 		copl_external_vector cs(&s[0],problem_data.m);
 		copl_external_vector cz(&z[0],problem_data.m);
 
-        	lp_variables variables (cx,cy,cs,cz,tau,kappa);	 
+        	lp_variables variables (cx,cy,cs,cz,tau,kappa);	
+ 		interior_point_algorithm(problem_data,settings,variables);
 	}
 
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings, lp_variables &variables){

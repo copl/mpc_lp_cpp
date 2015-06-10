@@ -10,10 +10,10 @@ namespace copl_ip {
 ofstream LOG_FILE_VARIABLE;
 
 lp_input::lp_input(copl_matrix &_A, 
-				   copl_vector &_b,
-				   copl_vector &_c,
-				   copl_matrix &_G,
-				   copl_vector &_h):A(_A),G(_G),c(_c),b(_b),h(_h) {
+		   copl_external_vector &_b,
+		   copl_external_vector &_c,
+		   copl_matrix &_G,
+		   copl_external_vector &_h):A(_A),G(_G),c(_c),b(_b),h(_h) {
   k_var = A.rows();
   m = G.rows();
   n = G.cols();

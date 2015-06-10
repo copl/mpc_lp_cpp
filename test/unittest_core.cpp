@@ -21,6 +21,7 @@ TEST(CORE,lp_vars_constructor)
     int n = 3;
     int k = 5;
     lp_variables vars(m,n,k);
+    
     //Copy to stl to use gmock 
     std::vector<double> x(n),y(k),z(m),s(m);
     
@@ -99,6 +100,7 @@ TEST(CORE,test_stepsize_andstep)
     int m = 10;
     int n = 3;
     int k = 5;
+    
     lp_variables vars(m,n,k);
     lp_direction dir(vars); 
     

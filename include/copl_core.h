@@ -19,10 +19,10 @@ class lp_input {
 public:
 	int m, n, k_var;
 	copl_matrix &A, &G;
-	copl_vector &c, &h, &b;
+	copl_external_vector &c, &h, &b;
 
 public:
-	lp_input(copl_matrix &_A, copl_vector & _b, copl_vector  &c, copl_matrix &G, copl_vector &h);	
+	lp_input(copl_matrix &_A, copl_external_vector & _b, copl_external_vector  &c, copl_matrix &G, copl_external_vector &h);	
 	void var_dump()  ;
 };
 //--------End lp_input--------

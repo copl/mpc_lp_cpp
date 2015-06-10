@@ -87,7 +87,7 @@ class k_newton_copl_matrix {
 class homogeneous_solver : protected k_newton_copl_matrix {
     
     protected:
-        copl_vector &_c, &_h, &_b;
+        copl_external_vector &_c, &_h, &_b;
         copl_vector rhs_1;
         copl_vector sol_1;
         copl_vector sol_2;

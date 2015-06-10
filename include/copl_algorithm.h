@@ -12,6 +12,8 @@ namespace copl_ip{
 
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings, lp_variables &variables);
 
+	void interior_point_algorithm_no_answer(lp_input &problem_data, lp_settings &settings);
+
 	void print_status(algorithm_state &state, lp_direction &direction, lp_variables &variables, lp_residuals &residuals, int itr);
 
 }
