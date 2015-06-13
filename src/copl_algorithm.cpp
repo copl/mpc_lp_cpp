@@ -9,7 +9,7 @@ namespace copl_ip {
 
 			interior_point_timer.start();
 
-        	problem_data.var_dump();
+        	//problem_data.var_dump();
         		
         	//Allocate the variables
         	lp_variables variables (problem_data.m,problem_data.n,problem_data.k_var);	
@@ -44,7 +44,7 @@ namespace copl_ip {
 			residuals.compute_residuals(problem_data, variables);
 
 			//Debug call
-            		residuals.var_dump();
+            		//residuals.var_dump();
 			
 			if (termination_criteria_met(settings, state, residuals)){
 				break;
@@ -52,7 +52,7 @@ namespace copl_ip {
 			
 			// compute affine rhs
 			rhs.compute_affine_rhs(residuals, variables);
-			rhs.var_dump();
+			//rhs.var_dump();
 
 			//Solve the system and compute the affine direction	
 			K_matrix.solve(direction,rhs,variables);
