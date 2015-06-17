@@ -22,7 +22,7 @@ public:
 	copl_external_vector &c, &h, &b;
 
 public:
-	lp_input(copl_matrix &_A, copl_external_vector & _b, copl_external_vector  &c, copl_matrix &G, copl_external_vector &h);	
+	lp_input(copl_matrix &_A, copl_external_vector & _b, copl_external_vector  &_c, copl_matrix &_G, copl_external_vector &_h);	
 	void var_dump()  ;
 };
 //--------End lp_input--------

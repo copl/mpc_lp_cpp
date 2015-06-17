@@ -5,6 +5,7 @@
 #include <copl_newton.h>
 #include <copl_core.h>
 #include <math.h>
+#include "macros.h"
 
 namespace copl_ip{
 using namespace testing;
@@ -14,27 +15,30 @@ TEST(Core,input)
 //
 }
 
-//Test the vars constructor
-TEST(CORE,lp_vars_constructor)
+TEST(CORE,macros)
 {
-    int m = 10;
-    int n = 3;
-    int k = 5;
-    lp_variables vars(m,n,k);
-    
-    //Copy to stl to use gmock 
-    std::vector<double> x(n),y(k),z(m),s(m);
-    
-    std::copy(&vars.x[0],&vars.x[0]+n,x.begin());
-    std::copy(&vars.y[0],&vars.y[0]+k,y.begin());
-    std::copy(&vars.s[0],&vars.s[0]+m,s.begin());
-    std::copy(&vars.z[0],&vars.z[0]+m,z.begin());
-    
-    //Check that the entries are correct
-    ASSERT_THAT(x,Each(0.0));
-    ASSERT_THAT(y,Each(0.0));
-    ASSERT_THAT(s,Each(1.0));
-    ASSERT_THAT(z,Each(1.0));
+    VARS(3,4,2);   
+
+    //Set the variables to some state
+    vars.x << 0.5,0.6,0.7,0.8;
+    vars.y << 0.9,1.1;
+    vars.s << 0.5,0.6,0.9;
+    vars.z << 0.5,1.e-3,1.7;
+    vars.tau = 0.4;
+    vars.kappa = 1.e-4;
+    ASSERT_EQ(vars.x[0],0.5);
+    ASSERT_EQ(vars.x[1],0.6);
+    ASSERT_EQ(vars.x[2],0.7);
+    ASSERT_EQ(vars.x[3],0.8);
+    ASSERT_EQ(vars.y[0],0.9);
+    ASSERT_EQ(vars.y[1],1.1);
+    ASSERT_EQ(vars.s[0],0.5);
+    ASSERT_EQ(vars.s[1],0.6);
+    ASSERT_EQ(vars.s[2],0.9);
+    ASSERT_EQ(vars.z[0],0.5);
+    ASSERT_EQ(vars.z[1],1.e-3);
+    ASSERT_EQ(vars.z[2],1.7);
+
 }
 
 //Test the direction constructor
@@ -43,7 +47,8 @@ TEST(CORE,dir_constructor)
     int m = 10;
     int n = 3;
     int k = 5;
-    lp_variables vars(m,n,k);
+    std::vector<double> r(2);
+    VARS(m,n,k); //Call the vars macro
     lp_direction dir(vars);
     //Check that the initialized vectors are the same length
     ASSERT_EQ(dir.dx.size(),n);
@@ -58,7 +63,7 @@ TEST(CORE,test_step)
     int m = 10;
     int n = 3;
     int k = 5;
-    lp_variables vars(m,n,k);
+    VARS(m,n,k);
     lp_direction dir(vars); 
     
     vars.x.setConstant(1.0);
@@ -101,7 +106,7 @@ TEST(CORE,test_stepsize_andstep)
     int n = 3;
     int k = 5;
     
-    lp_variables vars(m,n,k);
+    VARS(m,n,k);
     lp_direction dir(vars); 
     
     vars.x.setConstant(1.0);
@@ -157,8 +162,8 @@ TEST(CORE,residuals_constructor)
     //    x x x x
     // 
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -177,8 +182,7 @@ TEST(CORE,residuals_constructor)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
     
-        
-    lp_input lp_problem(A,b,c,G,h);
+    PROB(A,b,c,G,h)  
     lp_residuals res(lp_problem);
 
     ASSERT_EQ(res.r1.size(),n);
@@ -206,9 +210,8 @@ TEST(CORE,residuals)
     //    0 0 x 0
     //    x x x x
     // 
-
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -225,11 +228,11 @@ TEST(CORE,residuals)
     G.insert(2,0) = 8.0;
     G.insert(2,1) = 9.0;
     G.insert(2,2) = 10.0;
-    G.insert(2,3) = 11.0;
-    
+    G.insert(2,3) = 11.0;    
         
-    lp_input lp_problem(A,b,c,G,h);
-    lp_variables vars(m,n,k);
+    PROB(A,b,c,G,h);  
+    VARS(m,n,k);   
+
     //Set the variables to some state
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;
@@ -241,6 +244,7 @@ TEST(CORE,residuals)
   
     //Call the residual calculation method 
     res.compute_residuals(lp_problem, vars);
+    
     //the residuals should be 
     copl_vector error1(n), error2(k), error3(m); 
     double error4;
@@ -250,7 +254,10 @@ TEST(CORE,residuals)
     error3 = res.r3 - (-G*vars.x - vars.s + vars.tau*h);
     error4 = res.r4 - (- c.dot(vars.x) - b.dot(vars.y) - h.dot(vars.z) - vars.kappa); 
     double err_norm = error1.norm()+error2.norm()+error3.norm()+fabs(error4);
-    ASSERT_LT(err_norm, 1.e-15);
+    EXPECT_LT(error1.norm(), 1.e-15);
+    EXPECT_LT(error2.norm(), 1.e-15);
+    EXPECT_LT(error3.norm(), 1.e-15);
+    EXPECT_LT(fabs(error4), 1.e-15);
   }
 
 
@@ -259,7 +266,7 @@ TEST(CORE,residuals)
     int m = 3;
     int n = 4;
     int k = 2;
-    lp_variables vars(m,n,k);
+    VARS(m,n,k);
     //Set the variables to some state
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;
@@ -283,8 +290,8 @@ TEST(CORE,residuals)
 TEST(CORE, affine_linear_residual_reduction)
 {
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -303,9 +310,8 @@ TEST(CORE, affine_linear_residual_reduction)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
     
-        
-    lp_input lp_problem(A,b,c,G,h);
-    lp_variables vars(3,4,2);
+    PROB(A,b,c,G,h); 
+    VARS(3,4,2);
     lp_direction direction(vars);
     lp_residuals residuals(lp_problem);
     lp_residuals new_residuals(lp_problem);
@@ -339,9 +345,8 @@ TEST(CORE, affine_linear_residual_reduction)
 //TODO: This test checks that the affine direction reduces the residuals linearly
 TEST(CORE, residual_test)
 {
-
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -361,8 +366,8 @@ TEST(CORE, residual_test)
     G.insert(2,3) = 11.0;
     
         
-    lp_input lp_problem(A,b,c,G,h);
-    lp_variables vars(3,4,2);
+    PROB(A,b,c,G,h);
+    VARS(3,4,2);
     lp_direction direction(vars);
     lp_residuals residuals(lp_problem);
     lp_residuals new_residuals(lp_problem);
@@ -397,8 +402,8 @@ TEST(CORE, residual_test)
 //TODO: This test checks that the combined direction reduces the residuals linearly
 TEST(CORE, combined_linear_residual_reduction)
 {
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -418,8 +423,8 @@ TEST(CORE, combined_linear_residual_reduction)
     G.insert(2,3) = 11.0;
     
         
-    lp_input lp_problem(A,b,c,G,h);
-    lp_variables vars(3,4,2);
+    PROB(A,b,c,G,h);
+    VARS(3,4,2);
     lp_direction direction(vars);
 
     lp_direction zero_direction(vars); 
@@ -478,8 +483,8 @@ TEST(CORE, combined_linear_residual_reduction)
 
  TEST(CORE,affine_rhs)
  {
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);	
+    Eigen::SparseMatrix<double> G(3,4);	
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -498,8 +503,8 @@ TEST(CORE, combined_linear_residual_reduction)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
      
-    lp_input lp_problem(A,b,c,G,h);
-    lp_variables vars(3,4,2);
+    PROB(A,b,c,G,h);
+    VARS(3,4,2);
     lp_direction direction(vars);
     lp_residuals residuals(lp_problem);
     lp_residuals new_residuals(lp_problem);

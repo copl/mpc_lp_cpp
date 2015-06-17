@@ -18,22 +18,25 @@ TEST_OBJ_FILES := $(addprefix testbin/,$(notdir $(TEST_CPP_FILES:.cpp=.o)))
 
 ifeq ($(UNAME_S),Linux)
     CPP = g++
-    CFLAGS = -std=c++11 -Wall -Wextra 
+    CFLAGS = -std=c++11 -Wall -Wextra -fPIC
 	EXE_NAME = _linux
+	SHARED_EXTENSION = so
 endif
 
 ifeq ($(UNAME_S),Darwin)
     CPP = clang++
-    CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -w -g
+    CFLAGS = -std=c++11 -stdlib=libc++ -Wall -Wextra -w -g -fPIC
 	EXE_NAME = _darwin
+	SHARED_EXTENSION = dylib
 endif
 
 # I use cygwin :)
 # removed -pedantic because it is crazy at the moment
 ifeq ($(UNAME_S),CYGWIN_NT-6.1)
 	CPP = g++
-	CFLAGS = -std=c++11 -Wall -Wextra -w
+	CFLAGS = -std=c++11 -Wall -Wextra -w -fPIC
 	EXE_NAME = _cygwin
+	SHARED_EXTENSION = dll
 endif
 
 all: main
@@ -68,8 +71,12 @@ testbin/%.o: test/%.cpp
 bin/%.o: src/%.cpp 	
 	$(CPP) $(CFLAGS) $(INCLUDE) $(TEST_INCLUDE) -c $< -o $@
 
+lib: $(COPL_OBJ_FILES)
+	mkdir -p ./lib
+	$(CPP)  -stdlib=libc++ -std=c++11 $(COPL_OBJ_FILES) -o ./lib/copl_sovler.$(SHARED_EXTENSION) --shared -fPIC
+
 test: $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) bin/libgmock.a
 	$(CPP) $(CFLAGS) $(TEST_OBJ_FILES) $(COPL_OBJ_FILES) bin/libgmock.a -o ./bin/unittest.exe
 
 clean:
-	rm ./bin/*; rm ./testbin/*
+	rm ./bin/*; rm ./testbin/*; rm ./lib/*

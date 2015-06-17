@@ -93,7 +93,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 		eigenKMat->insert(i,i) = DELTA;
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(A,i); it; ++it)	
 		{
 			int c,r;
 			c = it.col();
@@ -101,7 +101,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 			eigenKMat->insert(r+n,c) = it.value();
 		}
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(G,i); it; ++it)	
 		{
 			int c,r;
 			c = it.col();
@@ -110,7 +110,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 		}
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(A,i); it; ++it)	
 		{
 			int c,r;
 			r = it.col();
@@ -123,7 +123,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(G,i); it; ++it)	
 		{
 			int c,r;
 			r = it.col();
@@ -164,10 +164,10 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 		//TODO: log error
 		std::cout << "CALLED UPDATE ON UNCOMPRESSED MATRIX \n";
     	throw new std::exception();
-    }
+    	}
 
 	double* Kvals = eigenKMat->valuePtr();
-    int m = variables.s.size();
+        int m = variables.s.size();
 	for(int j = 0; j < m; j++)
 	{
 	    Kvals[ (*hessianIx)[j] ] = -variables.s[j]/variables.z[j]-DELTA;

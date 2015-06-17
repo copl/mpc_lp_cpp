@@ -18,6 +18,16 @@ namespace copl_ip {
         	lp_variables variables (cx,cy,cs,cz,tau,kappa);	
  		interior_point_algorithm(problem_data,settings,variables);
 	}
+	
+	double c_callable_interior_point_algorithm(int m, int n, int k,\
+						 int* Gp, int* Gj, double* Gv, double* h,\
+						 double* c,\
+						 int* Ap, int* Aj, double* Av, double* b,\
+						 double* x, double* y, double* s, double* z, double* tau, double* kappa,\
+						 int max_iter, double linear_feas_tol, double comp_tol){
+	return 0.0;
+
+	}
 
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings, lp_variables &variables){
 			OUTPUT << "start" << endl;

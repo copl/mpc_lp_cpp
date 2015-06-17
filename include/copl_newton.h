@@ -58,7 +58,8 @@ class k_newton_copl_matrix {
         FRIEND_TEST(KNEWTON,NonZeroPerCols);
         FRIEND_TEST(KNEWTON,nnz);
         FRIEND_TEST(KNEWTON,Constructor);
-        FRIEND_TEST(KNEWTON,Update);
+        FRIEND_TEST(KNEWTON,Update1);
+        FRIEND_TEST(KNEWTON,Update2);
         FRIEND_TEST(KNEWTON,solve);
 
     public: 
