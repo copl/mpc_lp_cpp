@@ -13,8 +13,8 @@ k_newton_copl_matrix::k_newton_copl_matrix(int m, int n, double regularization)
 	DELTA     = regularization;
 	hessianIx = new std::vector<int>(m);
 	eigenKMat = new Eigen::SparseMatrix<double>(n,n);
-    cout << "This constructor should only be used in testing";
-    cout.flush();
+        cout << "This constructor should only be used in testing";
+        cout.flush();
 }
 
 k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_settings& settings)
@@ -28,18 +28,18 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_se
 	hessianIx = new std::vector<int>(m);
 	eigenKMat = new Eigen::SparseMatrix<double>(n+m+k,n+m+k);
 	
-    //Assemble 	
+        //Assemble 	
 	assemble_matrix(A, G);
     
-    //Compress 
+        //Compress 
 	eigenKMat->makeCompressed();	
 
-    //The indices are the last nonzero per column for the cols n+p to n+p+m-1
+        //The indices are the last nonzero per column for the cols n+p to n+p+m-1
 	int* outerIx = eigenKMat->outerIndexPtr();		
 	for(int i = 0; i < m; i++ )
 		 (*hessianIx)[i] = outerIx[i+n+k+1]-1;	
     
-    solver.analyzePattern(*eigenKMat);
+        solver.analyzePattern(*eigenKMat);
 
 }
 

@@ -42,7 +42,6 @@ public:
 		     copl_external_vector &_z, double &_tau, double &_kappa);
 	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
-	~lp_variables();
 };
 //--------End lp_variables--------
 

@@ -57,10 +57,6 @@ lp_variables::lp_variables(const lp_variables &obj):
 	#endif
 }
 
-lp_variables::~lp_variables() {
-	OUTPUT << "lp variables being deleted" << endl;
-	OUTPUT << "destructor not yet complete" << endl;
-}
 
 void lp_variables::take_step(lp_direction &direction){
 	double alpha = direction.alpha;
