@@ -12,8 +12,7 @@ using namespace std;
 using namespace copl_ip;
 
 
-<<<<<<< HEAD
-void make_random_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_vector &b, copl_vector &h)
+void make_random_problem(Eigen::SparseMatrix<double> &A, Eigen::SparseMatrix<double> &G, copl_vector &c, copl_vector &b, copl_vector &h)
 {
     srand(0);
     for (int i = 0 ; i < A.rows(); i++)
@@ -37,10 +36,7 @@ void make_random_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_ve
          h[i+G.cols()] = -(h[i] - 10);
     }
 }
-void make_trivial_problem(copl_matrix &A, copl_matrix &G, copl_vector &c, copl_vector &b, copl_vector &h)
-=======
 void make_trivial_problem(Eigen::SparseMatrix<double> &A, Eigen::SparseMatrix<double> &G, copl_vector &c, copl_vector &b, copl_vector &h)
->>>>>>> external_memory
 {
 
     c  << 1,2,3,4;
@@ -97,7 +93,7 @@ void getDimensionUF(string problem_name, int* k_var, int* n)
         A_File.close();
 
 } 
-void loadFromUF(string UF_group, string problem_name, copl_matrix &A, copl_matrix &G, copl_vector &c, copl_vector &b, copl_vector &h){
+void loadFromUF(string UF_group, string problem_name, Eigen::SparseMatrix<double> &A, Eigen::SparseMatrix<double> &G, copl_vector &c, copl_vector &b, copl_vector &h){
 		
 	int n = 0;
 	int m = 0;
@@ -295,24 +291,22 @@ int main()
 	// Initialize configuration variable
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale,regularization);	
     
-<<<<<<< HEAD
     
-    string problem_name = "ex3sta1"; //"lp_scfxm3"; //"lp_afiro";
-    int k_var,n;
-    getDimensionUF(problem_name, &k_var, &n);
+    //string problem_name = "ex3sta1"; //"lp_scfxm3"; //"lp_afiro";
+    //int k_var,n;
+    //getDimensionUF(problem_name, &k_var, &n);
     //k_var = 10;
     //n = 40;
-    OUTPUT << k_var << ":" << n << endl;
-    copl_matrix A(k_var,n);
-    copl_matrix G(2*n,n);
-    copl_vector c(n),b(k_var),h(2*n);
+    //OUTPUT << k_var << ":" << n << endl;
+    //copl_matrix A(k_var,n);
+    //copl_matrix G(2*n,n);
+    //copl_vector c(n),b(k_var),h(2*n);
     //make_trivial_problem(A,G,c,b,h);
     //make_random_problem(A,G,c,b,h);
-    loadFromUF("", "", A,G,c,b,h);
-    lp_input problem_data(A,b,c,G,h);
+    //loadFromUF("", "", A,G,c,b,h);
+    //lp_input problem_data(A,b,c,G,h);
     
      //problem_data.var_dump();
-=======
         Eigen::SparseMatrix<double> A(2,4);
         Eigen::SparseMatrix<double> G(3,4);
         
@@ -330,7 +324,6 @@ int main()
         lp_input problem_data(cA,cb,cc,cG,ch);
     
         problem_data.var_dump();
->>>>>>> external_memory
      
 	// The main function that run interior point algorithm.
 	interior_point_algorithm_no_answer(problem_data,settings);

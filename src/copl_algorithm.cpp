@@ -44,7 +44,10 @@ namespace copl_ip {
 
 
 	void interior_point_algorithm(lp_input &problem_data, lp_settings &settings, lp_variables &variables){
-		
+		// Timer for LP
+		lp_timer interior_point_timer;		
+                interior_point_timer.start();
+
 	       	algorithm_state state;
                 
 		//Create and analyze the newton matrix 
