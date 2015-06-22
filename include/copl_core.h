@@ -31,24 +31,29 @@ class lp_input {
 public:
 	int m, n, k_var;
 	copl_matrix &A, &G;
-	copl_vector &c, &h, &b;
+	copl_external_vector &c, &h, &b;
 
 public:
-	lp_input(copl_matrix &_A, copl_vector & _b, copl_vector  &c, copl_matrix &G, copl_vector &h);	
-	void var_dump();
+	lp_input(copl_matrix &_A, copl_external_vector & _b, copl_external_vector  &_c, copl_matrix &_G, copl_external_vector &_h);	
+	void var_dump()  ;
 };
 //--------End lp_input--------
 
 //lp_variables
 class lp_variables {
 public:
-	copl_vector x, s, z, y;
-
-	double tau, kappa;
-	lp_variables(int m, int n, int k_var);
+	copl_external_vector &x;
+	copl_external_vector &s; 
+	copl_external_vector &z; 
+	copl_external_vector &y;
+	double &tau;
+	double &kappa;
+	lp_variables(copl_external_vector &_x,
+		     copl_external_vector &_y,
+		     copl_external_vector &_s,
+		     copl_external_vector &_z, double &_tau, double &_kappa);
 	lp_variables(const lp_variables &obj);
 	void take_step(lp_direction &direction);
-	~lp_variables();
 };
 //--------End lp_variables--------
 

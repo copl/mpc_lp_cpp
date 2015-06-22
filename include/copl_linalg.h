@@ -18,8 +18,11 @@ using namespace std;
 namespace copl_ip 
 {
 
-typedef Eigen::SparseMatrix<double> copl_matrix;
+typedef Eigen::MappedSparseMatrix<double> copl_matrix;
+typedef Eigen::Map<Eigen::VectorXd> copl_external_vector;
 typedef Eigen::VectorXd copl_vector;
+
+//Macro to allocate lp variables
 
 }
 #endif

@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"
 #include "copl_linalg.h"
 #include "copl_newton.h"
+#include "macros.h"
 #include <vector>
 
 //We need this for the gmock predicates like Each
@@ -22,8 +23,8 @@ TEST(KNEWTON,Assemble)
     //    x x x x
     // 
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -37,13 +38,16 @@ TEST(KNEWTON,Assemble)
     G.insert(2,1) = 9.0;
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
-	
+
+    MATS(A,G);	
+
     //Assemble a matrix K
     k_newton_copl_matrix k_mat(4,9,1.E-7); 
-    k_mat.m = G.rows();
-    k_mat.n = G.cols();
-    k_mat.k = A.rows();
-    k_mat.assemble_matrix(A,G);
+    k_mat.m = cG.rows();
+    k_mat.n = cG.cols();
+    k_mat.k = cA.rows();
+	
+    k_mat.assemble_matrix(cA,cG);
     //The new matrix must have 10 + 2*(nnz(A)+nnz(G)
     ASSERT_EQ(k_mat.nnz(),9+2*A.nonZeros()+2*G.nonZeros());
     //Test the nonzero pattern the columns should have 
@@ -53,7 +57,7 @@ TEST(KNEWTON,Assemble)
 TEST(KNEWTON,NonZeroPerCols)
 {
 
-    //Make a copl_matrix A and G
+    //Make a Eigen::SparseMatrix<double> A and G
     //With patter 
     //    x x 0 0
     //A = x 0 x x
@@ -63,8 +67,8 @@ TEST(KNEWTON,NonZeroPerCols)
     //    x x x x
     // 
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -76,15 +80,15 @@ TEST(KNEWTON,NonZeroPerCols)
     G.insert(2,0) = 8.0;
     G.insert(2,1) = 9.0;
     G.insert(2,2) = 10.0;
-    G.insert(2,3) = 11.0;
-	
+    G.insert(2,3) = 11.0;  
+    MATS(A,G);	
     //Assemble a matrix K
     k_newton_copl_matrix k_mat(4,9,1.e-7); 
-    k_mat.m = G.rows();
-    k_mat.n = G.cols();
-    k_mat.k = A.rows();
+    k_mat.m = cG.rows();
+    k_mat.n = cG.cols();
+    k_mat.k = cA.rows();
 
-    k_mat.assemble_matrix(A,G);
+    k_mat.assemble_matrix(cA,cG);
 
     //Test the nonzero pattern the columns should have 
     //4344 34 225
@@ -103,7 +107,7 @@ TEST(KNEWTON,NonZeroPerCols)
 
 TEST(KNEWTON,nnz){
 
-    //Make a copl_matrix A and G
+    //Make a Eigen::SparseMatrix<double> A and G
     //With patter 
     //    x x 0 0
     //A = x 0 x x
@@ -113,8 +117,8 @@ TEST(KNEWTON,nnz){
     //    x x x x
     // 
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -127,21 +131,21 @@ TEST(KNEWTON,nnz){
     G.insert(2,1) = 9.0;
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
-	 
+    MATS(A,G); 
     //Assemble a matrix K
     k_newton_copl_matrix k_mat(4,9,1.e-7); 
-    k_mat.m = G.rows();
-    k_mat.n = G.cols();
-    k_mat.k = A.rows();
+    k_mat.m = cG.rows();
+    k_mat.n = cG.cols();
+    k_mat.k = cA.rows();
     
-    k_mat.assemble_matrix(A,G);
+    k_mat.assemble_matrix(cA,cG);
     ASSERT_EQ(k_mat.nnz(),22+2+3+4);
 }
 
 //Test the public constructor
 TEST(KNEWTON,Constructor)
 {
-    //Make a copl_matrix A and G
+    //Make a Eigen::SparseMatrix<double> A and G
     //With patter 
     //    x x 0 0
     //A = x 0 x x
@@ -151,8 +155,8 @@ TEST(KNEWTON,Constructor)
     //    x x x x
     // 
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -166,11 +170,11 @@ TEST(KNEWTON,Constructor)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
 	
-	
+    MATS(A,G)	
     copl_vector c,b,h;
     lp_settings settings(1,1,1,1,1.e-7);
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G,settings); 
+    k_newton_copl_matrix k_mat(cA,cG,settings); 
    
     //Just make sure it does not crash when constructing
     EXPECT_EQ( (*k_mat.hessianIx)[0], 23);
@@ -178,10 +182,10 @@ TEST(KNEWTON,Constructor)
     ASSERT_EQ( (*k_mat.hessianIx)[2], 30);
 }
 
-//Test the update routine
-TEST(KNEWTON,Update)
+//Test the update routine and check that the entries are properly updated
+TEST(KNEWTON,Update1)
 {
-    //Make a copl_matrix A and G
+    //Make a Eigen::SparseMatrix<double> A and G
     //With patter 
     //    x x 0 0
     //A = x 0 x x
@@ -190,8 +194,8 @@ TEST(KNEWTON,Update)
     //    0 0 x 0
     //    x x x x
     // 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -204,17 +208,78 @@ TEST(KNEWTON,Update)
     G.insert(2,1) = 9.0;
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
-	 	
-    copl_vector c,b,h;
     
+    MATS(A,G)	    
     lp_settings settings(1,1,1,1,1.e-7);
+    
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G,settings); 
+    k_newton_copl_matrix k_mat(cA,cG,settings); 
     int m = 3;
     int n = 4;
     int k = 2;
     
-    lp_variables vars(m,n,k);
+    VARS(m,n,k);
+    
+    for(int j = 0; j < m ;j++) {
+        vars.s[j] = 3.0;
+        vars.z[j] = 2.0;
+    }
+    
+    k_mat.update(vars);
+    
+    //After the update the matrix should be 
+    //[dI A' G'   ] 
+    //[A dI       ]
+    //[G    -s/z-d]
+    copl_vector w(m);
+    for(int j = 0; j < m; j++)
+        w[j] = -vars.s[j]/vars.z[j]-1.e-7;
+
+    double* vals = k_mat.eigenKMat->valuePtr();
+    int* hessianIx = &k_mat.hessianIx->operator[](0); 
+    EXPECT_LT(fabs(vals[hessianIx[0]]-w[0]),1.e-15);
+    EXPECT_LT(fabs(vals[hessianIx[1]]-w[1]),1.e-15);
+    EXPECT_LT(fabs(vals[hessianIx[2]]-w[2]),1.e-15);
+}
+
+
+//Test the update routine
+TEST(KNEWTON,Update2)
+{
+    //Make a Eigen::SparseMatrix<double> A and G
+    //With patter 
+    //    x x 0 0
+    //A = x 0 x x
+    //
+    //G = 0 0 0 x
+    //    0 0 x 0
+    //    x x x x
+    // 
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
+    A.insert(0,0) = 1.0;
+    A.insert(0,1) = 2.0;
+    A.insert(1,0) = 3.0;
+    A.insert(1,2) = 4.0;    
+    A.insert(1,3) = 5.0;
+    
+    G.insert(0,3) = 6.0;    
+    G.insert(1,2) = 7.0;
+    G.insert(2,0) = 8.0;
+    G.insert(2,1) = 9.0;
+    G.insert(2,2) = 10.0;
+    G.insert(2,3) = 11.0;
+    
+    MATS(A,G)	    
+    lp_settings settings(1,1,1,1,1.e-7);
+    
+    //Assemble a matrix K
+    k_newton_copl_matrix k_mat(cA,cG,settings); 
+    int m = 3;
+    int n = 4;
+    int k = 2;
+    
+    VARS(m,n,k);
     
     for(int j = 0; j < m ;j++) {
         vars.s[j] = 3.0;
@@ -238,25 +303,26 @@ TEST(KNEWTON,Update)
     for(int j = 0; j < m; j++)
         w[j] = vars.s[j]/vars.z[j]*x[j+n+k];
 
-    copl_matrix K = *(k_mat.eigenKMat);
+    Eigen::SparseMatrix<double> K = *(k_mat.eigenKMat);
     y = K*x;
 
-    y.segment(0,n)   = y.segment(0,n) - k_mat.DELTA*x.segment(0,n)
-                      - A.transpose()*x.segment(n,k) 
+    y.segment(0,n)   = y.segment(0,n) - k_mat.DELTA*x.segment(0,n)\
+                      - A.transpose()*x.segment(n,k) \
                       - G.transpose()*x.segment(n+k,m);
     y.segment(n,k)   = y.segment(n,k) - A*x.segment(0,n) \
                        + k_mat.DELTA*x.segment(n,k);
     y.segment(n+k,m) = y.segment(n+k,m) - G*x.segment(0,n)\
                        + k_mat.DELTA*x.segment(n+k,m) + w; 
-    
-    cout << "Residual norm: " << y.norm() << "\n";
-    ASSERT_LT(y.norm(),1.e-14);
+
+    EXPECT_LT(y.segment(0,n).norm(),1.e-14);
+    EXPECT_LT(y.segment(n,k).norm(),1.e-14);
+    EXPECT_LT(y.segment(n+k,m).norm(),1.e-14);
 
 }
 
 TEST(KNEWTON,solve)
 {
-    //Make a copl_matrix A and G
+    //Make a Eigen::SparseMatrix<double> A and G
     //With patter 
     //    x x 0 0
     //A = x 0 x x
@@ -265,8 +331,8 @@ TEST(KNEWTON,solve)
     //    0 0 x 0
     //    x x x x
     // 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -279,17 +345,17 @@ TEST(KNEWTON,solve)
     G.insert(2,1) = 9.0;
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
-	
+    MATS(A,G)	
     copl_vector c,b,h;
     
     lp_settings settings(1,1,1,1,1e-7);
     //Assemble a matrix K
-    k_newton_copl_matrix k_mat(A,G,settings); 
+    k_newton_copl_matrix k_mat(cA,cG,settings); 
     int m = 3;
     int n = 4;
     int k = 2;
     
-    lp_variables vars(m,n,k);
+    VARS(m,n,k);
     
     for(int j = 0; j < m ;j++) {
         vars.s[j] = 3.0;
@@ -313,7 +379,7 @@ TEST(KNEWTON,solve)
     for(int j = 0; j < m; j++)
         w[j] = vars.s[j]/vars.z[j]*x[j+n+k];
 
-    copl_matrix K = *(k_mat.eigenKMat);
+    Eigen::SparseMatrix<double> K = *(k_mat.eigenKMat);
     
     k_mat.solve(y,x);
     //y <- K\x
@@ -327,7 +393,7 @@ TEST(KNEWTON,solve)
 
 TEST(KNEWTON,solveException)
 {
-    //Make a copl_matrix A and G
+    //Make a Eigen::SparseMatrix<double> A and G
     //With patter 
     //    x x 0 0
     //A = x 0 x x
@@ -336,8 +402,8 @@ TEST(KNEWTON,solveException)
     //    0 0 x 0
     //    x x x x
     // 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     A.insert(0,0) = 1.0;
     A.insert(0,1) = 2.0;
     A.insert(1,0) = 3.0;
@@ -352,10 +418,10 @@ TEST(KNEWTON,solveException)
     G.insert(2,3) = 11.0;
 	
     copl_vector c,b,h;
-    
+    MATS(A,G)
     //Assemble a matrix K
     lp_settings settings(1,1,1,1,1.e-7);
-    k_newton_copl_matrix k_mat(A,G,settings); 
+    k_newton_copl_matrix k_mat(cA,cG,settings); 
     copl_vector x(9);
     copl_vector y(9);
     ASSERT_ANY_THROW(k_mat.solve(y,x));
@@ -370,8 +436,8 @@ TEST(KNEWTON,reduce_rhs_test)
 //[-c' -b' -h' k/t]dt  r4 + r6
 
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -390,7 +456,7 @@ TEST(KNEWTON,reduce_rhs_test)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
             
-    lp_input lp_problem(A,b,c,G,h);
+    PROB(A,b,c,G,h);
     //Form the rhs 
     linear_system_rhs rhs(lp_problem);
     //Fill the rhs with stuff
@@ -399,7 +465,7 @@ TEST(KNEWTON,reduce_rhs_test)
     rhs.q5.setConstant(10.0);
     rhs.q6 = 10.0;
 
-    lp_variables vars(3,4,2);
+    VARS(3,4,2);
     //Set the variables to some state
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;
@@ -435,8 +501,8 @@ TEST(KNEWTON,reduce_rhs_test)
 TEST(KNEWTON,back_substitute_test)
 {
 
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -455,14 +521,14 @@ TEST(KNEWTON,back_substitute_test)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
 
-    lp_variables vars(3,4,2);
+    VARS(3,4,2);
     vars.s << 1.0,1.0,1.0;
     vars.z << 0.5,0.5,0.5;
     vars.tau = 0.5;
     vars.kappa = 1.0;
     
     //Input
-    lp_input lp_problem(A,b,c,G,h);
+    PROB(A,b,c,G,h);
 
     //Form the rhs 
     linear_system_rhs rhs(lp_problem); 
@@ -498,8 +564,8 @@ TEST(KNEWTON,back_substitute_test)
 TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs)
 {
     //Populate A,G,c,b,h
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -516,7 +582,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
     
-    lp_input lp_problem(A,b,c,G,h);
+    PROB(A,b,c,G,h);
     linear_system_rhs rhs(lp_problem);
 
     //Fill the rhs with stuff
@@ -525,7 +591,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs)
     rhs.q5.setConstant(10.0);
     rhs.q6 = 10.0;
 
-    lp_variables vars(3,4,2);
+    VARS(3,4,2);
     //Set the variables to some state
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;
@@ -563,8 +629,8 @@ TEST(HOMOGENEOUS_SOLVER,solve_fixed_rhs)
 TEST(HOMOGENEOUS_SOLVER,solve_reduced)
 {
     //Populate A,G,c,b,h
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -581,7 +647,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
     
-    lp_input lp_problem(A,b,c,G,h);
+    PROB(A,b,c,G,h);
     linear_system_rhs rhs(lp_problem);
 
     //Fill the rhs with stuff
@@ -590,7 +656,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_reduced)
     rhs.q5.setConstant(10.0);
     rhs.q6 = 10.0;
 
-    lp_variables vars(3,4,2);
+    VARS(3,4,2);
     //Set the variables to some state
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;
@@ -644,8 +710,8 @@ TEST(HOMOGENEOUS_SOLVER,solve_full)
  *  kappa/tau dt + dk        q6
 */
     //Populate A,G,c,b,h
-    copl_matrix A(2,4);
-    copl_matrix G(3,4);
+    Eigen::SparseMatrix<double> A(2,4);
+    Eigen::SparseMatrix<double> G(3,4);
     copl_vector c(4),b(2),h(3);
     c  << 1,2,3,4;
     b  << 5,6;
@@ -662,7 +728,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_full)
     G.insert(2,2) = 10.0;
     G.insert(2,3) = 11.0;
     
-    lp_input lp_problem(A,b,c,G,h);
+    PROB(A,b,c,G,h);
     linear_system_rhs rhs(lp_problem);
     linear_system_rhs rhs_copy(lp_problem);
 
@@ -678,7 +744,7 @@ TEST(HOMOGENEOUS_SOLVER,solve_full)
     rhs_copy.q5.setConstant(10.0);
     rhs_copy.q6 = 10.0;
 
-    lp_variables vars(3,4,2);
+    VARS(3,4,2);
     //Set the variables to some state
     vars.x << 0.5,0.6,0.7,0.8;
     vars.y << 0.9,1.1;

@@ -42,7 +42,7 @@ class k_newton_copl_matrix {
     	Eigen::SparseLU<Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::AMDOrdering<int> >   solver;
 
         //The assembled eigen matrix 
-        copl_matrix* eigenKMat;    
+        Eigen::SparseMatrix<double>* eigenKMat;    
   
         //This function assembles the K newton matrix with identities in the diagonals
         //K = [-I A' G']
@@ -58,7 +58,8 @@ class k_newton_copl_matrix {
         FRIEND_TEST(KNEWTON,NonZeroPerCols);
         FRIEND_TEST(KNEWTON,nnz);
         FRIEND_TEST(KNEWTON,Constructor);
-        FRIEND_TEST(KNEWTON,Update);
+        FRIEND_TEST(KNEWTON,Update1);
+        FRIEND_TEST(KNEWTON,Update2);
         FRIEND_TEST(KNEWTON,solve);
 
     public: 
@@ -87,7 +88,7 @@ class k_newton_copl_matrix {
 class homogeneous_solver : protected k_newton_copl_matrix {
     
     protected:
-        copl_vector &_c, &_h, &_b;
+        copl_external_vector &_c, &_h, &_b;
         copl_vector rhs_1;
         copl_vector sol_1;
         copl_vector sol_2;

@@ -12,9 +12,9 @@ k_newton_copl_matrix::k_newton_copl_matrix(int m, int n, double regularization)
 	cout << "Testing constructor (m,n) " <<m <<","<<n <<"\n";
 	DELTA     = regularization;
 	hessianIx = new std::vector<int>(m);
-	eigenKMat = new copl_matrix(n,n);
-    cout << "This constructor should only be used in testing";
-    cout.flush();
+	eigenKMat = new Eigen::SparseMatrix<double>(n,n);
+        cout << "This constructor should only be used in testing";
+        cout.flush();
 }
 
 k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_settings& settings)
@@ -26,20 +26,20 @@ k_newton_copl_matrix::k_newton_copl_matrix(copl_matrix &A, copl_matrix &G, lp_se
 
 	//Now find the indices of the hessian
 	hessianIx = new std::vector<int>(m);
-	eigenKMat = new copl_matrix(n+m+k,n+m+k);
+	eigenKMat = new Eigen::SparseMatrix<double>(n+m+k,n+m+k);
 	
-    //Assemble 	
+        //Assemble 	
 	assemble_matrix(A, G);
     
-    //Compress 
+        //Compress 
 	eigenKMat->makeCompressed();	
 
-    //The indices are the last nonzero per column for the cols n+p to n+p+m-1
+        //The indices are the last nonzero per column for the cols n+p to n+p+m-1
 	int* outerIx = eigenKMat->outerIndexPtr();		
 	for(int i = 0; i < m; i++ )
 		 (*hessianIx)[i] = outerIx[i+n+k+1]-1;	
     
-    solver.analyzePattern(*eigenKMat);
+        solver.analyzePattern(*eigenKMat);
 
 }
 
@@ -93,7 +93,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 		eigenKMat->insert(i,i) = DELTA;
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(A,i); it; ++it)	
 		{
 			int c,r;
 			c = it.col();
@@ -101,7 +101,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 			eigenKMat->insert(r+n,c) = it.value();
 		}
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(G,i); it; ++it)	
 		{
 			int c,r;
 			c = it.col();
@@ -110,7 +110,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 		}
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(A,i); it; ++it)	
 		{
 			int c,r;
 			r = it.col();
@@ -123,7 +123,7 @@ void k_newton_copl_matrix::assemble_matrix(copl_matrix &A, copl_matrix &G)
 
 
 	for(int i = 0; i < n; i++ )
-		for(Eigen::SparseMatrix<double>::InnerIterator it(G,i); it; ++it)	
+		for(copl_matrix::InnerIterator it(G,i); it; ++it)	
 		{
 			int c,r;
 			r = it.col();
@@ -164,10 +164,10 @@ void k_newton_copl_matrix::update(lp_variables &variables)
 		//TODO: log error
 		std::cout << "CALLED UPDATE ON UNCOMPRESSED MATRIX \n";
     	throw new std::exception();
-    }
+    	}
 
 	double* Kvals = eigenKMat->valuePtr();
-    int m = variables.s.size();
+        int m = variables.s.size();
 	for(int j = 0; j < m; j++)
 	{
 	    Kvals[ (*hessianIx)[j] ] = -variables.s[j]/variables.z[j]-DELTA;

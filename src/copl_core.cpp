@@ -24,10 +24,10 @@ double lp_timer::get_total_time(){
 }
 
 lp_input::lp_input(copl_matrix &_A, 
-				   copl_vector &_b,
-				   copl_vector &_c,
-				   copl_matrix &_G,
-				   copl_vector &_h):A(_A),G(_G),c(_c),b(_b),h(_h) {
+		   copl_external_vector &_b,
+		   copl_external_vector &_c,
+		   copl_matrix &_G,
+		   copl_external_vector &_h):A(_A),G(_G),c(_c),b(_b),h(_h) {
   k_var = A.rows();
   m = G.rows();
   n = G.cols();
@@ -50,26 +50,27 @@ void lp_input::var_dump()  {
 };
 
 // lp_variables
-lp_variables::lp_variables(int m, int n, int k_var) :
-	x(n), s(m), z(m), y(k_var) {  
-    x.setZero();
-    y.setZero();
-    s.setConstant(1.0);
-    z.setConstant(1.0);
+	lp_variables::lp_variables(copl_external_vector &_x,
+				     copl_external_vector &_y,
+				     copl_external_vector &_s,
+				     copl_external_vector &_z, double &_tau, double &_kappa):
+	x(_x),y(_y),s(_s),z(_z),tau(_tau),kappa(_kappa){
+ 
+	x.setZero();
+    	y.setZero();
+    	s.setConstant(1.0);
+    	z.setConstant(1.0);
 	tau   = 1.0;
 	kappa = 1.0;
 }
 
-lp_variables::lp_variables(const lp_variables &obj){
+lp_variables::lp_variables(const lp_variables &obj):
+	x(obj.x),y(obj.y),s(obj.s),z(obj.z),tau(obj.tau),kappa(obj.kappa){
 	#ifdef PREVENT_COPY_CONSTRUCTOR
 	OUTPUT << "WARNING: Variables copy constructor called." << "\n";
 	#endif
 }
 
-lp_variables::~lp_variables() {
-	OUTPUT << "lp variables being deleted" << endl;
-	OUTPUT << "destructor not yet complete" << endl;
-}
 
 void lp_variables::take_step(lp_direction &direction){
 	double alpha = direction.alpha;
