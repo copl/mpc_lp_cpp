@@ -99,7 +99,7 @@ void loadFromUF(string UF_group, string problem_name, Eigen::SparseMatrix<double
 	int m = 0;
 	int k_var = 0;
 	// Inserted an script that download file from UF repository
-        ifstream A_File("../example_problems/"+problem_name+"/"+problem_name + ".mtx");
+        ifstream A_File("./example_problems/"+problem_name+"/"+problem_name + ".mtx");
 	
   	if (!A_File) {
   		cerr << "Error Loading from UF dataset. File not found (A Matrix)" << endl;
@@ -139,7 +139,7 @@ void loadFromUF(string UF_group, string problem_name, Eigen::SparseMatrix<double
 	A_File.close();
 
 
-	ifstream b_File("../example_problems/"+problem_name+"/"+problem_name + "_b.mtx");
+	ifstream b_File("./example_problems/"+problem_name+"/"+problem_name + "_b.mtx");
 	if (!b_File) {
 			cerr << "Error Loading from UF dataset. File not found (b vector)" << endl;
 			return;
@@ -170,7 +170,7 @@ void loadFromUF(string UF_group, string problem_name, Eigen::SparseMatrix<double
 	b_File.close();
 
 
-	ifstream c_File("../example_problems/"+problem_name+"/"+problem_name + "_c.mtx");
+	ifstream c_File("./example_problems/"+problem_name+"/"+problem_name + "_c.mtx");
 	if (!c_File) {
 			cerr << "Error Loading from UF dataset. File not found (c vector)" << endl;
 			return;
@@ -207,7 +207,7 @@ void loadFromUF(string UF_group, string problem_name, Eigen::SparseMatrix<double
            G.insert(n+i, i) =  -1;
         }
 
-        ifstream hi_File("../example_problems/"+problem_name+"/"+problem_name + "_hi.mtx");
+        ifstream hi_File("./example_problems/"+problem_name+"/"+problem_name + "_hi.mtx");
         if (!hi_File) {
                         cerr << "Error Loading from UF dataset. File not found (high vector)" << endl;
                         return;
@@ -237,7 +237,7 @@ void loadFromUF(string UF_group, string problem_name, Eigen::SparseMatrix<double
         hi_File.close();
 
 
-        ifstream lo_File("../example_problems/"+problem_name+"/"+problem_name + "_lo.mtx");
+        ifstream lo_File("./example_problems/"+problem_name+"/"+problem_name + "_lo.mtx");
         if (!lo_File) {
                         cerr << "Error Loading from UF dataset. File not found (low vector)" << endl;
                         return;
@@ -291,21 +291,22 @@ int main()
 	// Initialize configuration variable
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale,regularization);	
     
-    
-    //string problem_name = "ex3sta1"; //"lp_scfxm3"; //"lp_afiro";
-    //int k_var,n;
-    //getDimensionUF(problem_name, &k_var, &n);
+ /*   
+    string problem_name ="lp_afiro" ; // "ex3sta1"; //"lp_scfxm3"; //"lp_afiro";
+    int k_var,n;
+    getDimensionUF(problem_name, &k_var, &n);
     //k_var = 10;
     //n = 40;
-    //OUTPUT << k_var << ":" << n << endl;
-    //copl_matrix A(k_var,n);
-    //copl_matrix G(2*n,n);
-    //copl_vector c(n),b(k_var),h(2*n);
+    OUTPUT << k_var << ":" << n << endl;
+    Eigen::SparseMatrix<double> A(k_var,n);
+    Eigen::SparseMatrix<double> G(2*n,n);
+    copl_vector c(n),b(k_var),h(2*n);
     //make_trivial_problem(A,G,c,b,h);
     //make_random_problem(A,G,c,b,h);
-    //loadFromUF("", "", A,G,c,b,h);
+    loadFromUF("", problem_name, A,G,c,b,h);
     //lp_input problem_data(A,b,c,G,h);
-    
+    */
+      
      //problem_data.var_dump();
         Eigen::SparseMatrix<double> A(2,4);
         Eigen::SparseMatrix<double> G(3,4);
@@ -322,9 +323,16 @@ int main()
         copl_matrix cG(G.rows(),G.cols(),G.nonZeros(),G.innerIndexPtr(),G.outerIndexPtr(),G.valuePtr());
 
         lp_input problem_data(cA,cb,cc,cG,ch);
-    
+ 
+        cout << A.rows() << "\t "<< A.cols() << "\t "<< G.rows() << "\t "<< G.cols() << "\t "<< ch.size() << endl;
+        
+        cout << "A: " << endl;      
+        cout << A << endl;
+        cout << "cA: " << endl;
+        cout << cA.block(0,0,A.rows(),A.cols()) << endl;
+ 
         problem_data.var_dump();
-     
+        cout << "done" << endl;
 	// The main function that run interior point algorithm.
 	interior_point_algorithm_no_answer(problem_data,settings);
 	
