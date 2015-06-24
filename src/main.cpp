@@ -291,8 +291,8 @@ int main()
 	// Initialize configuration variable
 	lp_settings settings(max_iter,linear_feas_tol,comp_tol,bkscale,regularization);	
     
- /*   
-    string problem_name ="lp_afiro" ; // "ex3sta1"; //"lp_scfxm3"; //"lp_afiro";
+   
+    string problem_name = "ex3sta1"; //"lp_scfxm3"; //"lp_afiro";
     int k_var,n;
     getDimensionUF(problem_name, &k_var, &n);
     //k_var = 10;
@@ -305,34 +305,28 @@ int main()
     //make_random_problem(A,G,c,b,h);
     loadFromUF("", problem_name, A,G,c,b,h);
     //lp_input problem_data(A,b,c,G,h);
-    */
+    
       
      //problem_data.var_dump();
+ /*
         Eigen::SparseMatrix<double> A(2,4);
         Eigen::SparseMatrix<double> G(3,4);
         
         copl_vector c(4),b(2),h(3);
         make_trivial_problem(A,G,c,b,h);
-        
+   */     
 	copl_external_vector cc(&c[0],c.size()); 
 	copl_external_vector cb(&b[0],b.size()); 
 	copl_external_vector ch(&h[0],h.size()); 	
 	A.makeCompressed();
 	G.makeCompressed(); 
-	copl_matrix cA(A.rows(),A.cols(),A.nonZeros(),A.innerIndexPtr(),A.outerIndexPtr(),A.valuePtr());
-        copl_matrix cG(G.rows(),G.cols(),G.nonZeros(),G.innerIndexPtr(),G.outerIndexPtr(),G.valuePtr());
+	copl_matrix cA(A.rows(),A.cols(),A.nonZeros(),A.outerIndexPtr(),A.innerIndexPtr(),A.valuePtr());
+        copl_matrix cG(G.rows(),G.cols(),G.nonZeros(),G.outerIndexPtr(),G.innerIndexPtr(),G.valuePtr());
 
         lp_input problem_data(cA,cb,cc,cG,ch);
  
-        cout << A.rows() << "\t "<< A.cols() << "\t "<< G.rows() << "\t "<< G.cols() << "\t "<< ch.size() << endl;
-        
-        cout << "A: " << endl;      
-        cout << A << endl;
-        cout << "cA: " << endl;
-        cout << cA.block(0,0,A.rows(),A.cols()) << endl;
  
-        problem_data.var_dump();
-        cout << "done" << endl;
+        //problem_data.var_dump();
 	// The main function that run interior point algorithm.
 	interior_point_algorithm_no_answer(problem_data,settings);
 	
